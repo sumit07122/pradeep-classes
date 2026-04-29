@@ -1,5 +1,5 @@
-// IMPORT FACULTY IMAGES HERE
-import pradeepSir from './assets/pradeep.jpeg';
+// IMPORT FACULTY IMAGES HERE - Using a professional placeholder for now
+const pradeepSir = "https://images.unsplash.com/photo-1544161515-4ab6ce6db874?q=80&w=2070&auto=format&fit=crop";
 
 export const CONTACTS = {
   phone1: "8126180408",
