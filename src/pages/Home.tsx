@@ -70,6 +70,10 @@ export default function Home() {
               className="relative"
             >
               <div className="aspect-[4/5] bg-slate-200 rounded-[3rem] overflow-hidden relative shadow-2xl group border-8 border-white">
+                {/* 
+                   IMAGE USAGE: FACULTY[0].image refers to the 'pradeepSir' variable 
+                   imported in src/constants.ts from src/assets/pradeep.jpeg
+                */}
                 <img 
                   src={FACULTY[0].image} 
                   alt="Pradeep Sir"
