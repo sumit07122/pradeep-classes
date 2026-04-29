@@ -5,7 +5,6 @@ import { Link } from 'react-router-dom';
 import { FACULTY } from '../constants';
 
 export default function Faculty() {
-  console.log('Faculty data:', FACULTY);
   return (
     <div className="py-24 bg-white min-h-screen relative overflow-hidden">
       <div className="max-w-7xl mx-auto px-4 md:px-8">
