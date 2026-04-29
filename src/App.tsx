@@ -245,7 +245,7 @@ export default function App() {
                 {/* Visual Placeholder for Instructor Image */}
                 <div className="aspect-[4/5] bg-slate-200 rounded-[3rem] overflow-hidden relative shadow-2xl group border-8 border-white">
                   <img 
-                    src="pradeep-sir.jpg.jpeg" 
+                    src="/pradeep-sir.jpeg" 
                     alt="Pradeep Sir"
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
                     referrerPolicy="no-referrer"
