@@ -1,4 +1,6 @@
 
+import pradipSir from '../pradip.jpg';
+
 export const CONTACTS = {
   phone1: "8126180408",
   phone2: "7017775704",
@@ -34,7 +36,7 @@ export const FACULTY = [
     experience: "15+ Years of dedicated teaching experience",
     philosophy: "I believe every student has a unique potential that needs the right direction. My focus is on strengthening basic concepts and developing an analytical mindset rather than rote learning.",
     achievements: "Mentored over 500+ students to achieve 90%+ in board exams and top ranks in school entrance tests like Navodaya and Sainik school.",
-    image: "https://images.unsplash.com/photo-1544168190-79c17527004f?q=80&w=1080&auto=format&fit=crop"
+    image: pradipSir
   },
   {
     name: "Our Elite Faculty Team",
