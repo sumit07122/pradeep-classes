@@ -2,15 +2,19 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { GraduationCap, Facebook, Instagram, Youtube, Phone, Mail, MapPin } from 'lucide-react';
 import { motion } from 'motion/react';
-import { CONTACTS } from '../constants';
+import { CONTACTS, TRANSLATIONS } from '../constants';
+import { useApp } from '../context/AppContext';
 
 export default function Footer() {
+  const { language } = useApp();
+  const t = TRANSLATIONS[language];
+
   return (
     <motion.footer 
       initial={{ opacity: 0 }}
       whileInView={{ opacity: 1 }}
       viewport={{ once: true }}
-      className="bg-slate-50 border-t border-slate-200 py-16 px-4 md:px-8 mt-auto"
+      className="bg-slate-50 border-t border-slate-200 py-16 px-4 md:px-8 mt-auto transition-colors duration-300"
     >
       <div className="max-w-7xl mx-auto">
         <div className="grid md:grid-cols-4 gap-12 border-b border-slate-200 pb-12">
@@ -34,7 +38,7 @@ export default function Footer() {
           <div className="space-y-4">
             <h3 className="font-bold text-brand-primary uppercase tracking-wider text-sm">Quick Links</h3>
             <ul className="space-y-2">
-              {['Home', 'Courses', 'Results', 'Faculty', 'Contact'].map((item) => (
+              {['Home', 'Courses', 'Results', 'Faculty', 'Resources', 'Contact'].map((item) => (
                 <li key={item}>
                   <Link to={item === 'Home' ? '/' : `/${item.toLowerCase()}`} className="text-slate-500 hover:text-brand-primary text-sm transition-colors flex items-center gap-2">
                     <span className="w-1.5 h-1.5 rounded-full bg-brand-secondary/30"></span>
@@ -54,7 +58,7 @@ export default function Footer() {
               </li>
               <li className="flex items-center gap-2 text-sm text-slate-500">
                 <Phone size={18} className="text-brand-accent shrink-0" />
-                <span>{CONTACTS.phone1}, {CONTACTS.phone2}</span>
+                <span>{CONTACTS.phone1}</span>
               </li>
               <li className="flex items-center gap-2 text-sm text-slate-500 text-xs">
                 <Mail size={18} className="text-brand-accent shrink-0" />

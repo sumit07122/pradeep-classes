@@ -1,5 +1,4 @@
-// IMPORT FACULTY IMAGES HERE - Using a professional placeholder for now
-const pradeepSir = "https://images.unsplash.com/photo-1544161515-4ab6ce6db874?q=80&w=2070&auto=format&fit=crop";
+import pradeepSir from './assets/pradeep.jpeg';
 
 export const CONTACTS = {
   phone1: "8126180408",
@@ -7,9 +6,10 @@ export const CONTACTS = {
   email: "pradeepclasses@gmail.com",
   socials: {
     facebook: "https://facebook.com/pradeepclassesmathura",
-    instagram: "https://instagram.com/pradeep_classes",
-    youtube: "https://youtube.com/@pradeepclasses",
+    instagram: "https://www.instagram.com/pradeepclasses07",
+    youtube: "https://www.youtube.com/@PradeepClasses07",
   },
+  googleReviews: "https://share.google/KDMh4z709Yvc3OMt4",
   branches: [
     {
       name: "Main Branch",
@@ -18,10 +18,10 @@ export const CONTACTS = {
       coords: { lat: 27.5020, lng: 77.6430 }
     },
     {
-      name: "Head Office",
+      name: "Pradeep Classes Academy",
       address: "Narsi Vihar, Transport Nagar, Sonkh Road, Mathura (U.P.)",
       landmark: "Narsi Vihar Colony",
-      coords: { lat: 27.4760, lng: 77.6680 }
+      coords: { lat: 27.4868951, lng: 77.6496309 }
     }
   ]
 };
@@ -93,15 +93,17 @@ export const TOPPERS_BY_YEAR = {
     { name: "Rishav", school: "Sainik School" }
   ],
   "2023": [
-    { name: "Krishna Sirohi", year: "2023" },
-    { name: "Devendra Pandey", year: "2023" },
-    { name: "Piyush Chaudhary", year: "2023" },
-    { name: "Sonam", year: "2023" },
-    { name: "Aditya Ch.", year: "2023" },
-    { name: "Navyank Sharma", year: "2023" },
-    { name: "Ayush Chaudhary", score: "96", details: "10th CBSE" },
-    { name: "Archana Chaudhary", details: "10th CBSE" },
-    { name: "Saniya Agrawal", details: "10th CBSE" }
+    { name: "Archana Chaudhary", score: "92%", details: "10th CBSE (SST-96, Hindi-94)" },
+    { name: "Shrikant Thakur", score: "84%", details: "Science-94, Maths-96" },
+    { name: "Shaurya", score: "80%", details: "10th CBSE (Maths-92, Science-88)" },
+    { name: "Sonam", score: "93%", details: "Science-95, Hindi-94" },
+    { name: "Saniya Agrawal", score: "91%", details: "10th CBSE (Science-92, Maths-90)" },
+    { name: "Navyank Sharma", score: "89%", details: "SST-94, English-88" },
+    { name: "Piyush Chaudhary", score: "88%", details: "Math-92, Science-86" },
+    { name: "Aditya Ch.", score: "87%", details: "Math-90, SST-88" },
+    { name: "Devendra Pandey", score: "85%", details: "SST-89, English-84" },
+    { name: "Krishna Sirohi", score: "81%", details: "Math-85, Science-82" },
+    { name: "Ayush Chaudhary", score: "96%", details: "10th CBSE (Science-98, Maths-97)" }
   ]
 };
 
@@ -120,3 +122,84 @@ export const ADVANTAGES = [
   "Limited Batch Size",
   "Honest Efforts ! Great Results !"
 ];
+
+export const VIDEOS = [
+  {
+    id: "v1",
+    title: "Basic Mathematics Concepts",
+    thumbnail: "https://images.unsplash.com/photo-1635070041078-e363dbe005cb?q=80&w=2070&auto=format&fit=crop",
+    duration: "12:45",
+    link: "https://www.youtube.com/@PradeepClasses07/videos"
+  },
+  {
+    id: "v2",
+    title: "Science: Physics Wonders",
+    thumbnail: "https://images.unsplash.com/photo-1544383835-bda2bc66a55d?q=80&w=2021&auto=format&fit=crop",
+    duration: "15:20",
+    link: "https://www.youtube.com/@PradeepClasses07/videos"
+  },
+  {
+    id: "v3",
+    title: "Entrance Exam Strategy",
+    thumbnail: "https://images.unsplash.com/photo-1434030216411-0b793f4b4173?q=80&w=2070&auto=format&fit=crop",
+    duration: "10:30",
+    link: "https://www.youtube.com/@PradeepClasses07/videos"
+  }
+];
+
+export const NOTIFICATIONS = [
+  "CBSE Board Exams 2026 dates announced! Check the notice board.",
+  "Navodaya Entrance Exam 2026 Registration is now OPEN.",
+  "Sainik School Entrance Special Batch starts from May 15th.",
+  "New IIT/NEET Foundation Batch for Class 9th & 10th starts next week."
+];
+
+export const RESOURCES = [
+  {
+    category: "Navodaya",
+    papers: [
+      { year: "2024", title: "JNVST Class 6th Paper", link: "#" },
+      { year: "2023", title: "JNVST Class 6th Paper", link: "#" },
+      { year: "2022", title: "JNVST Class 6th Paper", link: "#" }
+    ]
+  },
+  {
+    category: "Sainik School",
+    papers: [
+      { year: "2024", title: "AISSEE Class 6th Paper", link: "#" },
+      { year: "2023", title: "AISSEE Class 6th Paper", link: "#" },
+      { year: "2022", title: "AISSEE Class 9th Paper", link: "#" }
+    ]
+  },
+  {
+    category: "Board Exams",
+    papers: [
+      { year: "2024", title: "CBSE Class 10th Maths", link: "#" },
+      { year: "2024", title: "CBSE Class 10th Science", link: "#" },
+      { year: "2023", title: "CBSE Class 10th Standard Maths", link: "#" }
+    ]
+  }
+];
+
+export const TRANSLATIONS = {
+  en: {
+    heroTitle: "Empowering Future Leaders",
+    heroSub: "Dedicated coaching for Class 1st to 12th.",
+    admission: "Admission Open",
+    contactUs: "Contact Us",
+    courses: "Our Courses",
+    results: "Our Results",
+    faculty: "Expert Faculty",
+    resources: "Resources"
+  },
+  hi: {
+    heroTitle: "भविष्य के नेताओं को सशक्त बनाना",
+    heroSub: "कक्षा 1 से 12 तक के लिए समर्पित कोचिंग।",
+    admission: "प्रवेश प्रारंभ",
+    contactUs: "संपर्क करें",
+    courses: "हमारे कोर्सेस",
+    results: "हमारे परिणाम",
+    faculty: "विशेषज्ञ शिक्षक",
+    resources: "संसाधन"
+  }
+};

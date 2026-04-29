@@ -1,28 +1,28 @@
 import React from 'react';
 import { motion } from 'motion/react';
 import { MapPin, Phone, Mail } from 'lucide-react';
-import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import { CONTACTS } from '../constants';
-import L from 'leaflet';
-
-// Fix for default marker icons in Leaflet
-import markerIcon from 'leaflet/dist/images/marker-icon.png';
-import markerIcon2x from 'leaflet/dist/images/marker-icon-2x.png';
-import markerShadow from 'leaflet/dist/images/marker-shadow.png';
-
-const DefaultIcon = L.icon({
-  iconUrl: markerIcon,
-  iconRetinaUrl: markerIcon2x,
-  shadowUrl: markerShadow,
-  iconSize: [25, 41],
-  iconAnchor: [12, 41],
-  popupAnchor: [1, -34],
-  shadowSize: [41, 41]
-});
-
-L.Marker.prototype.options.icon = DefaultIcon;
 
 export default function Contact() {
+  const [activeBranch, setActiveBranch] = React.useState(0);
+  const [formData, setFormData] = React.useState({
+    name: '',
+    phone: '',
+    class: 'Select Class',
+    message: ''
+  });
+
+  const googleMapUrl = `https://maps.google.com/maps?q=${CONTACTS.branches[activeBranch].coords.lat},${CONTACTS.branches[activeBranch].coords.lng}&t=k&z=17&ie=UTF8&iwloc=&output=embed`;
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    const whatsappMessage = `*New Enquiry from Website*%0A%0A*Name:* ${formData.name}%0A*Phone:* ${formData.phone}%0A*Class:* ${formData.class}%0A*Message:* ${formData.message}`;
+    const url = `https://wa.me/91${CONTACTS.phone1}?text=${whatsappMessage}`;
+    
+    window.open(url, '_blank');
+  };
+
   return (
     <div className="py-24 bg-white min-h-screen overflow-hidden">
       <div className="max-w-7xl mx-auto px-4 md:px-8">
@@ -50,9 +50,10 @@ export default function Contact() {
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true }}
                     transition={{ delay: idx * 0.1 }}
-                    className="flex gap-6 p-6 rounded-[2.5rem] bg-slate-50 border border-slate-100 items-start hover:bg-white hover:shadow-xl transition-all group"
+                    onClick={() => setActiveBranch(idx)}
+                    className={`flex gap-6 p-6 rounded-[2.5rem] border items-start hover:shadow-xl transition-all group cursor-pointer ${activeBranch === idx ? 'bg-white shadow-xl border-brand-secondary' : 'bg-slate-50 border-slate-100'}`}
                   >
-                    <div className="w-12 h-12 bg-white rounded-2xl flex items-center justify-center text-brand-primary shrink-0 shadow-sm border border-slate-100 group-hover:bg-brand-secondary group-hover:border-brand-secondary group-hover:text-brand-primary transition-colors">
+                    <div className={`w-12 h-12 rounded-2xl flex items-center justify-center shrink-0 shadow-sm border transition-colors ${activeBranch === idx ? 'bg-brand-secondary border-brand-secondary text-brand-primary' : 'bg-white text-brand-primary border-slate-100 group-hover:bg-brand-secondary group-hover:border-brand-secondary group-hover:text-brand-primary'}`}>
                       <MapPin size={24} />
                     </div>
                     <div>
@@ -96,33 +97,24 @@ export default function Contact() {
           >
             {/* Map Section */}
             <div className="bg-slate-100 rounded-[3rem] overflow-hidden h-[450px] shadow-inner border-8 border-white relative z-0">
-              <MapContainer 
-                center={[27.4890, 77.6555]} 
-                zoom={13} 
-                scrollWheelZoom={false}
-                className="w-full h-full"
-              >
-                <TileLayer
-                  attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-                  url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                />
-                {CONTACTS.branches.map((branch, idx) => (
-                  <Marker key={idx} position={[branch.coords.lat, branch.coords.lng]}>
-                    <Popup>
-                      <div className="p-1">
-                        <h4 className="font-bold text-brand-primary m-0">{branch.name}</h4>
-                        <p className="text-[10px] text-brand-accent font-bold uppercase mt-1 mb-2">{branch.landmark}</p>
-                        <p className="text-xs text-slate-600 leading-tight m-0">{branch.address}</p>
-                      </div>
-                    </Popup>
-                  </Marker>
-                ))}
-              </MapContainer>
+              <iframe
+                title="Google Maps"
+                src={googleMapUrl}
+                className="w-full h-full border-0"
+                allowFullScreen
+                loading="lazy"
+                referrerPolicy="no-referrer-when-downgrade"
+              ></iframe>
+              
+              <div className="absolute top-6 right-6 bg-brand-primary/90 backdrop-blur-md px-4 py-2 rounded-xl text-white text-[10px] font-black uppercase tracking-widest flex items-center gap-2">
+                <span className="w-2 h-2 bg-brand-accent rounded-full animate-pulse"></span>
+                Satellite View Active
+              </div>
             </div>
 
             {/* Enquiry Form */}
             <div className="bg-slate-50 rounded-[3rem] p-8 md:p-12 shadow-inner border border-slate-100">
-              <div className="max-w-xl mx-auto space-y-8">
+              <form onSubmit={handleSubmit} className="max-w-xl mx-auto space-y-8">
                 <div className="text-center">
                   <h3 className="text-3xl font-black text-brand-primary mb-2">Send an Enquiry</h3>
                   <p className="text-slate-500 font-medium">Fill out the form below and we'll get back to you shortly.</p>
@@ -131,16 +123,34 @@ export default function Contact() {
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div className="space-y-2">
                        <label className="text-xs font-black text-brand-primary uppercase ml-2 tracking-wide">Full Name</label>
-                       <input type="text" placeholder="e.g. John Doe" className="w-full bg-white border border-slate-200 p-4 rounded-2xl focus:outline-none focus:ring-2 focus:ring-brand-primary/20 transition-all font-medium" />
+                       <input 
+                        required
+                        type="text" 
+                        placeholder="e.g. John Doe" 
+                        className="w-full bg-white border border-slate-200 p-4 rounded-2xl focus:outline-none focus:ring-2 focus:ring-brand-primary/20 transition-all font-medium"
+                        value={formData.name}
+                        onChange={(e) => setFormData({...formData, name: e.target.value})}
+                       />
                     </div>
                     <div className="space-y-2">
                        <label className="text-xs font-black text-brand-primary uppercase ml-2 tracking-wide">Phone Number</label>
-                       <input type="text" placeholder="e.g. +91 98765 43210" className="w-full bg-white border border-slate-200 p-4 rounded-2xl focus:outline-none focus:ring-2 focus:ring-brand-primary/20 transition-all font-medium" />
+                       <input 
+                        required
+                        type="text" 
+                        placeholder="e.g. 9876543210" 
+                        className="w-full bg-white border border-slate-200 p-4 rounded-2xl focus:outline-none focus:ring-2 focus:ring-brand-primary/20 transition-all font-medium"
+                        value={formData.phone}
+                        onChange={(e) => setFormData({...formData, phone: e.target.value})}
+                       />
                     </div>
                   </div>
                   <div className="space-y-2">
                     <label className="text-xs font-black text-brand-primary uppercase ml-2 tracking-wide">Interested Class</label>
-                    <select className="w-full bg-white border border-slate-200 p-4 rounded-2xl focus:outline-none focus:ring-2 focus:ring-brand-primary/20 transition-all font-medium">
+                    <select 
+                      className="w-full bg-white border border-slate-200 p-4 rounded-2xl focus:outline-none focus:ring-2 focus:ring-brand-primary/20 transition-all font-medium"
+                      value={formData.class}
+                      onChange={(e) => setFormData({...formData, class: e.target.value})}
+                    >
                       <option>Select Class</option>
                       <option>Class 9th</option>
                       <option>Class 10th</option>
@@ -152,13 +162,22 @@ export default function Contact() {
                   </div>
                   <div className="space-y-2">
                     <label className="text-xs font-black text-brand-primary uppercase ml-2 tracking-wide">Message</label>
-                    <textarea placeholder="Tell us more about your academic goals..." rows={4} className="w-full bg-white border border-slate-200 p-4 rounded-2xl focus:outline-none focus:ring-2 focus:ring-brand-primary/20 transition-all font-medium"></textarea>
+                    <textarea 
+                      placeholder="Tell us more about your academic goals..." 
+                      rows={4} 
+                      className="w-full bg-white border border-slate-200 p-4 rounded-2xl focus:outline-none focus:ring-2 focus:ring-brand-primary/20 transition-all font-medium"
+                      value={formData.message}
+                      onChange={(e) => setFormData({...formData, message: e.target.value})}
+                    ></textarea>
                   </div>
-                  <button className="w-full bg-brand-primary text-white py-4 rounded-2xl font-black text-lg hover:scale-[1.02] active:scale-100 transition-all shadow-xl shadow-brand-primary/20 mt-4">
-                    Submit Details
+                  <button 
+                    type="submit"
+                    className="w-full bg-brand-primary text-white py-4 rounded-2xl font-black text-lg hover:scale-[1.02] active:scale-100 transition-all shadow-xl shadow-brand-primary/20 mt-4 flex items-center justify-center gap-2"
+                  >
+                    Submit via WhatsApp
                   </button>
                 </div>
-              </div>
+              </form>
             </div>
           </motion.div>
         </div>

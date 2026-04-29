@@ -1,7 +1,8 @@
 import React from 'react';
 import { motion } from 'motion/react';
 import { GraduationCap, FlaskConical, Trophy, BookOpen } from 'lucide-react';
-import { COURSES } from '../constants';
+import { COURSES, TRANSLATIONS } from '../constants';
+import { useApp } from '../context/AppContext';
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -22,8 +23,11 @@ const itemVariants = {
 };
 
 export default function Courses() {
+  const { language } = useApp();
+  const t = TRANSLATIONS[language];
+
   return (
-    <div className="py-24 bg-white min-h-screen">
+    <div className="py-24 bg-white min-h-screen transition-colors duration-300">
       <div className="max-w-7xl mx-auto px-4 md:px-8">
         <motion.div 
           initial={{ opacity: 0, y: 20 }}
@@ -33,7 +37,7 @@ export default function Courses() {
           <div className="max-w-2xl">
             <p className="text-brand-accent font-bold uppercase tracking-widest text-sm mb-2">Our Programs</p>
             <h1 className="text-4xl md:text-5xl font-black text-brand-primary heading-serif italic">
-              Courses Specially Designed for Your Success.
+              {t.courses} Specially Designed for Your Success.
             </h1>
           </div>
           <p className="text-slate-500 font-medium">From Foundation to Mastery.</p>
@@ -53,7 +57,7 @@ export default function Courses() {
               <motion.div 
                 key={idx}
                 variants={itemVariants}
-                className="p-8 bg-slate-50 rounded-[2rem] hover:bg-brand-primary hover:text-white transition-all duration-500 group shadow-sm hover:shadow-2xl hover:shadow-brand-primary/20"
+                className="p-8 bg-slate-50 rounded-[2.5rem] hover:bg-brand-primary hover:text-white transition-all duration-500 group shadow-sm hover:shadow-2xl hover:shadow-brand-primary/20"
               >
                 <div className="w-16 h-16 bg-white rounded-2xl flex items-center justify-center text-brand-primary mb-6 shadow-sm group-hover:scale-110 transition-transform">
                   <Icon size={32} />
@@ -71,7 +75,7 @@ export default function Courses() {
           })}
         </motion.div>
 
-        {/* Detailed Course Breakdown (New Content) */}
+        {/* Detailed Course Breakdown */}
         <div className="mt-24 space-y-16">
           <motion.div 
              initial={{ opacity: 0, x: -20 }}
@@ -134,42 +138,6 @@ export default function Courses() {
             </div>
             <div className="md:order-1 bg-slate-100 aspect-video rounded-[3rem] shadow-inner"></div>
           </motion.div>
-        </div>
-
-        {/* Why Choose Us Section */}
-        <div className="mt-32 p-12 md:p-20 bg-brand-primary rounded-[4rem] text-white overflow-hidden relative">
-          <div className="absolute top-0 right-0 w-64 h-64 bg-brand-secondary/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2"></div>
-          <div className="relative z-10 grid md:grid-cols-2 gap-12 items-center">
-             <div>
-               <h2 className="text-4xl font-black heading-serif italic mb-6">Experience the Difference</h2>
-               <p className="text-white/80 text-lg leading-relaxed mb-8">
-                 We don't just teach subjects; we mentor students to become the best versions of themselves. Our holistic approach ensures academic excellence and character building.
-               </p>
-               <div className="grid grid-cols-2 gap-6">
-                 <div>
-                   <h4 className="text-brand-secondary text-3xl font-black">15+</h4>
-                   <p className="text-xs font-bold uppercase tracking-widest opacity-60">Years of Legacy</p>
-                 </div>
-                 <div>
-                   <h4 className="text-brand-secondary text-3xl font-black">500+</h4>
-                   <p className="text-xs font-bold uppercase tracking-widest opacity-60">Selections</p>
-                 </div>
-               </div>
-             </div>
-             <div className="space-y-4">
-               {[
-                 "Personalized Feedback Loop",
-                 "Latest Competitive Syllabus",
-                 "Comfortable Learning Environment",
-                 "Expert Faculty Support"
-               ].map((point, i) => (
-                 <div key={i} className="flex items-center gap-3 p-4 bg-white/5 rounded-2xl border border-white/10">
-                   <div className="w-2 h-2 rounded-full bg-brand-secondary"></div>
-                   <p className="font-bold">{point}</p>
-                 </div>
-               ))}
-             </div>
-          </div>
         </div>
 
         {/* FAQ Section */}

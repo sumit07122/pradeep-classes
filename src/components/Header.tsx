@@ -1,48 +1,82 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { GraduationCap, Menu, X, Phone, Mail, Facebook, Instagram, Youtube, MapPin } from 'lucide-react';
+import { GraduationCap, Menu, X, Phone, Mail, Facebook, Instagram, Youtube, MapPin, Sun, Moon, Languages, Bell } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
-import { CONTACTS } from '../constants';
+import { CONTACTS, NOTIFICATIONS, TRANSLATIONS } from '../constants';
+import { useApp } from '../context/AppContext';
 
 export default function Header() {
+  const { language, setLanguage, theme, toggleTheme } = useApp();
   const [isMenuOpen, setIsMenuOpen] = React.useState(false);
   const location = useLocation();
+  const t = TRANSLATIONS[language];
 
   const navItems = [
-    { name: 'Home', path: '/' },
-    { name: 'Courses', path: '/courses' },
-    { name: 'Results', path: '/results' },
-    { name: 'Faculty', path: '/faculty' },
+    { name: t.courses, path: '/courses' },
+    { name: t.results, path: '/results' },
+    { name: t.faculty, path: '/faculty' },
+    { name: 'Resources', path: '/resources' },
     { name: 'Contact', path: '/contact' }
   ];
 
   return (
     <header className="z-50">
-      {/* Top Bar */}
-      <div className="bg-brand-primary text-white py-2 px-4 md:px-8 flex flex-col md:flex-row justify-between items-center text-xs gap-2">
-        <div className="flex items-center gap-4">
-          <div className="flex items-center gap-1 hover:text-brand-secondary transition-colors cursor-default">
-            <Phone size={14} className="text-brand-secondary" />
-            <span>{CONTACTS.phone1}, {CONTACTS.phone2}</span>
+      {/* Exam Notification Ticker */}
+      <div className="bg-brand-secondary text-brand-primary py-1 overflow-hidden whitespace-nowrap relative border-b border-brand-primary/10">
+        <div className="animate-marquee inline-block">
+          <div className="flex items-center gap-12">
+            {NOTIFICATIONS.map((note, i) => (
+              <div key={i} className="flex items-center gap-2 text-[10px] font-black uppercase tracking-wider">
+                <Bell size={12} className="animate-bounce" />
+                {note}
+              </div>
+            ))}
+            {/* Duplicate for seamless scrolling */}
+            {NOTIFICATIONS.map((note, i) => (
+              <div key={`dup-${i}`} className="flex items-center gap-2 text-[10px] font-black uppercase tracking-wider">
+                <Bell size={12} className="animate-bounce" />
+                {note}
+              </div>
+            ))}
           </div>
-          <div className="hidden sm:flex items-center gap-1 hover:text-brand-secondary transition-colors cursor-default">
-            <Mail size={14} className="text-brand-secondary" />
+        </div>
+      </div>
+
+      {/* Top Bar */}
+      <div className="bg-slate-50 text-slate-600 py-2 px-4 md:px-8 flex flex-col md:flex-row justify-between items-center text-xs gap-4 border-b border-slate-100">
+        <div className="flex items-center gap-4">
+          <div className="flex items-center gap-1 hover:text-brand-primary transition-colors cursor-default">
+            <Phone size={14} className="text-brand-primary" />
+            <span>{CONTACTS.phone1}</span>
+          </div>
+          <div className="hidden sm:flex items-center gap-1 hover:text-brand-primary transition-colors cursor-default">
+            <Mail size={14} className="text-brand-primary" />
             <span>{CONTACTS.email}</span>
           </div>
         </div>
+        
         <div className="flex items-center gap-4">
-          <div className="flex items-center gap-3 border-r border-white/20 pr-4 mr-2">
-            <a href={CONTACTS.socials.facebook} target="_blank" rel="noreferrer" className="hover:text-brand-secondary transition-colors"><Facebook size={14} /></a>
-            <a href={CONTACTS.socials.instagram} target="_blank" rel="noreferrer" className="hover:text-brand-secondary transition-colors"><Instagram size={14} /></a>
-            <a href={CONTACTS.socials.youtube} target="_blank" rel="noreferrer" className="hover:text-brand-secondary transition-colors"><Youtube size={14} /></a>
+          <div className="flex items-center gap-2 bg-slate-200/50 p-1 rounded-lg">
+            <button 
+              onClick={() => setLanguage(language === 'en' ? 'hi' : 'en')}
+              className="flex items-center gap-1 px-2 py-1 hover:bg-slate-200 rounded transition-colors font-bold uppercase tracking-tighter text-brand-primary"
+              id="lang-toggle"
+            >
+              <Languages size={14} className="text-brand-primary" />
+              {language === 'en' ? 'हिन्दी' : 'English'}
+            </button>
           </div>
-          <MapPin size={14} className="text-brand-secondary shrink-0" />
-          <span className="truncate">Near Shriji Baba School & Narsi Vihar Colony, Mathura</span>
+
+          <div className="flex items-center gap-3 border-l border-slate-200 pl-4 text-brand-primary">
+            <a href={CONTACTS.socials.facebook} target="_blank" rel="noreferrer" className="hover:text-brand-accent transition-colors"><Facebook size={14} /></a>
+            <a href={CONTACTS.socials.instagram} target="_blank" rel="noreferrer" className="hover:text-brand-accent transition-colors"><Instagram size={14} /></a>
+            <a href={CONTACTS.socials.youtube} target="_blank" rel="noreferrer" className="hover:text-brand-accent transition-colors"><Youtube size={14} /></a>
+          </div>
         </div>
       </div>
 
       {/* Navigation */}
-      <nav className="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-slate-100 shadow-sm">
+      <nav className="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b border-slate-100 shadow-sm transition-colors duration-300">
         <div className="max-w-7xl mx-auto px-4 md:px-8 py-4 flex justify-between items-center">
           <Link to="/" className="flex items-center gap-3 group">
             <div className="w-12 h-12 bg-brand-primary rounded-xl flex items-center justify-center text-brand-secondary shadow-lg group-hover:scale-110 transition-transform">
@@ -66,8 +100,9 @@ export default function Header() {
                 <span className={`absolute -bottom-1 left-0 h-0.5 bg-brand-secondary transition-all group-hover:w-full ${location.pathname === item.path ? 'w-full' : 'w-0'}`}></span>
               </Link>
             ))}
+
             <Link to="/contact" className="bg-brand-primary text-white px-6 py-2.5 rounded-full text-sm font-semibold hover:bg-brand-primary/90 hover:scale-105 active:scale-95 transition-all shadow-md shadow-brand-primary/20">
-              Admission Open
+              {t.admission}
             </Link>
           </div>
 
@@ -100,8 +135,9 @@ export default function Header() {
                     {item.name}
                   </Link>
                 ))}
-                <Link to="/contact" className="w-full block text-center bg-brand-primary text-white py-3 rounded-xl font-bold">
-                  Admission Open
+                
+                <Link to="/contact" className="w-full block text-center bg-brand-primary text-white py-3 rounded-xl font-bold" onClick={() => setIsMenuOpen(false)}>
+                  {t.admission}
                 </Link>
               </div>
             </motion.div>
