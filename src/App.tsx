@@ -84,6 +84,7 @@ const DefaultIcon = L.icon({
 
 L.Marker.prototype.options.icon = DefaultIcon;
 
+
 export default function App() {
   const [isMenuOpen, setIsMenuOpen] = React.useState(false);
 
@@ -244,12 +245,12 @@ export default function App() {
                 {/* Visual Placeholder for Instructor Image */}
                 <div className="aspect-[4/5] bg-slate-200 rounded-[3rem] overflow-hidden relative shadow-2xl group border-8 border-white">
                   <img 
-                    src="input_file_2.png" 
+                    src="pradeep-sir.jpg.jpeg" 
                     alt="Pradeep Sir"
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 grayscale hover:grayscale-0"
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
                     referrerPolicy="no-referrer"
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-brand-primary/80 via-transparent to-transparent"></div>
+                  <div className="absolute inset-0 bg-gradient-to-t from-brand-primary/40 via-transparent to-transparent"></div>
                   <div className="absolute bottom-10 left-10 text-white">
                     <p className="text-sm font-medium tracking-[0.3em] uppercase mb-2">Director & Mentor</p>
                     <h3 className="text-4xl font-black heading-serif italic">Pradeep Kumar</h3>
@@ -551,7 +552,7 @@ export default function App() {
                         <img 
                           src={f.image} 
                           alt={f.name}
-                          className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-700"
+                          className="w-full h-full object-cover transition-all duration-700"
                           referrerPolicy="no-referrer"
                         />
                       </div>
