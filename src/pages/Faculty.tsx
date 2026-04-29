@@ -88,6 +88,39 @@ export default function Faculty() {
             </motion.div>
           ))}
         </div>
+
+        {/* Faculty Values */}
+        <div className="mt-32 border-t border-slate-100 pt-24">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl font-black text-brand-primary heading-serif italic">Our Academic Values</h2>
+          </div>
+          <div className="grid md:grid-cols-3 gap-8">
+            {[
+              { title: "Conceptual Clarity", desc: "We move beyond memorization to ensure students understand the 'why' behind every concept." },
+              { title: "Regular Tracking", desc: "Weekly tests and personalized performance reports to keep every student on the right track." },
+              { title: "Ethical Mentoring", desc: "Teaching values of honesty, hard work, and social responsibility alongside academics." }
+            ].map((value, i) => (
+              <div key={i} className="p-10 bg-slate-50 rounded-[3rem] border border-slate-100 hover:bg-white hover:shadow-xl transition-all">
+                <div className="w-12 h-12 bg-white rounded-2xl flex items-center justify-center text-brand-secondary mb-6 shadow-sm font-black text-xl">
+                  0{i + 1}
+                </div>
+                <h4 className="text-xl font-black text-brand-primary mb-4">{value.title}</h4>
+                <p className="text-slate-500 font-medium leading-relaxed">{value.desc}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Join as Faculty */}
+        <div className="mt-32 bg-brand-accent p-12 rounded-[4rem] text-white flex flex-col md:flex-row items-center justify-between gap-8">
+           <div className="space-y-4 text-center md:text-left">
+             <h3 className="text-3xl font-black">Want to join our faculty?</h3>
+             <p className="text-white/80 font-medium max-w-md">We are always looking for passionate teachers who want to make a difference in Mathura's education landscape.</p>
+           </div>
+           <Link to="/contact" className="bg-white text-brand-accent px-8 py-4 rounded-2xl font-black hover:scale-105 transition-transform whitespace-nowrap">
+             Apply Now
+           </Link>
+        </div>
       </div>
     </div>
   );

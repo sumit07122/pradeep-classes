@@ -135,6 +135,61 @@ export default function Courses() {
             <div className="md:order-1 bg-slate-100 aspect-video rounded-[3rem] shadow-inner"></div>
           </motion.div>
         </div>
+
+        {/* Why Choose Us Section */}
+        <div className="mt-32 p-12 md:p-20 bg-brand-primary rounded-[4rem] text-white overflow-hidden relative">
+          <div className="absolute top-0 right-0 w-64 h-64 bg-brand-secondary/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2"></div>
+          <div className="relative z-10 grid md:grid-cols-2 gap-12 items-center">
+             <div>
+               <h2 className="text-4xl font-black heading-serif italic mb-6">Experience the Difference</h2>
+               <p className="text-white/80 text-lg leading-relaxed mb-8">
+                 We don't just teach subjects; we mentor students to become the best versions of themselves. Our holistic approach ensures academic excellence and character building.
+               </p>
+               <div className="grid grid-cols-2 gap-6">
+                 <div>
+                   <h4 className="text-brand-secondary text-3xl font-black">15+</h4>
+                   <p className="text-xs font-bold uppercase tracking-widest opacity-60">Years of Legacy</p>
+                 </div>
+                 <div>
+                   <h4 className="text-brand-secondary text-3xl font-black">500+</h4>
+                   <p className="text-xs font-bold uppercase tracking-widest opacity-60">Selections</p>
+                 </div>
+               </div>
+             </div>
+             <div className="space-y-4">
+               {[
+                 "Personalized Feedback Loop",
+                 "Latest Competitive Syllabus",
+                 "Comfortable Learning Environment",
+                 "Expert Faculty Support"
+               ].map((point, i) => (
+                 <div key={i} className="flex items-center gap-3 p-4 bg-white/5 rounded-2xl border border-white/10">
+                   <div className="w-2 h-2 rounded-full bg-brand-secondary"></div>
+                   <p className="font-bold">{point}</p>
+                 </div>
+               ))}
+             </div>
+          </div>
+        </div>
+
+        {/* FAQ Section */}
+        <div className="mt-32 max-w-3xl mx-auto">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl font-black text-brand-primary heading-serif italic">Frequently Asked Questions</h2>
+          </div>
+          <div className="space-y-6">
+            {[
+              { q: "What is the batch size?", a: "To ensure personalized attention, we keep our batches limited to 20-25 students." },
+              { q: "Do you provide study material?", a: "Yes, we provide comprehensive, updated study material and practice sheets for every subject." },
+              { q: "Is there any scholarship for bright students?", a: "Yes, we offer merit-based scholarships and special support for underprivileged children." }
+            ].map((faq, i) => (
+              <div key={i} className="p-8 bg-slate-50 rounded-3xl border border-slate-100">
+                <h4 className="font-black text-brand-primary mb-2">Q: {faq.q}</h4>
+                <p className="text-slate-600 font-medium">A: {faq.a}</p>
+              </div>
+            ))}
+          </div>
+        </div>
       </div>
     </div>
   );
