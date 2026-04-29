@@ -31,7 +31,7 @@ export default function Faculty() {
                   <div className="relative aspect-[4/5] bg-slate-100 rounded-[3rem] overflow-hidden border-8 border-white shadow-2xl">
                     {/* 
                        IMAGE USAGE: f.image comes from the FACULTY array in src/constants.ts
-                       which imports assets directly (like src/assets/pradeep.jpeg)
+                       which imports assets directly (like src/assets/pradeep.jpg)
                     */}
                     <img 
                       src={f.image} 
