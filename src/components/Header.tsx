@@ -79,7 +79,7 @@ export default function Header() {
       <nav className="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b border-slate-100 shadow-sm transition-colors duration-300">
         <div className="max-w-7xl mx-auto px-4 md:px-8 py-4 flex justify-between items-center">
           <Link to="/" className="flex items-center gap-3 group">
-            <div className="w-12 h-12 bg-brand-primary rounded-xl flex items-center justify-center text-brand-secondary shadow-lg group-hover:scale-110 transition-transform">
+            <div className="w-12 h-12 bg-brand-secondary rounded-xl flex items-center justify-center text-brand-primary shadow-lg group-hover:scale-110 transition-transform">
               <GraduationCap size={28} />
             </div>
             <div>
