@@ -1,4 +1,4 @@
-import pradeepSir from './assets/pradeep-sir.jpeg';
+import pradeep-sir from './assets/pradeep-sir.jpeg';
 
 export const CONTACTS = {
   phone1: "8126180408",
