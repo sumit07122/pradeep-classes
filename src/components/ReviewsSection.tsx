@@ -20,12 +20,14 @@ export default function ReviewsSection() {
     ); // To properly order by createdAt with a where clause on another field, a composite index is needed. Since we can't create one programmatically easily, we will sort in javascript if needed, but we can just use snapshot.docs and sort locally to be safe.
     
     // Instead of where('status', '==', 'approved') and orderBy('createdAt', 'desc') which requires an index, 
-    // let's just fetch approved ones or all and filter.
-    const allReviewsQ = query(collection(db, 'reviews'), orderBy('createdAt', 'desc'));
+    // let's just fetch approved ones using a query, and sort on the client.
+    const allReviewsQ = query(collection(db, 'reviews'), where('status', '==', 'approved'));
     
     const unsubscribe = onSnapshot(allReviewsQ, (snapshot) => {
       const allDocs = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-      setReviews(allDocs.filter((d: any) => d.status === 'approved'));
+      // Sort on client side
+      allDocs.sort((a: any, b: any) => b.createdAt.toMillis() - a.createdAt.toMillis());
+      setReviews(allDocs);
     }, (error) => handleFirestoreError(error, OperationType.GET, 'reviews'));
 
     return () => unsubscribe();
