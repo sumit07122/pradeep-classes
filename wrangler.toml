@@ -1,0 +1,7 @@
+name = "pradeep-classes"
+pages_build_output_dir = "dist"
+
+[[redirects]]
+from = "/*"
+to = "/index.html"
+status = 200
