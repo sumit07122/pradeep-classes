@@ -6,6 +6,8 @@ export default function AdminLogin() {
   const { user, isAdmin, loading, signInWithGoogle } = useAuth();
   const navigate = useNavigate();
 
+  const [error, setError] = React.useState<string | null>(null);
+
   React.useEffect(() => {
     if (user && isAdmin) {
       navigate('/admin/dashboard');
@@ -13,10 +15,12 @@ export default function AdminLogin() {
   }, [user, isAdmin, navigate]);
 
   const handleLogin = async () => {
+    setError(null);
     try {
       await signInWithGoogle();
-    } catch (error) {
-      console.error(error);
+    } catch (err: any) {
+      console.error(err);
+      setError(err.message || 'Failed to sign in with Google');
     }
   };
 
@@ -30,9 +34,15 @@ export default function AdminLogin() {
         <h1 className="text-3xl font-bold text-brand-primary mb-2">Admin Panel</h1>
         <p className="text-gray-600 mb-8">Sign in to access the dashboard</p>
 
+        {error && (
+          <div className="bg-red-50 text-red-600 p-4 rounded-lg mb-4 text-sm border border-red-100">
+            {error}
+          </div>
+        )}
+
         {user && !isAdmin ? (
-          <div className="bg-red-50 text-red-600 p-4 rounded-lg mb-4 text-sm">
-            You don't have administrator privileges. Please contact the super admin.
+          <div className="bg-amber-50 text-amber-700 p-4 rounded-lg mb-4 text-sm border border-amber-100">
+            Logged in as <span className="font-semibold">{user.email}</span>, but you don't have administrator privileges.
           </div>
         ) : null}
 
