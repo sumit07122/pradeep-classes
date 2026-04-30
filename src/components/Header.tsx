@@ -107,7 +107,7 @@ export default function Header() {
         <div className="max-w-7xl mx-auto px-4 md:px-8 py-4 flex justify-between items-center">
           <Link to="/" className="flex items-center gap-3 group">
             <div className="w-12 h-12 overflow-hidden bg-brand-secondary rounded-xl flex items-center justify-center text-brand-primary shadow-lg group-hover:scale-110 transition-transform">
-              <img src="https://drive.google.com/uc?export=view&id=1-hFy2Dri6g1hYLcNGr0I6dmdg7m1lpG-" alt="Pradeep Classes Logo" className="w-full h-full object-cover" onError={(e) => {
+              <img src="https://lh3.googleusercontent.com/d/1-hFy2Dri6g1hYLcNGr0I6dmdg7m1lpG-" alt="Pradeep Classes Logo" className="w-full h-full object-cover" onError={(e) => {
                 e.currentTarget.style.display = 'none';
                 e.currentTarget.nextElementSibling!.style.display = 'block';
               }} />
