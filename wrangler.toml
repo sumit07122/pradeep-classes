@@ -1,5 +1,8 @@
 name = "pradeep-classes"
-pages_build_output_dir = "dist"
+compatibility_date = "2024-04-30"
+
+[assets]
+directory = "./dist"
 
 [[redirects]]
 from = "/*"
