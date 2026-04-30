@@ -71,8 +71,8 @@ export default function Footer() {
         <div className="pt-8 flex flex-col md:flex-row justify-between items-center gap-4 text-xs font-medium text-slate-400 text-center md:text-left">
           <p className="flex items-center justify-center md:justify-start flex-wrap gap-1">
             © {new Date().getFullYear()} Pradeep Classes. All rights reserved. | Built by{' '}
-            <a href="mailto:sumitdevthakur@gmail.com" className="inline-flex items-center gap-1 text-brand-primary font-semibold hover:text-brand-accent transition-colors ml-1">
-              Sumit Dev Thakur <Mail size={12} />
+            <a href="https://instagram.com/who_sumitt" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 text-brand-primary font-semibold hover:text-brand-accent transition-colors ml-1">
+              Sumit Dev Thakur <Instagram size={12} />
             </a>
           </p>
           <div className="flex gap-6">

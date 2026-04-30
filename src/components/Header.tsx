@@ -106,8 +106,12 @@ export default function Header() {
       <nav className="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b border-slate-100 shadow-sm transition-colors duration-300">
         <div className="max-w-7xl mx-auto px-4 md:px-8 py-4 flex justify-between items-center">
           <Link to="/" className="flex items-center gap-3 group">
-            <div className="w-12 h-12 bg-brand-secondary rounded-xl flex items-center justify-center text-brand-primary shadow-lg group-hover:scale-110 transition-transform">
-              <GraduationCap size={28} />
+            <div className="w-12 h-12 overflow-hidden bg-brand-secondary rounded-xl flex items-center justify-center text-brand-primary shadow-lg group-hover:scale-110 transition-transform">
+              <img src="https://drive.google.com/uc?export=view&id=1-hFy2Dri6g1hYLcNGr0I6dmdg7m1lpG-" alt="Pradeep Classes Logo" className="w-full h-full object-cover" onError={(e) => {
+                e.currentTarget.style.display = 'none';
+                e.currentTarget.nextElementSibling!.style.display = 'block';
+              }} />
+              <GraduationCap size={28} className="hidden" />
             </div>
             <div>
               <h1 className="text-xl md:text-2xl font-bold tracking-tight text-brand-primary leading-tight">PRADEEP CLASSES</h1>
