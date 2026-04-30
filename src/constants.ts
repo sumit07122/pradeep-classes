@@ -158,27 +158,39 @@ export const NOTIFICATIONS = [
 
 export const RESOURCES = [
   {
-    category: "Navodaya",
+    category: "Navodaya (JNVST)",
     papers: [
-      { year: "2024", title: "JNVST Class 6th Paper", link: "#" },
-      { year: "2023", title: "JNVST Class 6th Paper", link: "#" },
-      { year: "2022", title: "JNVST Class 6th Paper", link: "#" }
+      { year: "2026", title: "JNVST Class 6th (Upcoming/Latest)", link: "https://wa.me/918126180408?text=I%20need%20JNVST%202026%20Sample%20Paper" },
+      { year: "2025", title: "JNVST Class 6th Full Paper", link: "#" },
+      { year: "2024", title: "JNVST Class 6th (Set A, B, C, D)", link: "#" },
+      { year: "2023", title: "JNVST Class 6th Solved Paper", link: "#" },
+      { year: "2020-2022", title: "Navodaya 3-Year Solved Pack", link: "#" },
+      { year: "2015-2019", title: "Archive Pack (JNVST)", link: "#" },
+      { year: "2010-2014", title: "Vintage JNVST Collection", link: "#" },
+      { year: "2000-2009", title: "Historical Navodaya Archive", link: "#" }
     ]
   },
   {
-    category: "Sainik School",
+    category: "Sainik School (AISSEE)",
     papers: [
-      { year: "2024", title: "AISSEE Class 6th Paper", link: "#" },
-      { year: "2023", title: "AISSEE Class 6th Paper", link: "#" },
-      { year: "2022", title: "AISSEE Class 9th Paper", link: "#" }
+      { year: "2026", title: "AISSEE Class 6th & 9th Prep", link: "https://wa.me/918126180408?text=I%20need%20Sainik%20School%202026%20Prep%20Material" },
+      { year: "2025", title: "AISSEE Class 6th Solved", link: "#" },
+      { year: "2024", title: "Sainik School Class 9th Original", link: "#" },
+      { year: "2020-2023", title: "AISSEE Previous 4 Years Archive", link: "#" },
+      { year: "2010-2019", title: "Sainik School 10-Year Compilation", link: "#" },
+      { year: "2000-2009", title: "AISSEE Historical Papers", link: "#" }
     ]
   },
   {
-    category: "Board Exams",
+    category: "Board Exams (CBSE/UP)",
     papers: [
-      { year: "2024", title: "CBSE Class 10th Maths", link: "#" },
-      { year: "2024", title: "CBSE Class 10th Science", link: "#" },
-      { year: "2023", title: "CBSE Class 10th Standard Maths", link: "#" }
+      { year: "2026", title: "CBSE Class 10th Maths (Expected)", link: "https://wa.me/918126180408?text=I%20need%20CBSE%202026%20Expected%20Questions" },
+      { year: "2025", title: "CBSE Class 12th Physics/Chem", link: "#" },
+      { year: "2024", title: "CBSE Class 10th All Subjects", link: "#" },
+      { year: "2020-2023", title: "NCERT Exemplar Solved Pack", link: "#" },
+      { year: "2015-2019", title: "CBSE Class 10/12 Mega Archive", link: "#" },
+      { year: "2010-2014", title: "Old Syllabus Archive (Vintage)", link: "#" },
+      { year: "2000-2009", title: "Class 10/12 Historical Papers", link: "#" }
     ]
   }
 ];

@@ -1,28 +1,13 @@
-import React from 'react';
+import React, { lazy, Suspense } from 'react';
 import SEO from '../components/SEO';
 import { motion } from 'motion/react';
 import { Award, Users, Phone, Trophy, CheckCircle2, BookOpen, Target, GraduationCap, PlayCircle, ArrowRight, MessageCircle, Star, Quote, HelpCircle } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import Counter from '../components/Counter';
-import NoticeBoard from '../components/NoticeBoard';
+import WhatsAppFloatingButton from '../components/WhatsAppFloatingButton';
 
-const FloatingWhatsApp = () => (
-  <motion.a
-    href="https://wa.me/918126180408?text=Hello%20Pradeep%20Classes,%20I%20would%20like%20to%20enquire%20about%20admissions."
-    target="_blank"
-    rel="noopener noreferrer"
-    initial={{ scale: 0, opacity: 0 }}
-    animate={{ scale: 1, opacity: 1 }}
-    whileHover={{ scale: 1.1 }}
-    className="fixed bottom-8 right-8 z-50 bg-[#25D366] text-white p-4 rounded-full shadow-2xl flex items-center justify-center group"
-    aria-label="Chat on WhatsApp"
-  >
-    <MessageCircle size={28} fill="currentColor" />
-    <span className="absolute right-full mr-4 bg-white text-slate-800 px-4 py-2 rounded-xl text-sm font-bold shadow-xl opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap border border-slate-100 pointer-events-none">
-      Chat with Pradeep Sir
-    </span>
-  </motion.a>
-);
+const ReviewsSection = lazy(() => import('../components/ReviewsSection'));
+const NoticeBoard = lazy(() => import('../components/NoticeBoard'));
 
 const FAQItem = ({ question, answer }: { question: string, answer: string }) => {
   const [isOpen, setIsOpen] = React.useState(false);
@@ -49,7 +34,6 @@ const FAQItem = ({ question, answer }: { question: string, answer: string }) => 
     </div>
   );
 };
-import ReviewsSection from '../components/ReviewsSection';
 import { ADVANTAGES, FACULTY, VIDEOS, CONTACTS, TRANSLATIONS } from '../constants';
 import { useApp } from '../context/AppContext';
 import { db } from '../lib/firebase';
@@ -100,13 +84,15 @@ export default function Home() {
 
   return (
     <div className="flex flex-col bg-white transition-colors duration-300">
-      <FloatingWhatsApp />
+      <WhatsAppFloatingButton />
       <SEO 
         title="Pradeep Classes Mathura | Top Coaching for Navodaya, Sainik School & IIT/NEET"
         description="Pradeep Classes Mathura offers expert coaching for Navodaya, Sainik School, IIT/NEET Foundation, and school academics (1st-12th). Join Mathura's top-rated coaching center with 15+ years of experience."
         keywords="Coaching in Mathura, Navodaya Coaching, Sainik School Coaching, IIT Foundation Mathura, NEET Foundation Mathura, Pradeep Classes Mathura, Academic Coaching Mathura, best coaching center mathura, pradeep sir coaching mathura"
       />
-      <NoticeBoard />
+      <Suspense fallback={<div>Loading...</div>}>
+        <NoticeBoard />
+      </Suspense>
       {/* Hero Section */}
       <section className="relative pt-12 pb-24 overflow-hidden">
         <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
@@ -294,7 +280,9 @@ export default function Home() {
       </section>
 
       {/* Student Reviews & Form */}
-      <ReviewsSection />
+      <Suspense fallback={<div>Loading Reviews...</div>}>
+        <ReviewsSection />
+      </Suspense>
 
       {/* Testimonials Section */}
       <section className="py-24 bg-brand-primary text-white overflow-hidden relative">

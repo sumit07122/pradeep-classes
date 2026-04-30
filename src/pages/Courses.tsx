@@ -116,6 +116,7 @@ export default function Courses() {
               <img 
                 src="https://images.unsplash.com/photo-1503676260728-1c00da094a0b?q=80&w=2022&auto=format&fit=crop" 
                 alt="Foundation academic classes" 
+                loading="lazy"
                 className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-brand-primary/40 to-transparent"></div>
@@ -154,6 +155,7 @@ export default function Courses() {
               <img 
                 src="https://images.unsplash.com/photo-1523240715630-3987501f606a?q=80&w=2070&auto=format&fit=crop" 
                 alt="Advanced board exam coaching" 
+                loading="lazy"
                 className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-brand-primary/40 to-transparent"></div>

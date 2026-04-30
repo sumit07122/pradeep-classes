@@ -50,24 +50,52 @@ export default function Header() {
   return (
     <header className="z-50">
       {/* Exam Notification Ticker */}
-      {announcement.active && announcement.text && (
-        <div className="bg-brand-secondary text-brand-primary py-1 overflow-hidden whitespace-nowrap relative border-b border-brand-primary/10">
-          <div className="animate-marquee inline-block">
-            <div className="flex items-center gap-12">
-              {[...Array(10)].map((_, i) => (
-                <div key={i} className="flex items-center gap-2 text-[10px] font-black uppercase tracking-wider">
-                  <Bell size={12} className="animate-bounce" />
-                  {announcement.link ? (
-                    <a href={announcement.link} target="_blank" rel="noreferrer" className="hover:underline">{announcement.text}</a>
-                  ) : (
-                    <span>{announcement.text}</span>
-                  )}
-                </div>
-              ))}
+      <AnimatePresence>
+        {announcement.active && announcement.text && (
+          <motion.div 
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: 'auto', opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            className="bg-brand-secondary text-brand-primary py-2.5 overflow-hidden relative border-b border-brand-primary/10 shadow-sm"
+          >
+            <div className="max-w-7xl mx-auto px-4 flex items-center justify-between gap-4">
+              <div className="flex-1 overflow-hidden">
+                <motion.div 
+                  className="whitespace-nowrap flex items-center gap-8"
+                  animate={{ x: ["0%", "-50%"] }}
+                  transition={{ 
+                    duration: 20, 
+                    repeat: Infinity, 
+                    ease: "linear" 
+                  }}
+                >
+                  {[...Array(6)].map((_, i) => (
+                    <div key={i} className="flex items-center gap-3 text-xs font-black uppercase tracking-widest shrink-0">
+                      <span className="flex items-center justify-center w-6 h-6 bg-brand-primary text-brand-secondary rounded-full">
+                        <Bell size={12} className="animate-pulse" />
+                      </span>
+                      <span>{announcement.text}</span>
+                    </div>
+                  ))}
+                </motion.div>
+              </div>
+              
+              <Link 
+                to={announcement.link || "/contact"} 
+                className="shrink-0 bg-brand-primary text-white px-4 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-widest hover:bg-brand-accent hover:scale-105 transition-all shadow-lg shadow-brand-primary/20 flex items-center gap-2 group whitespace-nowrap"
+              >
+                Enroll Now
+                <motion.span
+                  animate={{ x: [0, 4, 0] }}
+                  transition={{ duration: 1.5, repeat: Infinity }}
+                >
+                  <PlayCircle size={12} />
+                </motion.span>
+              </Link>
             </div>
-          </div>
-        </div>
-      )}
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Top Bar */}
       <div className="bg-slate-50 text-slate-600 py-2 px-4 md:px-8 flex flex-col md:flex-row justify-between items-center text-xs gap-4 border-b border-slate-100">

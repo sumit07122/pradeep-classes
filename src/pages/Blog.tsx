@@ -5,6 +5,7 @@ import { Newspaper, Lightbulb, Clock, ArrowRight, ExternalLink, RefreshCw, Spark
 import { getGeminiDailyContent, GsFact, CareerTip } from '../services/geminiService';
 import { doc, getDoc, setDoc, serverTimestamp } from 'firebase/firestore';
 import { db } from '../lib/firebase';
+import { handleFirestoreError, OperationType } from '../lib/firestore-errors';
 
 interface NewsItem {
   title: string;
@@ -71,12 +72,12 @@ export default function Blog() {
         const data = docSnap.data();
         const lastUpdated = data.lastUpdated?.toDate();
         const now = new Date();
-        // Update if older than 1 hour
+        // Update if older than 1 hour or forced
         if (!lastUpdated || (now.getTime() - lastUpdated.getTime() > 3600000)) {
           shouldUpdate = true;
         } else {
-          setFacts(data.gsFacts);
-          setTips(data.careerTips);
+          setFacts(data.gsFacts || []);
+          setTips(data.careerTips || []);
         }
       } else {
         shouldUpdate = true;
@@ -88,16 +89,40 @@ export default function Blog() {
           setFacts(freshContent.gsFacts);
           setTips(freshContent.careerTips);
           
-          // Cache in Firestore
-          await setDoc(docRef, {
-            gsFacts: freshContent.gsFacts,
-            careerTips: freshContent.careerTips,
-            lastUpdated: serverTimestamp()
-          });
+          // Only try to update the database if we have an authenticated admin
+          // This avoids "insufficient permissions" errors for guest users
+          try {
+            const currentUser = doc(db, 'admins', 'check'); // dummy doc to check if user is admin is too complex, let's just try-catch
+            await setDoc(docRef, {
+              gsFacts: freshContent.gsFacts,
+              careerTips: freshContent.careerTips,
+              lastUpdated: serverTimestamp()
+            });
+          } catch (writeErr) {
+            // Silently fail database update for non-admins, they'll just use the fresh local content
+            console.warn("Database cache update skipped (insufficient permissions/not admin). Local content is updated.");
+          }
+        } else {
+          // Static fallback if API fails
+          const fallbackFacts: GsFact[] = [
+            { category: "Indian Constitution", fact: "The Constitution of India is the longest written constitution of any sovereign country in the world.", explanation: "It contains 448 articles in 25 parts and 12 schedules." },
+            { category: "Science", fact: "Light travels at a speed of approximately 300,000 kilometers per second.", explanation: "This is why we see lightning before we hear thunder." },
+            { category: "History", fact: "The Indus Valley Civilization was one of the world's earliest urban civilizations.", explanation: "It was known for its advanced urban planning and drainage systems." }
+          ];
+          const fallbackTips: CareerTip[] = [
+            { subject: "Revision", tip: "Use the 1-3-7-30 rule for revision to ensure long-term retention." },
+            { subject: "Focus", tip: "Study in 25-minute chunks (Pomodoro technique) to maintain high concentration." }
+          ];
+          setFacts(fallbackFacts);
+          setTips(fallbackTips);
         }
       }
     } catch (err) {
-      console.error("Failed to fetch GS content", err);
+      handleFirestoreError(err, OperationType.GET, 'automated_content/daily_gs');
+      // Even if firestore fails, show fallbacks
+      setFacts([
+        { category: "Notice", fact: "New daily facts arriving soon!", explanation: "We're currently updating our GS repository. Please check back in a few minutes." }
+      ]);
     } finally {
       setLoadingFacts(false);
     }

@@ -109,6 +109,14 @@ service cloud.firestore {
              data.updatedAt is timestamp;
     }
 
+    function isValidAutomatedContent(data) {
+      return data.keys().hasAll(['gsFacts', 'careerTips', 'lastUpdated']) &&
+             data.keys().size() <= 4 &&
+             data.gsFacts is list &&
+             data.careerTips is list &&
+             data.lastUpdated is timestamp;
+    }
+
     match /notices/{noticeId} {
       allow read: if true; // Publicly readable
       allow create: if isValidId(noticeId) && isAdmin() && isValidNotice(incoming()) && incoming().createdAt == request.time;
@@ -173,6 +181,11 @@ service cloud.firestore {
       allow create: if isValidId(imageId) && isAdmin() && isValidSiteImage(incoming()) && incoming().updatedAt == request.time;
       allow update: if isValidId(imageId) && isAdmin() && isValidSiteImage(incoming()) && incoming().updatedAt == request.time;
       allow delete: if isValidId(imageId) && isAdmin();
+    }
+
+    match /automated_content/{docId} {
+      allow read: if true;
+      allow write: if isAdmin() && isValidAutomatedContent(incoming());
     }
   }
 }

@@ -63,9 +63,9 @@ export default function Resources() {
             >
               <div className="flex items-center gap-4 mb-8">
                 <div className="w-14 h-14 bg-white rounded-2xl flex items-center justify-center text-brand-primary shadow-sm">
-                  {category.category === 'Navodaya' && <School size={28} />}
-                  {category.category === 'Sainik School' && <GraduationCap size={28} />}
-                  {category.category === 'Board Exams' && <BookOpen size={28} />}
+                  {category.category.includes('Navodaya') && <School size={28} />}
+                  {category.category.includes('Sainik School') && <GraduationCap size={28} />}
+                  {category.category.includes('Board Exams') && <BookOpen size={28} />}
                 </div>
                 <h2 className="text-2xl font-black text-brand-primary heading-serif italic">
                   {category.category}
@@ -77,6 +77,7 @@ export default function Resources() {
                   <motion.a
                     key={pIdx}
                     href={paper.link}
+                    onClick={(e) => { if(paper.link === '#') { e.preventDefault(); alert("This PDF is currently being digitized. Please check back soon or request it via WhatsApp!"); } }}
                     whileHover={{ x: 10 }}
                     className="flex items-center justify-between p-5 bg-white rounded-2xl border border-slate-100 hover:border-brand-secondary transition-all group"
                   >
@@ -93,9 +94,14 @@ export default function Resources() {
                 ))}
               </div>
               
-              <button className="w-full mt-8 py-4 bg-brand-primary text-white rounded-2xl font-black text-sm hover:bg-brand-accent transition-colors flex items-center justify-center gap-2">
+              <a 
+                href={`https://wa.me/918126180408?text=Hello%20Pradeep%20Classes,%20I%20am%20looking%20for%20more%20papers%20for%20${category.category}.%20Can%20you%20help?`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-full mt-8 py-4 bg-brand-primary text-white rounded-2xl font-black text-sm hover:bg-brand-accent transition-colors flex items-center justify-center gap-2"
+              >
                 Request More Papers
-              </button>
+              </a>
             </motion.div>
           ))}
         </div>

@@ -113,6 +113,17 @@
         "updatedAt": { "type": "number" }
       },
       "required": ["key", "url", "updatedAt"]
+    },
+    "DailyGS": {
+      "title": "Daily GS Content",
+      "description": "Automated GS facts and career tips",
+      "type": "object",
+      "properties": {
+        "gsFacts": { "type": "array" },
+        "careerTips": { "type": "array" },
+        "lastUpdated": { "type": "number" }
+      },
+      "required": ["gsFacts", "careerTips", "lastUpdated"]
     }
   },
   "firestore": {
@@ -148,6 +159,10 @@
     "siteImages": {
       "schema": { "$ref": "#/entities/SiteImage" },
       "description": "Dynamic images used across the site"
+    },
+    "automated_content": {
+      "schema": { "$ref": "#/entities/DailyGS" },
+      "description": "Automated daily content periodically updated"
     }
   }
 }
