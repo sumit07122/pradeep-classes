@@ -69,7 +69,7 @@ export default function Footer() {
         </div>
         
         <div className="pt-8 flex flex-col md:flex-row justify-between items-center gap-4 text-xs font-medium text-slate-400">
-          <p>© {new Date().getFullYear()} Pradeep Classes. All rights reserved.</p>
+          <p>© {new Date().getFullYear()} Pradeep Classes. All rights reserved. | Built by Sumitdevthakur (sumitdevthakur@gmail.com)</p>
           <div className="flex gap-6">
             <Link to="/admin/login" className="hover:text-brand-primary transition-colors">Admin Login</Link>
             <a href="#" className="hover:text-brand-primary transition-colors">Privacy Policy</a>

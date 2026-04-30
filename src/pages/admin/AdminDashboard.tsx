@@ -133,7 +133,7 @@ export default function AdminDashboard() {
           <h1 className="text-2xl md:text-3xl font-black text-brand-primary">Admin Dashboard</h1>
           <p className="text-gray-500 font-medium mt-1">Welcome, <span className="text-brand-accent">{user?.email}</span> {isSuperAdmin && '(Super Admin)'}</p>
         </div>
-        <button onClick={logout} className="px-5 py-2.5 bg-red-50 text-red-600 rounded-lg font-bold hover:bg-red-100 cursor-pointer transition-colors">
+        <button onClick={logout} aria-label="Logout" className="px-5 py-2.5 bg-red-50 text-red-600 rounded-lg font-bold hover:bg-red-100 cursor-pointer transition-colors">
           Logout
         </button>
       </div>

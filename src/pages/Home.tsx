@@ -9,7 +9,8 @@ import ReviewsSection from '../components/ReviewsSection';
 import { ADVANTAGES, FACULTY, VIDEOS, CONTACTS, TRANSLATIONS } from '../constants';
 import { useApp } from '../context/AppContext';
 import { db } from '../lib/firebase';
-import { getDoc, doc } from 'firebase/firestore';
+import { getDoc, doc, collection, query, onSnapshot } from 'firebase/firestore';
+import { handleFirestoreError, OperationType } from '../lib/firestore-errors';
 
 export default function Home() {
   const { language } = useApp();
@@ -17,6 +18,7 @@ export default function Home() {
 
   const [remoteTitle, setRemoteTitle] = React.useState(t.heroTitle);
   const [remoteSubtitle, setRemoteSubtitle] = React.useState(t.heroSub);
+  const [siteImages, setSiteImages] = React.useState<Record<string, string>>({});
 
   React.useEffect(() => {
     // Sync initial state when translation changes
@@ -37,6 +39,19 @@ export default function Home() {
       }
     };
     fetchSettings();
+
+    // Listen for site images
+    const qImages = query(collection(db, 'siteImages'));
+    const unsubscribe = onSnapshot(qImages, (snapshot) => {
+      const images: Record<string, string> = {};
+      snapshot.docs.forEach(doc => {
+        const data = doc.data();
+        images[data.key] = data.url;
+      });
+      setSiteImages(images);
+    }, (error) => handleFirestoreError(error, OperationType.GET, 'siteImages'));
+
+    return () => unsubscribe();
   }, [language, t]);
 
   return (
@@ -110,7 +125,7 @@ export default function Home() {
             >
               <div className="aspect-[4/5] bg-slate-200 rounded-[3rem] overflow-hidden relative shadow-2xl group border-8 border-white">
                 <img 
-                  src={FACULTY[0].image} 
+                  src={siteImages['pradeep_sir'] || FACULTY[0].image} 
                   alt="Pradeep Sir"
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
                   referrerPolicy="no-referrer"

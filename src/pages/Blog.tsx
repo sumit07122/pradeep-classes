@@ -129,7 +129,9 @@ export default function Blog() {
                   // clean up description HTML
                   const cleanDesc = item.description.replace(/<[^>]+>/g, '').substring(0, 150) + '...';
                   // use a placeholder if no thumbnail
-                  const imgSrc = item.thumbnail || 'https://images.unsplash.com/photo-1585829365295-ab7cd400c167?q=80&w=2070&auto=format&fit=crop';
+                  const imgSrc = item.thumbnail || 
+                                 item.enclosure?.link || 
+                                 'https://images.unsplash.com/photo-1585829365295-ab7cd400c167?q=80&w=2070&auto=format&fit=crop';
                   return (
                     <motion.div 
                       key={idx}
