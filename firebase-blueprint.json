@@ -1,0 +1,139 @@
+{
+  "entities": {
+    "Notice": {
+      "title": "Notice",
+      "description": "Announcements and notices for students",
+      "type": "object",
+      "properties": {
+        "title": { "type": "string", "description": "Title of the notice" },
+        "content": { "type": "string", "description": "Contet of the notice" },
+        "date": { "type": "string", "description": "Date of announcement" },
+        "createdAt": { "type": "number", "description": "Timestamp" },
+        "createdBy": { "type": "string", "description": "Admin UID" }
+      },
+      "required": ["title", "content", "date", "createdAt", "createdBy"]
+    },
+    "Inquiry": {
+      "title": "Inquiry",
+      "description": "Student leads or contact inquiries",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" },
+        "phone": { "type": "string" },
+        "email": { "type": "string" },
+        "message": { "type": "string" },
+        "status": { "type": "string", "enum": ["new", "contacted", "resolved"] },
+        "createdAt": { "type": "number" }
+      },
+      "required": ["name", "phone", "message", "status", "createdAt"]
+    },
+    "Admin": {
+      "title": "Admin",
+      "description": "Administrator of the system",
+      "type": "object",
+      "properties": {
+        "email": { "type": "string" },
+        "createdAt": { "type": "number" }
+      },
+      "required": ["email", "createdAt"]
+    },
+    "Setting": {
+      "title": "Setting",
+      "description": "Website customizable settings",
+      "type": "object",
+      "properties": {
+        "heroTitle": { "type": "string" },
+        "heroSubtitle": { "type": "string" },
+        "announcementText": { "type": "string" },
+        "announcementLink": { "type": "string" },
+        "announcementActive": { "type": "boolean" },
+        "updatedAt": { "type": "number" }
+      },
+      "required": ["heroTitle", "heroSubtitle", "announcementText", "announcementLink", "announcementActive", "updatedAt"]
+    },
+    "Faculty": {
+      "title": "Faculty",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" },
+        "designation": { "type": "string" },
+        "qualification": { "type": "string" },
+        "specialization": { "type": "string" },
+        "experience": { "type": "string" },
+        "philosophy": { "type": "string" },
+        "achievements": { "type": "string" },
+        "imageUrl": { "type": "string" },
+        "createdAt": { "type": "number" }
+      },
+      "required": ["name", "designation", "createdAt"]
+    },
+    "Topper": {
+      "title": "Topper",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" },
+        "score": { "type": "string" },
+        "details": { "type": "string" },
+        "school": { "type": "string" },
+        "year": { "type": "string" },
+        "imageUrl": { "type": "string" },
+        "createdAt": { "type": "number" }
+      },
+      "required": ["name", "year", "createdAt"]
+    },
+    "GalleryImage": {
+      "title": "Gallery Image",
+      "type": "object",
+      "properties": {
+        "title": { "type": "string" },
+        "imageUrl": { "type": "string" },
+        "createdAt": { "type": "number" }
+      },
+      "required": ["title", "imageUrl", "createdAt"]
+    },
+    "Review": {
+      "title": "Review",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" },
+        "rating": { "type": "number" },
+        "text": { "type": "string" },
+        "status": { "type": "string", "enum": ["pending", "approved"] },
+        "email": { "type": "string" },
+        "createdAt": { "type": "number" }
+      },
+      "required": ["name", "rating", "text", "status", "createdAt"]
+    }
+  },
+  "firestore": {
+    "notices": {
+      "schema": { "$ref": "#/entities/Notice" },
+      "description": "Stores all notices and announcements"
+    },
+    "inquiries": {
+      "schema": { "$ref": "#/entities/Inquiry" },
+      "description": "Stores contact form submissions"
+    },
+    "admins": {
+      "schema": { "$ref": "#/entities/Admin" },
+      "description": "Stores admin users. Document ID is the admin's Email."
+    },
+    "settings": {
+      "schema": { "$ref": "#/entities/Setting" },
+      "description": "Stores single document 'general' for website content."
+    },
+    "faculties": {
+      "schema": { "$ref": "#/entities/Faculty" }
+    },
+    "toppers": {
+      "schema": { "$ref": "#/entities/Topper" }
+    },
+    "gallery": {
+      "schema": { "$ref": "#/entities/GalleryImage" }
+    },
+    "reviews": {
+      "schema": { "$ref": "#/entities/Review" },
+      "description": "Reviews created by users."
+    }
+  }
+}

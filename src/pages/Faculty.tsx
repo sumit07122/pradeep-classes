@@ -1,10 +1,32 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { motion } from 'motion/react';
 import { CheckCircle2, Phone } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import { FACULTY } from '../constants';
+import { FACULTY as CONSTANT_FACULTY } from '../constants';
+import { collection, getDocs, orderBy, query } from 'firebase/firestore';
+import { db } from '../lib/firebase';
 
 export default function Faculty() {
+  const [faculties, setFaculties] = useState<any[]>([]);
+
+  useEffect(() => {
+    const fetchFaculties = async () => {
+      try {
+        const q = query(collection(db, 'faculties'), orderBy('createdAt', 'desc'));
+        const snap = await getDocs(q);
+        if (!snap.empty) {
+          setFaculties(snap.docs.map(doc => ({ id: doc.id, ...doc.data() })));
+        } else {
+          setFaculties(CONSTANT_FACULTY);
+        }
+      } catch (err) {
+        console.error("Could not load faculties", err);
+        setFaculties(CONSTANT_FACULTY);
+      }
+    };
+    fetchFaculties();
+  }, []);
+
   return (
     <div className="py-24 bg-white min-h-screen relative overflow-hidden">
       <div className="max-w-7xl mx-auto px-4 md:px-8">
@@ -17,9 +39,9 @@ export default function Faculty() {
         </div>
 
         <div className="space-y-32">
-          {FACULTY.map((f, idx) => (
+          {faculties.map((f, idx) => (
             <motion.div 
-              key={idx}
+              key={f.id || idx}
               initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
@@ -29,15 +51,14 @@ export default function Faculty() {
                 <div className="relative group">
                   <div className="absolute -inset-4 bg-brand-secondary/20 rounded-[3.5rem] rotate-3 transition-transform group-hover:rotate-0"></div>
                   <div className="relative aspect-[4/5] bg-slate-100 rounded-[3rem] overflow-hidden border-8 border-white shadow-2xl">
-                    {/* 
-                       IMAGE USAGE: f.image comes from the FACULTY array in src/constants.ts
-                       which imports assets directly (like src/assets/pradeep.jpg)
-                    */}
                     <img 
-                      src={f.image} 
+                      src={f.imageUrl || f.image || 'https://images.unsplash.com/photo-1524178232363-1fb2b075b655?q=80&w=2070&auto=format&fit=crop'} 
                       alt={f.name}
                       className="w-full h-full object-cover transition-all duration-700 group-hover:scale-105"
                       referrerPolicy="no-referrer"
+                      onError={(e) => {
+                        e.currentTarget.src = 'https://images.unsplash.com/photo-1524178232363-1fb2b075b655?q=80&w=2070&auto=format&fit=crop';
+                      }}
                     />
                   </div>
                 </div>
@@ -71,16 +92,23 @@ export default function Faculty() {
                   </div>
                 </div>
 
+                {/* Optional philosophy and achievements sections */}
+                {(f.philosophy || f.achievements) && (
                 <div className="space-y-6">
+                  {f.philosophy && (
                   <div>
                     <h4 className="text-xs font-black text-brand-accent uppercase tracking-[0.2em] mb-3">Teaching Philosophy</h4>
                     <p className="text-slate-600 leading-relaxed italic font-medium text-lg">"{f.philosophy}"</p>
                   </div>
+                  )}
+                  {f.achievements && (
                   <div>
                     <h4 className="text-xs font-black text-brand-accent uppercase tracking-[0.2em] mb-3">Notable Achievements</h4>
                     <p className="text-slate-600 leading-relaxed font-medium text-lg">{f.achievements}</p>
                   </div>
+                  )}
                 </div>
+                )}
 
                 <div className="pt-4">
                   <Link to="/contact" className="w-fit bg-brand-primary text-white px-10 py-4 rounded-2xl font-bold flex items-center gap-3 hover:bg-brand-primary/90 transition-all shadow-xl shadow-brand-primary/20 hover:translate-y-[-2px]">

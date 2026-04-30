@@ -1,9 +1,11 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { GraduationCap, Menu, X, Phone, Mail, Facebook, Instagram, Youtube, MapPin, Sun, Moon, Languages, Bell } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
-import { CONTACTS, NOTIFICATIONS, TRANSLATIONS } from '../constants';
+import { CONTACTS, TRANSLATIONS } from '../constants';
 import { useApp } from '../context/AppContext';
+import { doc, getDoc } from 'firebase/firestore';
+import { db } from '../lib/firebase';
 
 export default function Header() {
   const { language, setLanguage, theme, toggleTheme } = useApp();
@@ -11,10 +13,36 @@ export default function Header() {
   const location = useLocation();
   const t = TRANSLATIONS[language];
 
+  const [announcement, setAnnouncement] = useState({ text: '', link: '', active: false });
+
+  useEffect(() => {
+    const fetchAnnouncement = async () => {
+      try {
+        const docRef = doc(db, 'settings', 'general');
+        const snap = await getDoc(docRef);
+        if (snap.exists()) {
+          const data = snap.data();
+          if (data.announcementActive) {
+            setAnnouncement({
+              text: data.announcementText || '',
+              link: data.announcementLink || '',
+              active: data.announcementActive
+            });
+          }
+        }
+      } catch (error) {
+        console.error("Could not load announcement", error);
+      }
+    };
+    fetchAnnouncement();
+  }, []);
+
   const navItems = [
     { name: t.courses, path: '/courses' },
     { name: t.results, path: '/results' },
     { name: t.faculty, path: '/faculty' },
+    { name: 'Gallery', path: '/gallery' },
+    { name: 'Blog', path: '/blog' },
     { name: 'Resources', path: '/resources' },
     { name: 'Contact', path: '/contact' }
   ];
@@ -22,25 +50,24 @@ export default function Header() {
   return (
     <header className="z-50">
       {/* Exam Notification Ticker */}
-      <div className="bg-brand-secondary text-brand-primary py-1 overflow-hidden whitespace-nowrap relative border-b border-brand-primary/10">
-        <div className="animate-marquee inline-block">
-          <div className="flex items-center gap-12">
-            {NOTIFICATIONS.map((note, i) => (
-              <div key={i} className="flex items-center gap-2 text-[10px] font-black uppercase tracking-wider">
-                <Bell size={12} className="animate-bounce" />
-                {note}
-              </div>
-            ))}
-            {/* Duplicate for seamless scrolling */}
-            {NOTIFICATIONS.map((note, i) => (
-              <div key={`dup-${i}`} className="flex items-center gap-2 text-[10px] font-black uppercase tracking-wider">
-                <Bell size={12} className="animate-bounce" />
-                {note}
-              </div>
-            ))}
+      {announcement.active && announcement.text && (
+        <div className="bg-brand-secondary text-brand-primary py-1 overflow-hidden whitespace-nowrap relative border-b border-brand-primary/10">
+          <div className="animate-marquee inline-block">
+            <div className="flex items-center gap-12">
+              {[...Array(10)].map((_, i) => (
+                <div key={i} className="flex items-center gap-2 text-[10px] font-black uppercase tracking-wider">
+                  <Bell size={12} className="animate-bounce" />
+                  {announcement.link ? (
+                    <a href={announcement.link} target="_blank" rel="noreferrer" className="hover:underline">{announcement.text}</a>
+                  ) : (
+                    <span>{announcement.text}</span>
+                  )}
+                </div>
+              ))}
+            </div>
           </div>
         </div>
-      </div>
+      )}
 
       {/* Top Bar */}
       <div className="bg-slate-50 text-slate-600 py-2 px-4 md:px-8 flex flex-col md:flex-row justify-between items-center text-xs gap-4 border-b border-slate-100">

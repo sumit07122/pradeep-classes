@@ -1,0 +1,163 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    function isSignedIn() { return request.auth != null; }
+    function isValidId(id) { return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$'); }
+    function isValidEmailId(id) { return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_.@\\-]+$'); }
+    function incoming() { return request.resource.data; }
+    function existing() { return resource.data; }
+    function isSuperAdmin() { 
+      return request.auth != null && request.auth.token.email == 'sumitdevthakur@gmail.com' && request.auth.token.email_verified == true; 
+    }
+    function isAdmin() { 
+      return isSuperAdmin() || (isSignedIn() && exists(/databases/$(database)/documents/admins/$(request.auth.token.email))); 
+    }
+
+    function isValidNotice(data) {
+      return data.keys().hasAll(['title', 'content', 'date', 'createdAt', 'createdBy']) &&
+             data.keys().size() <= 5 &&
+             data.title is string && data.title.size() > 0 && data.title.size() <= 200 &&
+             data.content is string && data.content.size() > 0 && data.content.size() <= 5000 &&
+             data.date is string && data.date.size() > 0 && data.date.size() <= 50 &&
+             data.createdAt is timestamp &&
+             data.createdBy is string && data.createdBy == request.auth.uid;
+    }
+
+    function isValidInquiry(data) {
+      return data.keys().hasAll(['name', 'phone', 'message', 'status', 'createdAt']) &&
+             data.keys().size() <= 6 &&
+             data.name is string && data.name.size() > 0 && data.name.size() <= 100 &&
+             data.phone is string && data.phone.size() >= 10 && data.phone.size() <= 15 &&
+             data.message is string && data.message.size() > 0 && data.message.size() <= 2000 &&
+             data.status is string && data.status.matches('^(new|contacted|resolved)$') &&
+             data.createdAt is timestamp &&
+             (data.get('email', '') is string && data.get('email', '').size() <= 100);
+    }
+
+    function isValidAdmin(data) {
+      return data.keys().hasAll(['email', 'createdAt']) &&
+             data.keys().size() <= 2 &&
+             data.email is string && data.email.size() > 0 && data.email.size() <= 100 &&
+             data.createdAt is timestamp;
+    }
+
+    function isValidSetting(data) {
+      return data.keys().hasAll(['heroTitle', 'heroSubtitle', 'announcementText', 'announcementLink', 'announcementActive', 'updatedAt']) &&
+             data.keys().size() <= 6 &&
+             data.heroTitle is string && data.heroTitle.size() > 0 && data.heroTitle.size() <= 200 &&
+             data.heroSubtitle is string && data.heroSubtitle.size() > 0 && data.heroSubtitle.size() <= 600 &&
+             data.announcementText is string && data.announcementText.size() <= 500 &&
+             data.announcementLink is string && data.announcementLink.size() <= 500 &&
+             data.announcementActive is bool &&
+             data.updatedAt is timestamp;
+    }
+
+    function isValidFaculty(data) {
+      return data.keys().hasAll(['name', 'designation', 'createdAt']) &&
+             data.keys().size() <= 9 &&
+             data.name is string && data.name.size() > 0 && data.name.size() <= 100 &&
+             data.designation is string && data.designation.size() > 0 && data.designation.size() <= 100 &&
+             (data.get('qualification', '') is string && data.get('qualification', '').size() <= 200) &&
+             (data.get('specialization', '') is string && data.get('specialization', '').size() <= 200) &&
+             (data.get('experience', '') is string && data.get('experience', '').size() <= 200) &&
+             (data.get('philosophy', '') is string && data.get('philosophy', '').size() <= 1000) &&
+             (data.get('achievements', '') is string && data.get('achievements', '').size() <= 1000) &&
+             (data.get('imageUrl', '') is string && data.get('imageUrl', '').size() <= 1000) &&
+             data.createdAt is timestamp;
+    }
+
+    function isValidTopper(data) {
+      return data.keys().hasAll(['name', 'year', 'createdAt']) &&
+             data.keys().size() <= 7 &&
+             data.name is string && data.name.size() > 0 && data.name.size() <= 100 &&
+             data.year is string && data.year.size() > 0 && data.year.size() <= 10 &&
+             (data.get('score', '') is string && data.get('score', '').size() <= 100) &&
+             (data.get('details', '') is string && data.get('details', '').size() <= 500) &&
+             (data.get('school', '') is string && data.get('school', '').size() <= 200) &&
+             (data.get('imageUrl', '') is string && data.get('imageUrl', '').size() <= 1000) &&
+             data.createdAt is timestamp;
+    }
+
+    function isValidGalleryImage(data) {
+      return data.keys().hasAll(['title', 'imageUrl', 'createdAt']) &&
+             data.keys().size() <= 3 &&
+             data.title is string && data.title.size() > 0 && data.title.size() <= 200 &&
+             data.imageUrl is string && data.imageUrl.size() > 0 && data.imageUrl.size() <= 1000 &&
+             data.createdAt is timestamp;
+    }
+
+    function isValidReview(data) {
+      return data.keys().hasAll(['name', 'rating', 'text', 'status', 'createdAt']) &&
+             data.keys().size() <= 6 &&
+             data.name is string && data.name.size() > 0 && data.name.size() <= 100 &&
+             data.rating is number && data.rating >= 1 && data.rating <= 5 &&
+             data.text is string && data.text.size() > 0 && data.text.size() <= 1000 &&
+             data.status is string && data.status.matches('^(pending|approved)$') &&
+             data.createdAt is timestamp &&
+             (data.get('email', '') is string && data.get('email', '').size() <= 100);
+    }
+
+    match /notices/{noticeId} {
+      allow read: if true; // Publicly readable
+      allow create: if isValidId(noticeId) && isAdmin() && isValidNotice(incoming()) && incoming().createdAt == request.time;
+      allow update: if isValidId(noticeId) && isAdmin() && isValidNotice(incoming()) && incoming().createdBy == existing().createdBy && incoming().createdAt == existing().createdAt;
+      allow delete: if isValidId(noticeId) && isAdmin();
+    }
+
+    match /inquiries/{inquiryId} {
+      allow read: if isAdmin();
+      allow create: if isValidId(inquiryId) && isValidInquiry(incoming()) && incoming().status == 'new' && incoming().createdAt == request.time;
+      allow update: if isValidId(inquiryId) && isAdmin() && isValidInquiry(incoming()) && incoming().createdAt == existing().createdAt && incoming().diff(existing()).affectedKeys().hasOnly(['status']);
+      allow delete: if isValidId(inquiryId) && isAdmin();
+      allow list: if isAdmin(); // Needed for queries by admin
+    }
+
+    match /admins/{adminId} {
+      allow read: if isSuperAdmin() || (isSignedIn() && request.auth.token.email == adminId);
+      allow create: if isValidEmailId(adminId) && isSuperAdmin() && isValidAdmin(incoming()) && incoming().createdAt == request.time;
+      allow update: if isValidEmailId(adminId) && isSuperAdmin() && isValidAdmin(incoming()) && incoming().createdAt == existing().createdAt;
+      allow delete: if isValidEmailId(adminId) && isSuperAdmin();
+      allow list: if isSuperAdmin();
+    }
+
+    match /settings/{settingId} {
+      allow read: if true;
+      allow create: if settingId == 'general' && isAdmin() && isValidSetting(incoming()) && incoming().updatedAt == request.time;
+      allow update: if settingId == 'general' && isAdmin() && isValidSetting(incoming()) && incoming().diff(existing()).affectedKeys().hasOnly(['heroTitle', 'heroSubtitle', 'announcementText', 'announcementLink', 'announcementActive', 'updatedAt']) && incoming().updatedAt == request.time;
+      allow delete: if false; // Settings shouldn't be deleted
+    }
+
+    match /faculties/{facultyId} {
+      allow read: if true;
+      allow create: if isValidId(facultyId) && isAdmin() && isValidFaculty(incoming()) && incoming().createdAt == request.time;
+      allow update: if isValidId(facultyId) && isAdmin() && isValidFaculty(incoming()) && incoming().createdAt == existing().createdAt;
+      allow delete: if isValidId(facultyId) && isAdmin();
+    }
+
+    match /toppers/{topperId} {
+      allow read: if true;
+      allow create: if isValidId(topperId) && isAdmin() && isValidTopper(incoming()) && incoming().createdAt == request.time;
+      allow update: if isValidId(topperId) && isAdmin() && isValidTopper(incoming()) && incoming().createdAt == existing().createdAt;
+      allow delete: if isValidId(topperId) && isAdmin();
+    }
+
+    match /gallery/{imageId} {
+      allow read: if true;
+      allow create: if isValidId(imageId) && isAdmin() && isValidGalleryImage(incoming()) && incoming().createdAt == request.time;
+      allow update: if isValidId(imageId) && isAdmin() && isValidGalleryImage(incoming()) && incoming().createdAt == existing().createdAt;
+      allow delete: if isValidId(imageId) && isAdmin();
+    }
+
+    match /reviews/{reviewId} {
+      allow read: if isAdmin() || resource.data.status == 'approved';
+      allow create: if isValidId(reviewId) && isValidReview(incoming()) && incoming().status == 'pending' && incoming().createdAt == request.time;
+      allow update: if isValidId(reviewId) && isAdmin() && isValidReview(incoming()) && incoming().createdAt == existing().createdAt && incoming().diff(existing()).affectedKeys().hasOnly(['status']);
+      allow delete: if isValidId(reviewId) && isAdmin();
+      allow list: if isAdmin() || resource.data.status == 'approved';
+    }
+  }
+}

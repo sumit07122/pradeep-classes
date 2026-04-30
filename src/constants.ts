@@ -16,7 +16,8 @@ export const CONTACTS = {
       name: "Main Branch",
       address: "Anand Lok Colony, Beside Shriji Baba School, Goverdhan Road, Mathura (U.P.) - 281004",
       landmark: "Beside Shriji Baba School",
-      coords: { lat: 27.5020, lng: 77.6430 }
+      coords: { lat: 27.5020, lng: 77.6430 },
+      mapUrl: "https://maps.app.goo.gl/k4qrvmVa9D6K9abPA?g_st=ac"
     },
     {
       name: "Pradeep Classes Academy",
@@ -36,7 +37,7 @@ export const FACULTY = [
     experience: "15+ Years of dedicated teaching experience",
     philosophy: "I believe every student has a unique potential that needs the right direction. My focus is on strengthening basic concepts and developing an analytical mindset rather than rote learning.",
     achievements: "Mentored over 500+ students to achieve 90%+ in board exams and top ranks in school entrance tests like Navodaya and Sainik school.",
-    image: pradipSir
+    image: "https://drive.google.com/thumbnail?id=177DpFjIU-A6BMeVHCqvorTDdXiQ1KonR&sz=w1000"
   },
   {
     name: "Our Elite Faculty Team",

@@ -38,7 +38,7 @@ export default function Footer() {
           <div className="space-y-4">
             <h3 className="font-bold text-brand-primary uppercase tracking-wider text-sm">Quick Links</h3>
             <ul className="space-y-2">
-              {['Home', 'Courses', 'Results', 'Faculty', 'Resources', 'Contact'].map((item) => (
+              {['Home', 'Courses', 'Results', 'Faculty', 'Gallery', 'Blog', 'Resources', 'Contact'].map((item) => (
                 <li key={item}>
                   <Link to={item === 'Home' ? '/' : `/${item.toLowerCase()}`} className="text-slate-500 hover:text-brand-primary text-sm transition-colors flex items-center gap-2">
                     <span className="w-1.5 h-1.5 rounded-full bg-brand-secondary/30"></span>
@@ -71,6 +71,7 @@ export default function Footer() {
         <div className="pt-8 flex flex-col md:flex-row justify-between items-center gap-4 text-xs font-medium text-slate-400">
           <p>© {new Date().getFullYear()} Pradeep Classes. All rights reserved.</p>
           <div className="flex gap-6">
+            <Link to="/admin/login" className="hover:text-brand-primary transition-colors">Admin Login</Link>
             <a href="#" className="hover:text-brand-primary transition-colors">Privacy Policy</a>
             <a href="#" className="hover:text-brand-primary transition-colors">Terms of Service</a>
           </div>

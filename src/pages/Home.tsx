@@ -3,15 +3,44 @@ import { motion } from 'motion/react';
 import { Award, Users, Phone, Trophy, CheckCircle2, BookOpen, Target, GraduationCap, PlayCircle, ArrowRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import Counter from '../components/Counter';
+import NoticeBoard from '../components/NoticeBoard';
+import ReviewsSection from '../components/ReviewsSection';
 import { ADVANTAGES, FACULTY, VIDEOS, CONTACTS, TRANSLATIONS } from '../constants';
 import { useApp } from '../context/AppContext';
+import { db } from '../lib/firebase';
+import { getDoc, doc } from 'firebase/firestore';
 
 export default function Home() {
   const { language } = useApp();
   const t = TRANSLATIONS[language];
 
+  const [remoteTitle, setRemoteTitle] = React.useState(t.heroTitle);
+  const [remoteSubtitle, setRemoteSubtitle] = React.useState(t.heroSub);
+
+  React.useEffect(() => {
+    // Sync initial state when translation changes
+    setRemoteTitle(t.heroTitle);
+    setRemoteSubtitle(t.heroSub);
+    
+    // Fetch global setting overrides
+    const fetchSettings = async () => {
+      try {
+        const docRef = doc(db, 'settings', 'general');
+        const snap = await getDoc(docRef);
+        if (snap.exists()) {
+          if (snap.data().heroTitle) setRemoteTitle(snap.data().heroTitle);
+          if (snap.data().heroSubtitle) setRemoteSubtitle(snap.data().heroSubtitle);
+        }
+      } catch (err) {
+        console.error("Could not load remote settings", err);
+      }
+    };
+    fetchSettings();
+  }, [language, t]);
+
   return (
     <div className="flex flex-col bg-white transition-colors duration-300">
+      <NoticeBoard />
       {/* Hero Section */}
       <section className="relative pt-12 pb-24 overflow-hidden">
         <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
@@ -37,10 +66,10 @@ export default function Home() {
                 </div>
               </div>
               <h1 className="text-4xl md:text-6xl font-black text-brand-primary leading-[1.1] heading-serif italic">
-                {t.heroTitle} <span className="text-brand-accent">at Pradeep Classes.</span>
+                {remoteTitle} <span className="text-brand-accent">at Pradeep Classes.</span>
               </h1>
               <p className="text-lg text-slate-600 leading-relaxed max-w-lg">
-                {t.heroSub} Special batches for Navodaya, Sainik School, and IIT/NEET Foundation.
+                {remoteSubtitle} Special batches for Navodaya, Sainik School, and IIT/NEET Foundation.
               </p>
               <div className="flex flex-wrap gap-4 pt-4">
                 <Link to="/contact" className="bg-brand-primary text-white px-8 py-4 rounded-2xl font-bold hover:bg-brand-primary/90 hover:translate-y-[-2px] active:translate-y-0 transition-all shadow-xl shadow-brand-primary/30 flex items-center gap-2">
@@ -79,6 +108,9 @@ export default function Home() {
                   alt="Pradeep Sir"
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
                   referrerPolicy="no-referrer"
+                  onError={(e) => {
+                    e.currentTarget.src = 'https://images.unsplash.com/photo-1524178232363-1fb2b075b655?q=80&w=2070&auto=format&fit=crop';
+                  }}
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-brand-primary/40 via-transparent to-transparent"></div>
                 <div className="absolute bottom-10 left-10 text-white">
@@ -194,6 +226,9 @@ export default function Home() {
           </div>
         </div>
       </section>
+
+      {/* Student Reviews & Form */}
+      <ReviewsSection />
 
       {/* Video Lectures Section */}
       <section className="py-24 bg-slate-50 relative overflow-hidden transition-colors duration-300">

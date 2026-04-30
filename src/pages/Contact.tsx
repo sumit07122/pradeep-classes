@@ -2,6 +2,9 @@ import React from 'react';
 import { motion } from 'motion/react';
 import { MapPin, Phone, Mail } from 'lucide-react';
 import { CONTACTS } from '../constants';
+import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
+import { db } from '../lib/firebase';
+import { handleFirestoreError, OperationType } from '../lib/firestore-errors';
 
 export default function Contact() {
   const [activeBranch, setActiveBranch] = React.useState(0);
@@ -14,13 +17,32 @@ export default function Contact() {
 
   const googleMapUrl = `https://maps.google.com/maps?q=${CONTACTS.branches[activeBranch].coords.lat},${CONTACTS.branches[activeBranch].coords.lng}&t=k&z=17&ie=UTF8&iwloc=&output=embed`;
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const [isSubmitting, setIsSubmitting] = React.useState(false);
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setIsSubmitting(true);
     
-    const whatsappMessage = `*New Enquiry from Website*%0A%0A*Name:* ${formData.name}%0A*Phone:* ${formData.phone}%0A*Class:* ${formData.class}%0A*Message:* ${formData.message}`;
-    const url = `https://wa.me/91${CONTACTS.phone1}?text=${whatsappMessage}`;
-    
-    window.open(url, '_blank');
+    try {
+      try {
+        await addDoc(collection(db, 'inquiries'), {
+          name: formData.name,
+          phone: formData.phone,
+          message: formData.class + " - " + formData.message,
+          status: 'new',
+          createdAt: serverTimestamp()
+        });
+        alert('Thank you! Your inquiry has been sent successfully. We will contact you soon.');
+        setFormData({ name: '', phone: '', class: 'Select Class', message: '' });
+      } catch (error) {
+        handleFirestoreError(error, OperationType.CREATE, 'inquiries');
+      }
+    } catch (error) {
+      console.error(error);
+      alert('Failed to send inquiry. Please try again later.');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -59,7 +81,12 @@ export default function Contact() {
                     <div>
                       <h4 className="font-black text-brand-primary text-base uppercase tracking-tight mb-1">{branch.name}</h4>
                       <p className="text-brand-accent text-xs font-black uppercase tracking-wider mb-3 underline decoration-brand-accent/30 underline-offset-4">{branch.landmark}</p>
-                      <p className="text-sm font-medium text-slate-600 leading-relaxed">{branch.address}</p>
+                      <p className="text-sm font-medium text-slate-600 leading-relaxed mb-3">{branch.address}</p>
+                      {branch.mapUrl && (
+                        <a href={branch.mapUrl} target="_blank" rel="noreferrer" className="inline-block mt-2 text-xs font-bold text-white bg-brand-primary px-3 py-1.5 rounded-lg hover:bg-brand-primary/90 transition-colors shadow shadow-brand-primary/20">
+                          Open in Google Maps
+                        </a>
+                      )}
                     </div>
                   </motion.div>
                 ))}
@@ -172,9 +199,10 @@ export default function Contact() {
                   </div>
                   <button 
                     type="submit"
-                    className="w-full bg-brand-primary text-white py-4 rounded-2xl font-black text-lg hover:scale-[1.02] active:scale-100 transition-all shadow-xl shadow-brand-primary/20 mt-4 flex items-center justify-center gap-2"
+                    disabled={isSubmitting}
+                    className="w-full bg-brand-primary text-white py-4 rounded-2xl font-black text-lg hover:scale-[1.02] active:scale-100 transition-all shadow-xl shadow-brand-primary/20 mt-4 flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed"
                   >
-                    Submit via WhatsApp
+                    {isSubmitting ? 'Sending...' : 'Send Inquiry'}
                   </button>
                 </div>
               </form>

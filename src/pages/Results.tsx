@@ -1,9 +1,39 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { motion } from 'motion/react';
 import { Trophy, MapPin } from 'lucide-react';
-import { TOPPERS, TOPPERS_BY_YEAR } from '../constants';
+import { TOPPERS, TOPPERS_BY_YEAR as CONSTANT_TOPPERS_BY_YEAR } from '../constants';
+import { collection, getDocs, orderBy, query } from 'firebase/firestore';
+import { db } from '../lib/firebase';
 
 export default function Results() {
+  const [toppersByYear, setToppersByYear] = useState<Record<string, any[]>>({});
+
+  useEffect(() => {
+    const fetchToppers = async () => {
+      try {
+        const q = query(collection(db, 'toppers'), orderBy('year', 'desc'), orderBy('createdAt', 'desc'));
+        const snap = await getDocs(q);
+        if (!snap.empty) {
+          const fetchedByYear: Record<string, any[]> = {};
+          snap.docs.forEach(doc => {
+            const data = doc.data();
+            if (!fetchedByYear[data.year]) {
+              fetchedByYear[data.year] = [];
+            }
+            fetchedByYear[data.year].push({ id: doc.id, ...data });
+          });
+          setToppersByYear(fetchedByYear);
+        } else {
+          setToppersByYear(CONSTANT_TOPPERS_BY_YEAR);
+        }
+      } catch (err) {
+        console.error("Could not load toppers", err);
+        setToppersByYear(CONSTANT_TOPPERS_BY_YEAR);
+      }
+    };
+    fetchToppers();
+  }, []);
+
   return (
     <div className="py-24 bg-stone-50 border-y border-stone-200 relative overflow-hidden min-h-screen">
       <div className="absolute top-0 right-0 w-96 h-96 bg-brand-secondary/5 rounded-full blur-[100px] -translate-y-1/2 translate-x-1/2"></div>
@@ -60,7 +90,7 @@ export default function Results() {
         </div>
 
         {/* Detailed Results By Year */}
-        {Object.entries(TOPPERS_BY_YEAR).sort((a,b) => b[0].localeCompare(a[0])).map(([year, students]) => (
+        {Object.entries(toppersByYear).sort((a,b) => b[0].localeCompare(a[0])).map(([year, students]) => (
           <div key={year} className="mb-24 last:mb-0">
             <div className="flex items-center gap-6 mb-12">
               <h3 className="text-4xl font-black text-brand-primary heading-serif italic">The {year} Batch</h3>
@@ -70,22 +100,27 @@ export default function Results() {
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
               {students.map((topper, idx) => (
                 <motion.div 
-                  key={idx}
+                  key={topper.id || idx}
                   initial={{ opacity: 0, y: 20 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   transition={{ delay: (idx % 4) * 0.05 }}
                   whileHover={{ y: -5 }}
                   viewport={{ once: true }}
-                  className="bg-white p-7 rounded-[2.5rem] shadow-sm border border-slate-100 group hover:shadow-2xl hover:border-brand-secondary transition-all relative overflow-hidden"
+                  className="bg-white p-7 rounded-[2.5rem] shadow-sm border border-slate-100 group hover:shadow-2xl hover:border-brand-secondary transition-all relative overflow-hidden flex flex-col"
                 >
                   <div className="absolute top-0 right-0 w-2 h-0 bg-brand-secondary group-hover:h-full transition-all duration-500"></div>
-                  <h4 className="font-black text-brand-primary group-hover:text-brand-accent transition-colors text-lg leading-tight">{topper.name}</h4>
+                  
+                  {topper.imageUrl && (
+                    <img src={topper.imageUrl} alt={topper.name} className="w-20 h-20 object-cover rounded-full mb-4 border-2 border-slate-100 mx-auto group-hover:border-brand-primary transition-colors" />
+                  )}
+
+                  <h4 className="font-black text-brand-primary group-hover:text-brand-accent transition-colors text-lg leading-tight mt-auto">{topper.name}</h4>
                   {topper.score && <p className="text-brand-accent font-black text-xl mt-2">{topper.score}</p>}
                   {topper.rank && <p className="text-brand-primary/60 text-xs font-black mt-1 uppercase tracking-tight">{topper.rank}</p>}
                   {topper.school && (
                     <div className="flex items-center gap-1.5 mt-2 bg-slate-50 px-3 py-1 rounded-full w-fit">
                       <MapPin size={10} className="text-brand-secondary" />
-                      <span className="text-[10px] text-slate-500 font-black uppercase">{topper.school}</span>
+                      <span className="text-[10px] text-slate-500 font-black uppercase line-clamp-1">{topper.school}</span>
                     </div>
                   )}
                   {topper.details && (
@@ -100,7 +135,8 @@ export default function Results() {
           </div>
         ))}
 
-        {/* Past Legacy Section */}
+        {/* Past Legacy Section Fallback (only shown if not fetching from firebase) */}
+        {Object.keys(toppersByYear).length > 0 && toppersByYear === CONSTANT_TOPPERS_BY_YEAR && (
         <div className="mt-24 pt-12 border-t border-slate-200/50">
           <div className="flex items-center gap-6 mb-12">
             <div className="h-px flex-1 bg-gradient-to-r from-transparent to-slate-200"></div>
@@ -129,6 +165,7 @@ export default function Results() {
             ))}
           </div>
         </div>
+        )}
       </div>
     </div>
   );
