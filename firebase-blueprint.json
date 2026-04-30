@@ -103,6 +103,16 @@
         "createdAt": { "type": "number" }
       },
       "required": ["name", "rating", "text", "status", "createdAt"]
+    },
+    "SiteImage": {
+      "title": "Site Image",
+      "type": "object",
+      "properties": {
+        "key": { "type": "string" },
+        "url": { "type": "string" },
+        "updatedAt": { "type": "number" }
+      },
+      "required": ["key", "url", "updatedAt"]
     }
   },
   "firestore": {
@@ -134,6 +144,10 @@
     "reviews": {
       "schema": { "$ref": "#/entities/Review" },
       "description": "Reviews created by users."
+    },
+    "siteImages": {
+      "schema": { "$ref": "#/entities/SiteImage" },
+      "description": "Dynamic images used across the site"
     }
   }
 }

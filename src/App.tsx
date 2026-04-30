@@ -1,4 +1,5 @@
 import React from 'react';
+import { HelmetProvider } from 'react-helmet-async';
 import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
 import { AppProvider } from './context/AppContext';
 import { AuthProvider } from './context/AuthContext';
@@ -33,36 +34,38 @@ function ScrollToTop() {
 
 export default function App() {
   return (
-    <AuthProvider>
-      <AppProvider>
-        <Router>
-          <div className="min-h-screen font-sans flex flex-col selection:bg-brand-secondary selection:text-brand-primary bg-white transition-colors duration-300">
-            <ScrollToTop />
-            <Header />
-            <main className="flex-grow">
-              <Routes>
-                <Route path="/" element={<Home />} />
-                <Route path="/courses" element={<Courses />} />
-                <Route path="/results" element={<Results />} />
-                <Route path="/faculty" element={<Faculty />} />
-                <Route path="/gallery" element={<Gallery />} />
-                <Route path="/blog" element={<Blog />} />
-                <Route path="/resources" element={<Resources />} />
-                <Route path="/contact" element={<Contact />} />
-                
-                {/* Admin Routes */}
-                <Route path="/admin/login" element={<AdminLogin />} />
-                <Route element={<AdminRoute />}>
-                  <Route path="/admin/dashboard" element={<AdminDashboard />} />
-                </Route>
-              </Routes>
-            </main>
-            <Footer />
-            <WhatsAppFloatingButton />
-            <InquiryPopup />
-          </div>
-        </Router>
-      </AppProvider>
-    </AuthProvider>
+    <HelmetProvider>
+      <AuthProvider>
+        <AppProvider>
+          <Router>
+            <div className="min-h-screen font-sans flex flex-col selection:bg-brand-secondary selection:text-brand-primary bg-white transition-colors duration-300">
+              <ScrollToTop />
+              <Header />
+              <main className="flex-grow">
+                <Routes>
+                  <Route path="/" element={<Home />} />
+                  <Route path="/courses" element={<Courses />} />
+                  <Route path="/results" element={<Results />} />
+                  <Route path="/faculty" element={<Faculty />} />
+                  <Route path="/gallery" element={<Gallery />} />
+                  <Route path="/blog" element={<Blog />} />
+                  <Route path="/resources" element={<Resources />} />
+                  <Route path="/contact" element={<Contact />} />
+                  
+                  {/* Admin Routes */}
+                  <Route path="/admin/login" element={<AdminLogin />} />
+                  <Route element={<AdminRoute />}>
+                    <Route path="/admin/dashboard" element={<AdminDashboard />} />
+                  </Route>
+                </Routes>
+              </main>
+              <Footer />
+              <WhatsAppFloatingButton />
+              <InquiryPopup />
+            </div>
+          </Router>
+        </AppProvider>
+      </AuthProvider>
+    </HelmetProvider>
   );
 }

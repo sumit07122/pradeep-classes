@@ -1,4 +1,5 @@
 import React from 'react';
+import { Helmet } from 'react-helmet-async';
 import { motion } from 'motion/react';
 import { MapPin, Phone, Mail } from 'lucide-react';
 import { CONTACTS } from '../constants';
@@ -47,6 +48,10 @@ export default function Contact() {
 
   return (
     <div className="py-24 bg-white min-h-screen overflow-hidden">
+      <Helmet>
+        <title>Contact Pradeep Classes Mathura | Enquire Now</title>
+        <meta name="description" content="Have questions? Contact Pradeep Classes Mathura. Find our branch locations, phone numbers, and submit an inquiry form to kickstart your academic journey." />
+      </Helmet>
       <div className="max-w-7xl mx-auto px-4 md:px-8">
         <div className="text-center mb-16">
           <p className="text-brand-accent font-bold uppercase tracking-widest text-sm mb-2">Contact Us</p>

@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { Helmet } from 'react-helmet-async';
 import { motion } from 'motion/react';
 import { Newspaper, Lightbulb, Clock, ArrowRight, ExternalLink, RefreshCw } from 'lucide-react';
 
@@ -77,6 +78,10 @@ export default function Blog() {
 
   return (
     <div className="py-24 bg-stone-50 min-h-screen">
+      <Helmet>
+        <title>Educational News & Updates | Pradeep Classes Mathura</title>
+        <meta name="description" content="Stay updated with the latest educational news, current affairs, and daily facts to prepare for competitive exams with Pradeep Classes Mathura." />
+      </Helmet>
       <div className="max-w-7xl mx-auto px-4 md:px-8">
         <div className="text-center mb-16">
           <p className="text-brand-accent font-bold uppercase tracking-widest text-sm mb-2">Automated Feed</p>

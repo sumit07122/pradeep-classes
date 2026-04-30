@@ -186,6 +186,12 @@ export default function AdminDashboard() {
             >
               Photos
             </button>
+            <button 
+              onClick={() => setActiveTab('images')} 
+              className={`w-full text-left px-4 py-3 rounded-lg font-bold transition-all ${activeTab === 'images' ? 'bg-brand-primary text-white shadow-md shadow-brand-primary/20' : 'text-gray-600 hover:bg-brand-secondary/30 hover:text-brand-primary'}`}
+            >
+              Site Images
+            </button>
             {isSuperAdmin && (
               <>
                 <h3 className="text-xs font-black text-gray-400 uppercase tracking-wider mb-2 mt-4 px-4 pt-2">Admin</h3>
@@ -378,6 +384,11 @@ export default function AdminDashboard() {
               <GenericPanel title="Manage Photos" collectionName="gallery" fields={[{name:'title', label:'Image Title'}, {name:'imageUrl', label:'Image URL'}]} />
             )}
 
+            {/* Site Images Section */}
+            {activeTab === 'images' && (
+              <SiteImagesPanel />
+            )}
+
             {/* Manage Admins Section */}
             {isSuperAdmin && activeTab === 'admins' && (
               <AdminsPanel />
@@ -526,6 +537,80 @@ function GenericPanel({ title, collectionName, fields }: { title: string, collec
   );
 }
 
+function SiteImagesPanel() {
+  const [images, setImages] = React.useState<any[]>([]);
+  const [formData, setFormData] = React.useState<any>({ key: '', url: '' });
+  const [editingId, setEditingId] = React.useState<string | null>(null);
+
+  React.useEffect(() => {
+    const qImages = query(collection(db, 'siteImages'), orderBy('updatedAt', 'desc'));
+    const unsubscribe = onSnapshot(qImages, (snapshot) => {
+      setImages(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })));
+    }, (error) => handleFirestoreError(error, OperationType.GET, 'siteImages'));
+
+    return () => unsubscribe();
+  }, []);
+
+  const handleSaveImage = async (e: React.FormEvent) => {
+    e.preventDefault();
+    try {
+      if (editingId) {
+        await updateDoc(doc(db, 'siteImages', editingId), {
+          url: formData.url,
+          updatedAt: serverTimestamp()
+        });
+        alert('Image updated successfully.');
+      } else {
+        await addDoc(collection(db, 'siteImages'), {
+          key: formData.key,
+          url: formData.url,
+          updatedAt: serverTimestamp()
+        });
+        alert('Image added successfully.');
+      }
+      setFormData({ key: '', url: '' });
+      setEditingId(null);
+    } catch (error) {
+      handleFirestoreError(error, editingId ? OperationType.UPDATE : OperationType.CREATE, 'siteImages');
+    }
+  };
+
+  const handleEdit = (img: any) => {
+    setFormData({ key: img.key, url: img.url });
+    setEditingId(img.id);
+  };
+
+  return (
+    <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+      <h2 className="text-2xl font-bold mb-6">Manage Site Images</h2>
+      <form onSubmit={handleSaveImage} className="mb-8 space-y-4 max-w-xl bg-gray-50 p-6 rounded-xl">
+        {!editingId && (
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Image Key (unique identifier)</label>
+            <input type="text" required value={formData.key} onChange={e => setFormData({...formData, key: e.target.value})} className="w-full px-4 py-2 border rounded-lg" placeholder="e.g., pradeep_sir" />
+          </div>
+        )}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">Image URL</label>
+          <input type="text" required value={formData.url} onChange={e => setFormData({...formData, url: e.target.value})} className="w-full px-4 py-2 border rounded-lg" />
+        </div>
+        <button type="submit" className="px-6 py-2 bg-brand-primary text-white rounded-lg hover:bg-brand-primary/90 font-medium">
+          {editingId ? 'Update Image' : 'Add Image'}
+        </button>
+      </form>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        {images.map(img => (
+          <div key={img.id} className="p-4 border rounded-lg bg-gray-50">
+            <h4 className="font-bold text-lg mb-2">{img.key}</h4>
+            <img src={img.url} alt={img.key} className="w-full h-32 object-cover mb-3" />
+            <button onClick={() => handleEdit(img)} className="text-blue-600 font-bold text-sm">Edit</button>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 function SettingsPanel() {
   const [heroTitle, setHeroTitle] = React.useState('Your Path to Academic Excellence Starts Here');
   const [heroSubtitle, setHeroSubtitle] = React.useState('Expert faculty, comprehensive study material, and a proven track record of success in CBSE and competitive exams.');
@@ -573,43 +658,58 @@ function SettingsPanel() {
 
   return (
     <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
-      <h2 className="text-2xl font-bold mb-6">Site Settings</h2>
-      <form onSubmit={handleSaveSettings} className="space-y-6 max-w-2xl">
-        <div className="bg-gray-50 p-4 rounded-lg space-y-4">
-          <h3 className="font-semibold text-gray-800 text-lg">Hero Section (Home Page)</h3>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Hero Title</label>
-            <input type="text" required value={heroTitle} onChange={e => setHeroTitle(e.target.value)} className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-brand-primary/20 outline-none" />
+      <h2 className="text-2xl font-bold mb-6">Site Settings & Live Preview</h2>
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <form onSubmit={handleSaveSettings} className="space-y-6">
+          <div className="bg-gray-50 p-4 rounded-lg space-y-4">
+            <h3 className="font-semibold text-gray-800 text-lg">Hero Section (Home Page)</h3>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Hero Title</label>
+              <input type="text" required value={heroTitle} onChange={e => setHeroTitle(e.target.value)} className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-brand-primary/20 outline-none" />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Hero Subtitle</label>
+              <textarea required value={heroSubtitle} onChange={e => setHeroSubtitle(e.target.value)} rows={3} className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-brand-primary/20 outline-none" />
+            </div>
           </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Hero Subtitle</label>
-            <textarea required value={heroSubtitle} onChange={e => setHeroSubtitle(e.target.value)} rows={3} className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-brand-primary/20 outline-none" />
+          
+          <div className="bg-gray-50 p-4 rounded-lg space-y-4">
+            <h3 className="font-semibold text-gray-800 text-lg">Top Announcement Bar</h3>
+            <div className="flex items-center gap-2">
+              <input type="checkbox" id="announcementActive" checked={announcementActive} onChange={e => setAnnouncementActive(e.target.checked)} className="w-4 h-4 text-brand-primary rounded border-gray-300 focus:ring-brand-primary" />
+              <label htmlFor="announcementActive" className="text-sm font-medium text-gray-700 cursor-pointer">Show announcement bar at top of website</label>
+            </div>
+            {announcementActive && (
+              <>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Announcement Text</label>
+                  <input type="text" placeholder="e.g. Navodaya Entrance Registration Open!" value={announcementText} onChange={e => setAnnouncementText(e.target.value)} className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-brand-primary/20 outline-none" />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Link (Optional)</label>
+                  <input type="text" placeholder="https://..." value={announcementLink} onChange={e => setAnnouncementLink(e.target.value)} className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-brand-primary/20 outline-none" />
+                </div>
+              </>
+            )}
           </div>
-        </div>
+          <button type="submit" className="px-6 py-2 bg-brand-primary text-white rounded-lg hover:bg-brand-primary/90 font-medium cursor-pointer">
+            Save Settings
+          </button>
+        </form>
 
-        <div className="bg-gray-50 p-4 rounded-lg space-y-4">
-          <h3 className="font-semibold text-gray-800 text-lg">Top Announcement Bar</h3>
-          <div className="flex items-center gap-2">
-            <input type="checkbox" id="announcementActive" checked={announcementActive} onChange={e => setAnnouncementActive(e.target.checked)} className="w-4 h-4 text-brand-primary rounded border-gray-300 focus:ring-brand-primary" />
-            <label htmlFor="announcementActive" className="text-sm font-medium text-gray-700 cursor-pointer">Show announcement bar at top of website</label>
+        <div className="border rounded-xl p-6 bg-gray-50">
+          <h3 className="font-semibold text-gray-800 text-lg mb-4">Live Preview</h3>
+          <div className="bg-white p-6 rounded-lg shadow border border-gray-200">
+            {announcementActive && (
+              <div className="bg-brand-primary text-white text-sm py-2 px-4 rounded-lg mb-4 text-center font-bold">
+                {announcementText || "Announcement bar active"}
+              </div>
+            )}
+            <h1 className="text-3xl font-black text-brand-primary mb-3">{heroTitle}</h1>
+            <p className="text-gray-600 font-medium">{heroSubtitle}</p>
           </div>
-          {announcementActive && (
-            <>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Announcement Text</label>
-                <input type="text" placeholder="e.g. Navodaya Entrance Registration Open!" value={announcementText} onChange={e => setAnnouncementText(e.target.value)} className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-brand-primary/20 outline-none" />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Link (Optional)</label>
-                <input type="text" placeholder="https://..." value={announcementLink} onChange={e => setAnnouncementLink(e.target.value)} className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-brand-primary/20 outline-none" />
-              </div>
-            </>
-          )}
         </div>
-        <button type="submit" className="px-6 py-2 bg-brand-primary text-white rounded-lg hover:bg-brand-primary/90 font-medium cursor-pointer">
-          Save Settings
-        </button>
-      </form>
+      </div>
     </div>
   );
 }

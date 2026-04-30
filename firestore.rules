@@ -101,6 +101,14 @@ service cloud.firestore {
              (data.get('email', '') is string && data.get('email', '').size() <= 100);
     }
 
+    function isValidSiteImage(data) {
+      return data.keys().hasAll(['key', 'url', 'updatedAt']) &&
+             data.keys().size() <= 3 &&
+             data.key is string && data.key.size() > 0 && data.key.size() <= 100 &&
+             data.url is string && data.url.size() > 0 && data.url.size() <= 1000 &&
+             data.updatedAt is timestamp;
+    }
+
     match /notices/{noticeId} {
       allow read: if true; // Publicly readable
       allow create: if isValidId(noticeId) && isAdmin() && isValidNotice(incoming()) && incoming().createdAt == request.time;
@@ -158,6 +166,13 @@ service cloud.firestore {
       allow update: if isValidId(reviewId) && isAdmin() && isValidReview(incoming()) && incoming().createdAt == existing().createdAt && incoming().diff(existing()).affectedKeys().hasOnly(['status']);
       allow delete: if isValidId(reviewId) && isAdmin();
       allow list: if isAdmin() || resource.data.status == 'approved';
+    }
+
+    match /siteImages/{imageId} {
+      allow read: if true;
+      allow create: if isValidId(imageId) && isAdmin() && isValidSiteImage(incoming()) && incoming().updatedAt == request.time;
+      allow update: if isValidId(imageId) && isAdmin() && isValidSiteImage(incoming()) && incoming().updatedAt == request.time;
+      allow delete: if isValidId(imageId) && isAdmin();
     }
   }
 }
