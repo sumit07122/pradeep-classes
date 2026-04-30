@@ -1,7 +1,10 @@
 import React, { useEffect, useState } from 'react';
-import { Helmet } from 'react-helmet-async';
+import SEO from '../components/SEO';
 import { motion } from 'motion/react';
-import { Newspaper, Lightbulb, Clock, ArrowRight, ExternalLink, RefreshCw } from 'lucide-react';
+import { Newspaper, Lightbulb, Clock, ArrowRight, ExternalLink, RefreshCw, Sparkles, Brain } from 'lucide-react';
+import { getGeminiDailyContent, GsFact, CareerTip } from '../services/geminiService';
+import { doc, getDoc, setDoc, serverTimestamp } from 'firebase/firestore';
+import { db } from '../lib/firebase';
 
 interface NewsItem {
   title: string;
@@ -9,13 +12,18 @@ interface NewsItem {
   link: string;
   thumbnail: string;
   description: string;
+  enclosure?: {
+    link: string;
+  };
 }
 
 export default function Blog() {
   const [activeCategory, setActiveCategory] = useState('education');
   const [news, setNews] = useState<NewsItem[]>([]);
-  const [facts, setFacts] = useState<string[]>([]);
+  const [facts, setFacts] = useState<GsFact[]>([]);
+  const [tips, setTips] = useState<CareerTip[]>([]);
   const [loading, setLoading] = useState(true);
+  const [loadingFacts, setLoadingFacts] = useState(true);
 
   const categories = {
     national: {
@@ -36,52 +44,92 @@ export default function Blog() {
     }
   };
 
-  const fetchNewsAndFacts = async (categoryKey = activeCategory) => {
+  const fetchNews = async (categoryKey = activeCategory) => {
     setLoading(true);
     try {
       const feedUrl = categories[categoryKey as keyof typeof categories].url;
       const newsRes = await fetch(`https://api.rss2json.com/v1/api.json?rss_url=${feedUrl}`);
       const newsData = await newsRes.json();
-      
       const articles = newsData.items?.slice(0, 10) || [];
-      
-      // Fetch some random facts for the "GS/Facts" section
-      const factsPromises = Array(3).fill(0).map(() => 
-        fetch('https://uselessfacts.jsph.pl/api/v2/facts/random').then(r => r.json())
-      );
-      const factsData = await Promise.all(factsPromises);
-      
       setNews(articles);
-      setFacts(factsData.map(f => f.text));
     } catch (err) {
-      console.error("Failed to fetch blog content", err);
+      console.error("Failed to fetch news updates", err);
     } finally {
       setLoading(false);
     }
   };
 
+  const fetchGSContent = async (forceRefresh = false) => {
+    setLoadingFacts(true);
+    try {
+      const docRef = doc(db, 'automated_content', 'daily_gs');
+      const docSnap = await getDoc(docRef);
+
+      let shouldUpdate = forceRefresh;
+      
+      if (docSnap.exists()) {
+        const data = docSnap.data();
+        const lastUpdated = data.lastUpdated?.toDate();
+        const now = new Date();
+        // Update if older than 1 hour
+        if (!lastUpdated || (now.getTime() - lastUpdated.getTime() > 3600000)) {
+          shouldUpdate = true;
+        } else {
+          setFacts(data.gsFacts);
+          setTips(data.careerTips);
+        }
+      } else {
+        shouldUpdate = true;
+      }
+
+      if (shouldUpdate) {
+        const freshContent = await getGeminiDailyContent();
+        if (freshContent) {
+          setFacts(freshContent.gsFacts);
+          setTips(freshContent.careerTips);
+          
+          // Cache in Firestore
+          await setDoc(docRef, {
+            gsFacts: freshContent.gsFacts,
+            careerTips: freshContent.careerTips,
+            lastUpdated: serverTimestamp()
+          });
+        }
+      }
+    } catch (err) {
+      console.error("Failed to fetch GS content", err);
+    } finally {
+      setLoadingFacts(false);
+    }
+  };
+
   useEffect(() => {
-    fetchNewsAndFacts();
+    fetchNews();
+    fetchGSContent();
     
-    // Auto-refresh every 1 hour (3600000ms)
-    const intervalId = setInterval(() => {
-      fetchNewsAndFacts();
-    }, 3600000);
+    // Auto-refresh news every 30 mins, facts every 1 hour
+    const newsInterval = setInterval(() => fetchNews(), 1800000);
+    const factsInterval = setInterval(() => fetchGSContent(), 3600000);
     
-    return () => clearInterval(intervalId);
+    return () => {
+      clearInterval(newsInterval);
+      clearInterval(factsInterval);
+    };
   }, []);
 
   const handleCategoryChange = (key: string) => {
     setActiveCategory(key);
-    fetchNewsAndFacts(key);
+    fetchNews(key);
   };
 
   return (
     <div className="py-24 bg-stone-50 min-h-screen">
-      <Helmet>
-        <title>Educational News & Updates | Pradeep Classes Mathura</title>
-        <meta name="description" content="Stay updated with the latest educational news, current affairs, and daily facts to prepare for competitive exams with Pradeep Classes Mathura." />
-      </Helmet>
+      <SEO 
+        title="Educational News & Insights | Pradeep Classes Mathura"
+        description="Stay ahead with automated educational news, current affairs, and daily general studies facts. Curated for competitive exam aspirants at Pradeep Classes."
+        keywords="educational newsletter mathura, current affairs for students, gs preparation mathura, board exam news, scholarship alerts"
+        canonical="https://pradeepclasses.in/blog"
+      />
       <div className="max-w-7xl mx-auto px-4 md:px-8">
         <div className="text-center mb-16">
           <p className="text-brand-accent font-bold uppercase tracking-widest text-sm mb-2">Automated Feed</p>
@@ -129,9 +177,17 @@ export default function Blog() {
                   // clean up description HTML
                   const cleanDesc = item.description.replace(/<[^>]+>/g, '').substring(0, 150) + '...';
                   // use a placeholder if no thumbnail
+                  // categorize images for fallback
+                  const fallbackImages = {
+                    education: 'https://images.unsplash.com/photo-1546410531-bb4caa6b424d?q=80&w=2071&auto=format&fit=crop',
+                    national: 'https://images.unsplash.com/photo-1532375811409-caac3341bed7?q=80&w=2070&auto=format&fit=crop',
+                    international: 'https://images.unsplash.com/photo-1529107386315-e1a2ed48a620?q=80&w=2070&auto=format&fit=crop',
+                    finance: 'https://images.unsplash.com/photo-1611974714014-4986a23a31bc?q=80&w=2070&auto=format&fit=crop'
+                  };
+
                   const imgSrc = item.thumbnail || 
                                  item.enclosure?.link || 
-                                 'https://images.unsplash.com/photo-1585829365295-ab7cd400c167?q=80&w=2070&auto=format&fit=crop';
+                                 fallbackImages[activeCategory as keyof typeof fallbackImages];
                   return (
                     <motion.div 
                       key={idx}
@@ -178,34 +234,64 @@ export default function Blog() {
 
           {/* Sidebar (Facts/GS) */}
           <div className="space-y-8">
-              <div className="bg-brand-primary text-white p-8 rounded-3xl relative overflow-hidden">
+              <div className="bg-brand-primary text-white p-8 rounded-3xl relative overflow-hidden shadow-2xl shadow-brand-primary/20">
                 <div className="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full blur-[50px] -translate-y-1/2 translate-x-1/3"></div>
                 
-                <div className="flex items-center gap-3 mb-8 relative">
-                  <Lightbulb className="text-brand-secondary w-7 h-7" />
-                  <h2 className="text-2xl font-black">Daily Facts & GS</h2>
+                <div className="flex items-center justify-between mb-8 relative">
+                  <div className="flex items-center gap-3">
+                    <Sparkles className="text-brand-secondary w-7 h-7" />
+                    <h2 className="text-2xl font-black">GS Daily Capsule</h2>
+                  </div>
+                  <Brain className="text-white/20 w-8 h-8" />
                 </div>
                 
                 <div className="space-y-6 relative">
-                  {facts.map((fact, idx) => (
-                    <motion.div 
-                      key={idx}
-                      initial={{ opacity: 0, x: 20 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      transition={{ delay: 0.5 + (idx * 0.1) }}
-                      className="bg-white/10 p-5 rounded-2xl backdrop-blur-sm border border-white/10"
-                    >
-                      <p className="font-medium text-white/90 leading-relaxed text-sm">
-                        "{fact}"
-                      </p>
-                    </motion.div>
-                  ))}
+                  {loadingFacts ? (
+                    <div className="flex flex-col items-center py-6">
+                      <RefreshCw className="w-8 h-8 text-brand-secondary animate-spin mb-2" />
+                      <p className="text-white/60 text-xs">Generating fresh facts...</p>
+                    </div>
+                  ) : (
+                    <>
+                      {facts.map((fact, idx) => (
+                        <motion.div 
+                          key={idx}
+                          initial={{ opacity: 0, x: 20 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          transition={{ delay: 0.1 * idx }}
+                          className="bg-white/10 p-5 rounded-2xl backdrop-blur-sm border border-white/10 group"
+                        >
+                          <div className="text-[10px] uppercase tracking-widest text-brand-secondary font-bold mb-2 opacity-70">
+                            {fact.category}
+                          </div>
+                          <p className="font-bold text-white leading-relaxed text-sm mb-2">
+                             {fact.fact}
+                          </p>
+                          {fact.explanation && (
+                            <p className="text-white/60 text-xs leading-relaxed italic">
+                              {fact.explanation}
+                            </p>
+                          )}
+                        </motion.div>
+                      ))}
+
+                      <div className="pt-4 border-t border-white/10">
+                        <h3 className="text-sm font-black text-brand-secondary uppercase tracking-widest mb-4">Study Strategy</h3>
+                        {tips.map((tip, idx) => (
+                          <div key={idx} className="flex gap-3 mb-4 last:mb-0">
+                            <div className="w-1.5 h-1.5 rounded-full bg-brand-secondary mt-1.5 shrink-0"></div>
+                            <p className="text-sm text-white/80"><span className="font-bold text-white">{tip.subject}:</span> {tip.tip}</p>
+                          </div>
+                        ))}
+                      </div>
+                    </>
+                  )}
                   
                 <button 
-                  onClick={() => fetchNewsAndFacts(activeCategory)}
-                  className="w-full mt-6 bg-brand-secondary text-brand-primary font-bold py-3 rounded-xl hover:bg-brand-secondary/90 transition-colors flex items-center justify-center gap-2"
+                  onClick={() => { fetchNews(); fetchGSContent(true); }}
+                  className="w-full mt-6 bg-brand-secondary text-brand-primary font-bold py-3 rounded-xl hover:bg-white hover:scale-[1.02] transition-all flex items-center justify-center gap-2"
                 >
-                  <RefreshCw size={18} /> Refresh News & Facts
+                  <RefreshCw size={18} /> Update Now
                 </button>
               </div>
             </div>

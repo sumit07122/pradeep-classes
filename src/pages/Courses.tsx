@@ -1,4 +1,5 @@
 import React from 'react';
+import SEO from '../components/SEO';
 import { motion } from 'motion/react';
 import { GraduationCap, FlaskConical, Trophy, BookOpen } from 'lucide-react';
 import { COURSES, TRANSLATIONS } from '../constants';
@@ -28,6 +29,12 @@ export default function Courses() {
 
   return (
     <div className="py-24 bg-white min-h-screen transition-colors duration-300">
+      <SEO 
+        title="Courses & Programs | Pradeep Classes Mathura"
+        description="Explore our wide range of coaching programs: Navodaya & Sainik School entrance prep, IIT/NEET Foundation, and comprehensive school academic coaching (1st-12th)."
+        keywords="school coaching mathura, navodaya school batch, sainik school batch mathura, iit foundation mathura, neet foundation mathura, class 10 coaching, class 12 coaching mathura"
+        canonical="https://pradeepclasses.in/courses"
+      />
       <div className="max-w-7xl mx-auto px-4 md:px-8">
         <motion.div 
           initial={{ opacity: 0, y: 20 }}
@@ -105,7 +112,14 @@ export default function Courses() {
                 </li>
               </ul>
             </div>
-            <div className="bg-slate-100 aspect-video rounded-[3rem] shadow-inner"></div>
+            <div className="relative aspect-video rounded-[3rem] overflow-hidden shadow-2xl group">
+              <img 
+                src="https://images.unsplash.com/photo-1503676260728-1c00da094a0b?q=80&w=2022&auto=format&fit=crop" 
+                alt="Foundation academic classes" 
+                className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-brand-primary/40 to-transparent"></div>
+            </div>
           </motion.div>
 
           <motion.div 
@@ -136,7 +150,14 @@ export default function Courses() {
                 </li>
               </ul>
             </div>
-            <div className="md:order-1 bg-slate-100 aspect-video rounded-[3rem] shadow-inner"></div>
+            <div className="md:order-1 relative aspect-video rounded-[3rem] overflow-hidden shadow-2xl group">
+              <img 
+                src="https://images.unsplash.com/photo-1523240715630-3987501f606a?q=80&w=2070&auto=format&fit=crop" 
+                alt="Advanced board exam coaching" 
+                className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-brand-primary/40 to-transparent"></div>
+            </div>
           </motion.div>
         </div>
 

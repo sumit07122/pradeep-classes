@@ -1,5 +1,5 @@
 import React from 'react';
-import { Helmet } from 'react-helmet-async';
+import SEO from '../components/SEO';
 import { motion } from 'motion/react';
 import { Award, Users, Phone, Trophy, CheckCircle2, BookOpen, Target, GraduationCap, PlayCircle, ArrowRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
@@ -56,11 +56,11 @@ export default function Home() {
 
   return (
     <div className="flex flex-col bg-white transition-colors duration-300">
-      <Helmet>
-        <title>Pradeep Classes Mathura | Top Coaching for Navodaya, Sainik School & IIT/NEET</title>
-        <meta name="description" content="Pradeep Classes Mathura offers expert coaching for Navodaya, Sainik School, IIT/NEET Foundation, and school academics (1st-12th). Join Mathura's top-rated coaching center with 15+ years of experience." />
-        <meta name="keywords" content="Coaching in Mathura, Navodaya Coaching, Sainik School Coaching, IIT Foundation Mathura, NEET Foundation Mathura, Pradeep Classes Mathura, Academic Coaching Mathura" />
-      </Helmet>
+      <SEO 
+        title="Pradeep Classes Mathura | Top Coaching for Navodaya, Sainik School & IIT/NEET"
+        description="Pradeep Classes Mathura offers expert coaching for Navodaya, Sainik School, IIT/NEET Foundation, and school academics (1st-12th). Join Mathura's top-rated coaching center with 15+ years of experience."
+        keywords="Coaching in Mathura, Navodaya Coaching, Sainik School Coaching, IIT Foundation Mathura, NEET Foundation Mathura, Pradeep Classes Mathura, Academic Coaching Mathura, best coaching center mathura, pradeep sir coaching mathura"
+      />
       <NoticeBoard />
       {/* Hero Section */}
       <section className="relative pt-12 pb-24 overflow-hidden">

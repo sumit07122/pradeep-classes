@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import SEO from '../components/SEO';
 import { motion } from 'motion/react';
 import { collection, getDocs, orderBy, query } from 'firebase/firestore';
 import { db } from '../lib/firebase';
@@ -24,6 +25,12 @@ export default function Gallery() {
 
   return (
     <div className="py-24 bg-white min-h-screen relative overflow-hidden">
+      <SEO 
+        title="Gallery | Pradeep Classes Mathura Coaching"
+        description="Explore the gallery of Pradeep Classes Mathura. See our classrooms, coaching activities, and memorable celebrations with students."
+        keywords="pradeep classes mathura gallery, coaching classrooms mathura, student events mathura"
+        canonical="https://pradeepclasses.in/gallery"
+      />
       <div className="max-w-7xl mx-auto px-4 md:px-8">
         <div className="text-center mb-20">
           <p className="text-brand-accent font-bold uppercase tracking-widest text-sm mb-2">Our Campus</p>

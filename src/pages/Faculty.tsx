@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import SEO from '../components/SEO';
 import { motion } from 'motion/react';
 import { CheckCircle2, Phone } from 'lucide-react';
 import { Link } from 'react-router-dom';
@@ -29,6 +30,12 @@ export default function Faculty() {
 
   return (
     <div className="py-24 bg-white min-h-screen relative overflow-hidden">
+      <SEO 
+        title="Meet Our Expert Faculty | Pradeep Classes Mathura"
+        description="Learn from the best mentors in Mathura. Our expert faculty, led by Pradeep Kumar, provides personalized coaching for board exams and competitive entrances."
+        keywords="pradeep classes mathura faculty, best teachers mathura, coaching mentors, pradeep sir mathura, expert coaching faculty"
+        canonical="https://pradeepclasses.in/faculty"
+      />
       <div className="max-w-7xl mx-auto px-4 md:px-8">
         <div className="text-center mb-20">
           <p className="text-brand-accent font-bold uppercase tracking-widest text-sm mb-2">Our Mentors</p>

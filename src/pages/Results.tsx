@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import SEO from '../components/SEO';
 import { motion } from 'motion/react';
 import { Trophy, MapPin } from 'lucide-react';
 import { TOPPERS, TOPPERS_BY_YEAR as CONSTANT_TOPPERS_BY_YEAR } from '../constants';
@@ -36,6 +37,12 @@ export default function Results() {
 
   return (
     <div className="py-24 bg-stone-50 border-y border-stone-200 relative overflow-hidden min-h-screen">
+      <SEO 
+        title="Our Toppers & Results | Pradeep Classes Legacy"
+        description="Witness the legacy of excellence at Pradeep Classes. Check out our record holders, rankers, and subject toppers from Navodaya, Sainik School, and Board exams."
+        keywords="pradeep classes results, mathura coaching toppers, navodaya selection mathura, sainik school selection lists, coaching achievements mathura"
+        canonical="https://pradeepclasses.in/results"
+      />
       <div className="absolute top-0 right-0 w-96 h-96 bg-brand-secondary/5 rounded-full blur-[100px] -translate-y-1/2 translate-x-1/2"></div>
       
       <div className="max-w-7xl mx-auto px-4 md:px-8 relative z-10">

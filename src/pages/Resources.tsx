@@ -1,4 +1,5 @@
 import React from 'react';
+import SEO from '../components/SEO';
 import { motion } from 'motion/react';
 import { FileDown, GraduationCap, School, BookOpen, Search, Download } from 'lucide-react';
 import { RESOURCES } from '../constants';
@@ -15,6 +16,12 @@ export default function Resources() {
 
   return (
     <div className="py-24 bg-white min-h-screen">
+      <SEO 
+        title="Download Resources | Pradeep Classes Mathura"
+        description="Access free study materials, previous year question papers for Navodaya, Sainik School, and Board exams (CBSE/UP Board) at Pradeep Classes."
+        keywords="download study material, navodaya previous year papers, sainik school entrance papers, board exam sample papers mathura"
+        canonical="https://pradeepclasses.in/resources"
+      />
       <div className="max-w-7xl mx-auto px-4 md:px-8">
         <motion.div 
           initial={{ opacity: 0, y: 20 }}
