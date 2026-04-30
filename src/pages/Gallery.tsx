@@ -26,10 +26,10 @@ export default function Gallery() {
   return (
     <div className="py-24 bg-white min-h-screen relative overflow-hidden">
       <SEO 
-        title="Gallery | Pradeep Classes Mathura Coaching"
-        description="Explore the gallery of Pradeep Classes Mathura. See our classrooms, coaching activities, and memorable celebrations with students."
-        keywords="pradeep classes mathura gallery, coaching classrooms mathura, student events mathura"
-        canonical="https://pradeepclasses.in/gallery"
+        title="Campus Gallery | Pradeep Classes Mathura"
+        description="Take a visual tour of Pradeep Classes campus in Mathura. View our classrooms, study environment, and school-prep activities for Navodaya and Sainik school."
+        keywords="pradeep classes mathura gallery, coaching classrooms mathura, student events mathura, coaching campus mathura"
+        canonical="https://www.pradeepclasses.in/gallery"
       />
       <div className="max-w-7xl mx-auto px-4 md:px-8">
         <div className="text-center mb-20">

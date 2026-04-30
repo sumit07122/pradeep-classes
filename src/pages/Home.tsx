@@ -1,10 +1,54 @@
 import React from 'react';
 import SEO from '../components/SEO';
 import { motion } from 'motion/react';
-import { Award, Users, Phone, Trophy, CheckCircle2, BookOpen, Target, GraduationCap, PlayCircle, ArrowRight } from 'lucide-react';
+import { Award, Users, Phone, Trophy, CheckCircle2, BookOpen, Target, GraduationCap, PlayCircle, ArrowRight, MessageCircle, Star, Quote, HelpCircle } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import Counter from '../components/Counter';
 import NoticeBoard from '../components/NoticeBoard';
+
+const FloatingWhatsApp = () => (
+  <motion.a
+    href="https://wa.me/918126180408?text=Hello%20Pradeep%20Classes,%20I%20would%20like%20to%20enquire%20about%20admissions."
+    target="_blank"
+    rel="noopener noreferrer"
+    initial={{ scale: 0, opacity: 0 }}
+    animate={{ scale: 1, opacity: 1 }}
+    whileHover={{ scale: 1.1 }}
+    className="fixed bottom-8 right-8 z-50 bg-[#25D366] text-white p-4 rounded-full shadow-2xl flex items-center justify-center group"
+    aria-label="Chat on WhatsApp"
+  >
+    <MessageCircle size={28} fill="currentColor" />
+    <span className="absolute right-full mr-4 bg-white text-slate-800 px-4 py-2 rounded-xl text-sm font-bold shadow-xl opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap border border-slate-100 pointer-events-none">
+      Chat with Pradeep Sir
+    </span>
+  </motion.a>
+);
+
+const FAQItem = ({ question, answer }: { question: string, answer: string }) => {
+  const [isOpen, setIsOpen] = React.useState(false);
+  return (
+    <div className="border-b border-slate-200">
+      <button 
+        onClick={() => setIsOpen(!isOpen)}
+        className="w-full py-6 flex items-center justify-between text-left hover:text-brand-primary transition-colors group"
+      >
+        <span className="text-lg font-bold text-slate-800 group-hover:text-brand-primary">{question}</span>
+        <div className={`p-2 rounded-lg transition-all ${isOpen ? 'bg-brand-primary text-white' : 'bg-slate-100 text-slate-500'}`}>
+          <HelpCircle size={20} className={`transition-transform duration-300 ${isOpen ? 'rotate-180' : ''}`} />
+        </div>
+      </button>
+      <motion.div
+        initial={false}
+        animate={{ height: isOpen ? 'auto' : 0, opacity: isOpen ? 1 : 0 }}
+        className="overflow-hidden"
+      >
+        <p className="pb-6 text-slate-600 leading-relaxed">
+          {answer}
+        </p>
+      </motion.div>
+    </div>
+  );
+};
 import ReviewsSection from '../components/ReviewsSection';
 import { ADVANTAGES, FACULTY, VIDEOS, CONTACTS, TRANSLATIONS } from '../constants';
 import { useApp } from '../context/AppContext';
@@ -56,6 +100,7 @@ export default function Home() {
 
   return (
     <div className="flex flex-col bg-white transition-colors duration-300">
+      <FloatingWhatsApp />
       <SEO 
         title="Pradeep Classes Mathura | Top Coaching for Navodaya, Sainik School & IIT/NEET"
         description="Pradeep Classes Mathura offers expert coaching for Navodaya, Sainik School, IIT/NEET Foundation, and school academics (1st-12th). Join Mathura's top-rated coaching center with 15+ years of experience."
@@ -250,6 +295,97 @@ export default function Home() {
 
       {/* Student Reviews & Form */}
       <ReviewsSection />
+
+      {/* Testimonials Section */}
+      <section className="py-24 bg-brand-primary text-white overflow-hidden relative">
+        <div className="absolute top-0 right-0 w-96 h-96 bg-white/5 rounded-full blur-[100px] -translate-y-1/2 translate-x-1/2"></div>
+        <div className="max-w-7xl mx-auto px-4 md:px-8 relative z-10">
+          <div className="text-center mb-16">
+            <p className="text-brand-secondary font-bold uppercase tracking-widest text-sm mb-2">Success Stories</p>
+            <h2 className="text-4xl md:text-5xl font-black mb-6">What Parents & Students Say</h2>
+            <div className="w-24 h-1.5 bg-brand-secondary mx-auto"></div>
+          </div>
+
+          <div className="grid md:grid-cols-3 gap-8">
+            {[
+              {
+                name: "Rahul Sharma",
+                sub: "Navodaya Selection 2023",
+                text: "Pradeep Classes is the best choice for Navodaya preparation in Mathura. The trick-based math teaching is revolutionary.",
+                rating: 5
+              },
+              {
+                name: "Mrs. Verma",
+                sub: "Parent of Class 10 student",
+                text: "Personalized attention is what sets them apart. My daughter's confidence in Science and Math improved within 3 months.",
+                rating: 5
+              },
+              {
+                name: "Kartik Singh",
+                sub: "IIT Foundation Batch",
+                text: "The foundation batch helped me build concepts that are helping me even now in my higher studies. Highly recommended!",
+                rating: 5
+              }
+            ].map((t, idx) => (
+              <motion.div
+                key={idx}
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ delay: idx * 0.1 }}
+                viewport={{ once: true }}
+                className="bg-white/10 backdrop-blur-xl p-8 rounded-3xl border border-white/10 flex flex-col justify-between h-full group hover:bg-white/20 transition-all"
+              >
+                <div>
+                  <div className="flex gap-1 mb-6 text-brand-secondary">
+                    {Array(t.rating).fill(0).map((_, i) => <Star key={i} size={16} fill="currentColor" />)}
+                  </div>
+                  <Quote size={40} className="text-brand-secondary/20 mb-4" />
+                  <p className="text-lg text-white/90 leading-relaxed mb-8 italic">"{t.text}"</p>
+                </div>
+                <div className="flex items-center gap-4 border-t border-white/10 pt-6">
+                  <div className="w-12 h-12 rounded-full bg-brand-secondary/20 flex items-center justify-center text-brand-secondary font-bold text-xl">
+                    {t.name.charAt(0)}
+                  </div>
+                  <div>
+                    <h4 className="font-bold">{t.name}</h4>
+                    <p className="text-sm text-brand-secondary/80">{t.sub}</p>
+                  </div>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* FAQ Section */}
+      <section className="py-24 bg-white">
+        <div className="max-w-4xl mx-auto px-4 md:px-8">
+          <div className="text-center mb-16">
+            <p className="text-brand-accent font-bold uppercase tracking-widest text-sm mb-2">Have Questions?</p>
+            <h2 className="text-4xl font-black text-brand-primary mb-4 text-center">Frequently Asked Questions</h2>
+            <p className="text-slate-600 text-center">Everything you need to know about admissions and our coaching philosophy.</p>
+          </div>
+
+          <div className="space-y-4">
+            <FAQItem 
+              question="What is the admission procedure for Pradeep Classes?"
+              answer="Admission starts with a small diagnostic test to understand the student's current level. You can visit our center near Goverdhan Chauraha to enroll directly or use the contact form on this website."
+            />
+            <FAQItem 
+              question="Do you provide coaching for Navodaya and Sainik School?"
+              answer="Yes, we have specialized separate batches for Navodaya Vidyalaya and Sainik School entrance exams with a track record of 100+ selections."
+            />
+            <FAQItem 
+              question="What are the batch timings for Class 10th and 12th?"
+              answer="We offer multiple batches: Morning (6:00 AM - 8:00 AM) and Evening (3:00 PM - 7:00 PM) to suit school schedules. Please call us for current batch availability."
+            />
+            <FAQItem 
+              question="Is there a separate foundation batch for IIT/NEET?"
+              answer="Yes, we have specialized foundation batches for Class 8th to 10th students targeting future competitive success in engineering and medical fields."
+            />
+          </div>
+        </div>
+      </section>
 
       {/* Video Lectures Section */}
       <section className="py-24 bg-slate-50 relative overflow-hidden transition-colors duration-300">

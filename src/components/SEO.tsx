@@ -75,6 +75,27 @@ const SEO: React.FC<SEOProps> = ({
           ]
         })}
       </script>
+      {/* Structured Data (JSON-LD) - BreadcrumbList */}
+      <script type="application/ld+json">
+        {JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "BreadcrumbList",
+          "itemListElement": [
+            {
+              "@type": "ListItem",
+              "position": 1,
+              "name": "Home",
+              "item": "https://www.pradeepclasses.in/"
+            },
+            {
+              "@type": "ListItem",
+              "position": 2,
+              "name": title.split('|')[0].trim(),
+              "item": canonical
+            }
+          ]
+        })}
+      </script>
     </Helmet>
   );
 };
