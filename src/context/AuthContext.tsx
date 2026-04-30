@@ -27,7 +27,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       
       if (currentUser) {
         // Check super admin email
-        const isSuper = currentUser.email === 'sumitdevthakur@gmail.com' && currentUser.emailVerified;
+        const isSuper = (currentUser.email === 'sumitdevthakur@gmail.com' || currentUser.email === 'pradeepclasses.in@gmail.com') && currentUser.emailVerified;
         setIsSuperAdmin(isSuper);
         
         let isAdminUser = false;

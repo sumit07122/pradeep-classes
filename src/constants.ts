@@ -4,7 +4,7 @@ import pradipSir from './assets/pradip.jpg';
 export const CONTACTS = {
   phone1: "8126180408",
   phone2: "7017775704",
-  email: "pradeepclasses@gmail.com",
+  email: "pradeepclasses.in@gmail.com",
   socials: {
     facebook: "https://facebook.com/pradeepclassesmathura",
     instagram: "https://www.instagram.com/pradeepclasses07",

@@ -11,7 +11,7 @@ service cloud.firestore {
     function incoming() { return request.resource.data; }
     function existing() { return resource.data; }
     function isSuperAdmin() { 
-      return request.auth != null && request.auth.token.email == 'sumitdevthakur@gmail.com' && request.auth.token.email_verified == true; 
+      return request.auth != null && (request.auth.token.email == 'sumitdevthakur@gmail.com' || request.auth.token.email == 'pradeepclasses.in@gmail.com') && request.auth.token.email_verified == true; 
     }
     function isAdmin() { 
       return isSuperAdmin() || (isSignedIn() && exists(/databases/$(database)/documents/admins/$(request.auth.token.email))); 

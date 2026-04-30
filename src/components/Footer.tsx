@@ -68,8 +68,13 @@ export default function Footer() {
           </div>
         </div>
         
-        <div className="pt-8 flex flex-col md:flex-row justify-between items-center gap-4 text-xs font-medium text-slate-400">
-          <p>© {new Date().getFullYear()} Pradeep Classes. All rights reserved. | Built by Sumitdevthakur (sumitdevthakur@gmail.com)</p>
+        <div className="pt-8 flex flex-col md:flex-row justify-between items-center gap-4 text-xs font-medium text-slate-400 text-center md:text-left">
+          <p className="flex items-center justify-center md:justify-start flex-wrap gap-1">
+            © {new Date().getFullYear()} Pradeep Classes. All rights reserved. | Built by{' '}
+            <a href="mailto:sumitdevthakur@gmail.com" className="inline-flex items-center gap-1 text-brand-primary font-semibold hover:text-brand-accent transition-colors ml-1">
+              Sumit Dev Thakur <Mail size={12} />
+            </a>
+          </p>
           <div className="flex gap-6">
             <Link to="/admin/login" className="hover:text-brand-primary transition-colors">Admin Login</Link>
             <a href="#" className="hover:text-brand-primary transition-colors">Privacy Policy</a>
