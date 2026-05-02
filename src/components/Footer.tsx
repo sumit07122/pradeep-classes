@@ -70,14 +70,14 @@ export default function Footer() {
         
         <div className="pt-8 flex flex-col md:flex-row justify-between items-center gap-4 text-xs font-medium text-slate-400 text-center md:text-left">
           <p className="flex items-center justify-center md:justify-start flex-wrap gap-1">
-            © {new Date().getFullYear()} Pradeep Classes. All rights reserved. | Built by{' '}
-            <span className="text-brand-primary font-semibold ml-1">Shrikant Thakur</span>
-            <span className="flex items-center gap-2 ml-2">
-              <a href="https://instagram.com/who_sumitt" target="_blank" rel="noopener noreferrer" className="text-brand-primary hover:text-brand-accent transition-colors">
-                <Instagram size={12} />
+            © {new Date().getFullYear()} Pradeep Classes. All rights reserved. | Developed by{' '}
+            <span className="text-brand-primary font-bold ml-1">Shrikant Thakur</span>
+            <span className="flex items-center gap-3 ml-3">
+              <a href="mailto:sumitdevthakur@gmail.com" title="Email Developer" className="text-brand-primary hover:text-brand-accent transition-colors">
+                <Mail size={16} />
               </a>
-              <a href="mailto:sumitdevthakur@gmail.com" className="text-brand-primary hover:text-brand-accent transition-colors">
-                <Mail size={12} />
+              <a href="https://instagram.com/who_sumitt" target="_blank" rel="noopener noreferrer" title="Instagram" className="text-brand-primary hover:text-brand-accent transition-colors">
+                <Instagram size={16} />
               </a>
             </span>
           </p>

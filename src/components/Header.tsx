@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { GraduationCap, Menu, X, Phone, Mail, Facebook, Instagram, Youtube, MapPin, Sun, Moon, Languages, Bell } from 'lucide-react';
+import { GraduationCap, Menu, X, Phone, Mail, Facebook, Instagram, Youtube, MapPin, Sun, Moon, Languages, Bell, PlayCircle } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { CONTACTS, TRANSLATIONS } from '../constants';
 import { useApp } from '../context/AppContext';
@@ -136,8 +136,11 @@ export default function Header() {
           <Link to="/" className="flex items-center gap-3 group">
             <div className="w-12 h-12 overflow-hidden bg-brand-secondary rounded-xl flex items-center justify-center text-brand-primary shadow-lg group-hover:scale-110 transition-transform">
               <img src="https://lh3.googleusercontent.com/d/1-hFy2Dri6g1hYLcNGr0I6dmdg7m1lpG-" alt="Pradeep Classes Logo" className="w-full h-full object-cover" onError={(e) => {
-                e.currentTarget.style.display = 'none';
-                e.currentTarget.nextElementSibling!.style.display = 'block';
+                const target = e.currentTarget;
+                target.style.display = 'none';
+                if (target.nextElementSibling) {
+                  (target.nextElementSibling as HTMLElement).style.display = 'block';
+                }
               }} />
               <GraduationCap size={28} className="hidden" />
             </div>

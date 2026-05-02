@@ -4,14 +4,39 @@ import { motion } from 'motion/react';
 import { FileDown, GraduationCap, School, BookOpen, Search, Download } from 'lucide-react';
 import { RESOURCES } from '../constants';
 import { useApp } from '../context/AppContext';
+import { collection, query, orderBy, onSnapshot } from 'firebase/firestore';
+import { db } from '../lib/firebase';
 
 export default function Resources() {
   const { language } = useApp();
   const [searchTerm, setSearchTerm] = React.useState('');
+  const [cloudResources, setCloudResources] = React.useState<any[]>([]);
 
-  const filteredResources = RESOURCES.map(cat => ({
-    ...cat,
-    papers: cat.papers.filter(p => p.title.toLowerCase().includes(searchTerm.toLowerCase()))
+  React.useEffect(() => {
+    const q = query(collection(db, 'resources'), orderBy('year', 'desc'));
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+      const docs = snapshot.docs.map(doc => doc.data());
+      setCloudResources(docs);
+    });
+    return () => unsubscribe();
+  }, []);
+
+  // Merge static constant if cloud is empty, otherwise prefer cloud
+  const displayResourcesRaw = cloudResources.length > 0 
+    ? cloudResources 
+    : RESOURCES.flatMap(cat => cat.papers.map(p => ({ ...p, category: cat.category })));
+
+  // Group by category
+  const grouped = displayResourcesRaw.reduce((acc: any, paper: any) => {
+    const cat = paper.category;
+    if (!acc[cat]) acc[cat] = [];
+    acc[cat].push(paper);
+    return acc;
+  }, {});
+
+  const categories = Object.keys(grouped).map(catName => ({
+    category: catName,
+    papers: grouped[catName].filter((p: any) => p.title.toLowerCase().includes(searchTerm.toLowerCase()))
   })).filter(cat => cat.papers.length > 0);
 
   return (
@@ -52,7 +77,7 @@ export default function Resources() {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          {filteredResources.map((category, catIdx) => (
+          {categories.map((category, catIdx) => (
             <motion.div
               key={category.category}
               initial={{ opacity: 0, scale: 0.9 }}
@@ -77,7 +102,8 @@ export default function Resources() {
                   <motion.a
                     key={pIdx}
                     href={paper.link}
-                    onClick={(e) => { if(paper.link === '#') { e.preventDefault(); alert("This PDF is currently being digitized. Please check back soon or request it via WhatsApp!"); } }}
+                    target="_blank"
+                    rel="noopener noreferrer"
                     whileHover={{ x: 10 }}
                     className="flex items-center justify-between p-5 bg-white rounded-2xl border border-slate-100 hover:border-brand-secondary transition-all group"
                   >
@@ -106,7 +132,7 @@ export default function Resources() {
           ))}
         </div>
 
-        {filteredResources.length === 0 && (
+        {categories.length === 0 && (
           <div className="text-center py-20 bg-slate-50 rounded-[3rem] border-2 border-dashed border-slate-200">
             <h3 className="text-2xl font-black text-slate-400">No resources found for "{searchTerm}"</h3>
             <p className="text-slate-500 mt-2 font-medium">Try searching for a different keyword.</p>

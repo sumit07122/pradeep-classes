@@ -160,37 +160,42 @@ export const RESOURCES = [
   {
     category: "Navodaya (JNVST)",
     papers: [
-      { year: "2026", title: "JNVST Class 6th (Upcoming/Latest)", link: "https://wa.me/918126180408?text=I%20need%20JNVST%202026%20Sample%20Paper" },
-      { year: "2025", title: "JNVST Class 6th Full Paper", link: "#" },
-      { year: "2024", title: "JNVST Class 6th (Set A, B, C, D)", link: "#" },
-      { year: "2023", title: "JNVST Class 6th Solved Paper", link: "#" },
-      { year: "2020-2022", title: "Navodaya 3-Year Solved Pack", link: "#" },
-      { year: "2015-2019", title: "Archive Pack (JNVST)", link: "#" },
-      { year: "2010-2014", title: "Vintage JNVST Collection", link: "#" },
-      { year: "2000-2009", title: "Historical Navodaya Archive", link: "#" }
+      { year: "2026", title: "JNVST Class 6th (Upcoming)", link: "https://school.careers360.com/articles/navodaya-question-papers" },
+      { year: "2025", title: "JNVST Class 6th Full Paper", link: "https://www.selfstudys.com/books/navodaya-previous-year-paper/english/6th" },
+      { year: "2024", title: "JNVST Class 6th (All Sets)", link: "https://www.selfstudys.com/books/navodaya-previous-year-paper/english/6th" },
+      { year: "2023", title: "JNVST Class 6th Solved Paper", link: "https://www.selfstudys.com/books/navodaya-previous-year-paper/english/6th" },
+      { year: "2022", title: "JNVST Class 6th Original", link: "https://www.selfstudys.com/books/navodaya-previous-year-paper/english/6th" },
+      { year: "2021", title: "JNVST Class 6th Paper", link: "https://www.selfstudys.com/books/navodaya-previous-year-paper/english/6th" },
+      { year: "2015-2020", title: "Navodaya 5-Year Archive", link: "https://www.selfstudys.com/books/navodaya-previous-year-paper/english/6th" },
+      { year: "2010-2014", title: "JNVST Previous Year Bundle", link: "https://www.selfstudys.com/books/navodaya-previous-year-paper/english/6th" },
+      { year: "2000-2009", title: "Historical JNVST Papers", link: "https://www.selfstudys.com/books/navodaya-previous-year-paper/english/6th" }
     ]
   },
   {
     category: "Sainik School (AISSEE)",
     papers: [
-      { year: "2026", title: "AISSEE Class 6th & 9th Prep", link: "https://wa.me/918126180408?text=I%20need%20Sainik%20School%202026%20Prep%20Material" },
-      { year: "2025", title: "AISSEE Class 6th Solved", link: "#" },
-      { year: "2024", title: "Sainik School Class 9th Original", link: "#" },
-      { year: "2020-2023", title: "AISSEE Previous 4 Years Archive", link: "#" },
-      { year: "2010-2019", title: "Sainik School 10-Year Compilation", link: "#" },
-      { year: "2000-2009", title: "AISSEE Historical Papers", link: "#" }
+      { year: "2026", title: "AISSEE Class 6th & 9th Prep", link: "https://exams.nta.ac.in/AISSEE/" },
+      { year: "2025", title: "AISSEE Class 6th Solved", link: "https://www.selfstudys.com/books/sainik-school-previous-year-paper/english/6th" },
+      { year: "2024", title: "Sainik School Class 9th Original", link: "https://www.selfstudys.com/books/sainik-school-previous-year-paper/english/9th" },
+      { year: "2023", title: "AISSEE Class 6th Original", link: "https://www.selfstudys.com/books/sainik-school-previous-year-paper/english/6th" },
+      { year: "2022", title: "AISSEE Class 9th Solved", link: "https://www.selfstudys.com/books/sainik-school-previous-year-paper/english/9th" },
+      { year: "2021", title: "AISSEE Class 6th Original", link: "https://www.selfstudys.com/books/sainik-school-previous-year-paper/english/6th" },
+      { year: "2010-2020", title: "Sainik School 10-Year Mega Pack", link: "https://www.selfstudys.com/books/sainik-school-previous-year-paper/english/6th" },
+      { year: "2000-2009", title: "Historical AISSEE Collection", link: "https://www.selfstudys.com/books/sainik-school-previous-year-paper/english/6th" }
     ]
   },
   {
     category: "Board Exams (CBSE/UP)",
     papers: [
-      { year: "2026", title: "CBSE Class 10th Maths (Expected)", link: "https://wa.me/918126180408?text=I%20need%20CBSE%202026%20Expected%20Questions" },
-      { year: "2025", title: "CBSE Class 12th Physics/Chem", link: "#" },
-      { year: "2024", title: "CBSE Class 10th All Subjects", link: "#" },
-      { year: "2020-2023", title: "NCERT Exemplar Solved Pack", link: "#" },
-      { year: "2015-2019", title: "CBSE Class 10/12 Mega Archive", link: "#" },
-      { year: "2010-2014", title: "Old Syllabus Archive (Vintage)", link: "#" },
-      { year: "2000-2009", title: "Class 10/12 Historical Papers", link: "#" }
+      { year: "2026", title: "CBSE Class 10th Maths (Expected)", link: "https://www.cbse.gov.in/cbsenew/question-paper.html" },
+      { year: "2025", title: "CBSE Class 12th PCM Solved", link: "https://www.cbse.gov.in/cbsenew/question-paper.html" },
+      { year: "2024", title: "CBSE Class 10th All Subjects", link: "https://www.cbse.gov.in/cbsenew/question-paper.html" },
+      { year: "2023", title: "CBSE Class 12th All Subjects", link: "https://www.cbse.gov.in/cbsenew/question-paper.html" },
+      { year: "2022", title: "CBSE Term-1 & Term-2 Pack", link: "https://www.cbse.gov.in/cbsenew/question-paper.html" },
+      { year: "2021", title: "CBSE Board Exam Papers", link: "https://www.cbse.gov.in/cbsenew/question-paper.html" },
+      { year: "2015-2020", title: "CBSE/UP 5-Year Solved Pack", link: "https://www.selfstudys.com/books/cbse-previous-year-paper" },
+      { year: "2010-2014", title: "Board Exam Archive Collection", link: "https://www.selfstudys.com/books/cbse-previous-year-paper" },
+      { year: "2000-2009", title: "Historical Board Papers (Vintage)", link: "https://www.selfstudys.com/books/cbse-previous-year-paper" }
     ]
   }
 ];
