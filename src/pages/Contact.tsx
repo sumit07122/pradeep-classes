@@ -9,6 +9,7 @@ import { handleFirestoreError, OperationType } from '../lib/firestore-errors';
 
 export default function Contact() {
   const [activeBranch, setActiveBranch] = React.useState(0);
+  const [isMapActive, setIsMapActive] = React.useState(false);
   const [formData, setFormData] = React.useState({
     name: '',
     phone: '',
@@ -16,7 +17,8 @@ export default function Contact() {
     message: ''
   });
 
-  const googleMapUrl = `https://maps.google.com/maps?q=${CONTACTS.branches[activeBranch].coords.lat},${CONTACTS.branches[activeBranch].coords.lng}&t=k&z=17&ie=UTF8&iwloc=&output=embed`;
+  const activeCoords = CONTACTS.branches[activeBranch].coords;
+  const googleMapUrl = `https://www.google.com/maps/embed?pb=!1m14!1m12!1m3!1d3545.0!2d${activeCoords.lng}!3d${activeCoords.lat}!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!5e1!3m2!1sen!2sin!4v1714570000000!5m2!1sen!2sin&q=${activeCoords.lat},${activeCoords.lng}`;
 
   const [isSubmitting, setIsSubmitting] = React.useState(false);
 
@@ -79,7 +81,10 @@ export default function Contact() {
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true }}
                     transition={{ delay: idx * 0.1 }}
-                    onClick={() => setActiveBranch(idx)}
+                    onClick={() => {
+                      setActiveBranch(idx);
+                      setIsMapActive(false); // Reset interaction on branch change
+                    }}
                     className={`flex gap-6 p-6 rounded-[2.5rem] border items-start hover:shadow-xl transition-all group cursor-pointer ${activeBranch === idx ? 'bg-white shadow-xl border-brand-secondary' : 'bg-slate-50 border-slate-100'}`}
                   >
                     <div className={`w-12 h-12 rounded-2xl flex items-center justify-center shrink-0 shadow-sm border transition-colors ${activeBranch === idx ? 'bg-brand-secondary border-brand-secondary text-brand-primary' : 'bg-white text-brand-primary border-slate-100 group-hover:bg-brand-secondary group-hover:border-brand-secondary group-hover:text-brand-primary'}`}>
@@ -89,11 +94,6 @@ export default function Contact() {
                       <h4 className="font-black text-brand-primary text-base uppercase tracking-tight mb-1">{branch.name}</h4>
                       <p className="text-brand-accent text-xs font-black uppercase tracking-wider mb-3 underline decoration-brand-accent/30 underline-offset-4">{branch.landmark}</p>
                       <p className="text-sm font-medium text-slate-600 leading-relaxed mb-3">{branch.address}</p>
-                      {branch.mapUrl && (
-                        <a href={branch.mapUrl} target="_blank" rel="noreferrer" className="inline-block mt-2 text-xs font-bold text-white bg-brand-primary px-3 py-1.5 rounded-lg hover:bg-brand-primary/90 transition-colors shadow shadow-brand-primary/20">
-                          Open in Google Maps
-                        </a>
-                      )}
                     </div>
                   </motion.div>
                 ))}
@@ -130,19 +130,48 @@ export default function Contact() {
             className="lg:col-span-3 space-y-12"
           >
             {/* Map Section */}
-            <div className="bg-slate-100 rounded-[3rem] overflow-hidden h-[450px] shadow-inner border-8 border-white relative z-0">
+            <div 
+              className="bg-slate-100 rounded-[3rem] overflow-hidden h-[500px] shadow-inner border-8 border-white relative z-0 group"
+              onMouseLeave={() => setIsMapActive(false)}
+            >
               <iframe
                 title="Google Maps"
                 src={googleMapUrl}
-                className="w-full h-full border-0"
+                className={`w-full h-full border-0 transition-opacity duration-300 ${isMapActive ? 'opacity-100' : 'opacity-60 pointer-events-none md:pointer-events-auto'}`}
                 allowFullScreen
                 loading="lazy"
                 referrerPolicy="no-referrer-when-downgrade"
               ></iframe>
               
-              <div className="absolute top-6 right-6 bg-brand-primary/90 backdrop-blur-md px-4 py-2 rounded-xl text-white text-[10px] font-black uppercase tracking-widest flex items-center gap-2">
-                <span className="w-2 h-2 bg-brand-accent rounded-full animate-pulse"></span>
-                Satellite View Active
+              {/* Interaction Overlay for Mobile */}
+              {!isMapActive && (
+                <div 
+                  className="absolute inset-0 flex flex-col items-center justify-center bg-slate-900/10 backdrop-blur-[2px] md:hidden cursor-pointer"
+                  onClick={() => setIsMapActive(true)}
+                >
+                  <div className="bg-white/90 px-6 py-3 rounded-2xl shadow-2xl flex items-center gap-3 animate-bounce">
+                    <MapPin className="text-brand-primary" size={20} />
+                    <span className="text-brand-primary font-black text-sm uppercase tracking-widest">Tap to interact with map</span>
+                  </div>
+                </div>
+              )}
+
+              {/* Direction Button Overlay */}
+              <div className="absolute bottom-6 right-6 flex flex-col gap-3 items-end">
+                <a 
+                  href={CONTACTS.branches[activeBranch].mapUrl || `https://www.google.com/maps/dir/?api=1&destination=${CONTACTS.branches[activeBranch].coords.lat},${CONTACTS.branches[activeBranch].coords.lng}`}
+                  target="_blank" 
+                  rel="noreferrer" 
+                  className="bg-brand-primary text-white px-6 py-3 rounded-2xl font-black text-xs uppercase tracking-widest flex items-center gap-2 shadow-2xl hover:scale-105 active:scale-95 transition-all"
+                >
+                  <MapPin size={16} />
+                  Get Directions
+                </a>
+                
+                <div className="bg-white/90 backdrop-blur-md px-4 py-2 rounded-xl text-brand-primary text-[10px] font-black uppercase tracking-widest flex items-center gap-2 shadow-lg border border-white">
+                  <span className="w-2 h-2 bg-brand-accent rounded-full animate-pulse"></span>
+                  Precise Location Active
+                </div>
               </div>
             </div>
 

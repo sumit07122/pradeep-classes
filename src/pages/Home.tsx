@@ -181,6 +181,99 @@ export default function Home() {
         </div>
       </section>
 
+      {/* Admissions Poster Section */}
+      <section className="py-12 bg-white relative">
+        <div className="max-w-7xl mx-auto px-4 md:px-8">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="bg-slate-50 rounded-[3rem] p-6 md:p-12 border-2 border-brand-primary/5 shadow-xl relative overflow-hidden"
+          >
+            {/* Visual background details */}
+            <div className="absolute -top-24 -right-24 w-64 h-64 bg-brand-primary/5 rounded-full blur-3xl"></div>
+            <div className="absolute -bottom-24 -left-24 w-64 h-64 bg-brand-secondary/10 rounded-full blur-3xl"></div>
+
+            <div className="grid md:grid-cols-2 gap-12 items-center relative z-10">
+              <div className="order-2 md:order-1">
+                <motion.div 
+                  animate={{ 
+                    boxShadow: ["0 25px 50px -12px rgba(0,0,0,0.25)", "0 25px 50px -12px rgba(var(--brand-primary-rgb), 0.3)", "0 25px 50px -12px rgba(0,0,0,0.25)"] 
+                  }}
+                  transition={{ duration: 3, repeat: Infinity }}
+                  className="aspect-[3/4] bg-white rounded-[2.5rem] shadow-2xl overflow-hidden border-[12px] border-white ring-4 ring-brand-primary/5 hover:ring-brand-primary/20 transition-all duration-500"
+                >
+                  <img 
+                    src={siteImages['admissions_poster'] || 'https://lh3.googleusercontent.com/d/1qv_xncWkt5A7sgecugiqeSzKk0aqsF4H'} 
+                    alt="Admissions Open 2026-27" 
+                    className="w-full h-full object-cover"
+                    referrerPolicy="no-referrer"
+                    onError={(e) => {
+                      // Fallback if the specific image ID above isn't yours
+                      e.currentTarget.src = 'https://images.unsplash.com/photo-1546410531-bb4caa6b424d?q=80&w=2071&auto=format&fit=crop';
+                    }}
+                  />
+                </motion.div>
+              </div>
+              
+              <div className="order-1 md:order-2 space-y-8">
+                <div>
+                  <span className="inline-block px-4 py-1.5 bg-brand-accent text-white text-xs font-black uppercase tracking-widest rounded-full mb-4 shadow-lg shadow-brand-accent/20">
+                    Enrollment Open 2026-27
+                  </span>
+                  <h2 className="text-4xl md:text-5xl font-black text-brand-primary leading-tight italic heading-serif">
+                    Military, Sainik & <br />
+                    <span className="text-brand-accent">Navodaya</span> Coaching
+                  </h2>
+                </div>
+
+                <div className="space-y-4">
+                  <div className="flex items-center gap-4 bg-white p-4 rounded-2xl shadow-sm border border-slate-100">
+                    <div className="w-10 h-10 bg-brand-secondary rounded-xl flex items-center justify-center text-brand-primary">
+                      <GraduationCap size={20} />
+                    </div>
+                    <div>
+                      <p className="text-sm font-black text-slate-800">Entrance Prep: Class 4th - 8th</p>
+                      <p className="text-xs text-slate-500">Complete Defense School Preparation</p>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    {[
+                      'Experienced Defence Mentors',
+                      'Regular Tests & Doubts',
+                      'Safe Environment',
+                      'Limited Seats'
+                    ].map((item, i) => (
+                      <div key={i} className="flex items-center gap-2 text-slate-600 font-bold text-sm">
+                        <CheckCircle2 size={16} className="text-green-500 shrink-0" />
+                        {item}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="flex flex-col sm:flex-row gap-4 pt-4">
+                  <Link 
+                    to="/contact" 
+                    className="flex-1 bg-brand-primary text-white text-center py-4 rounded-2xl font-black shadow-lg shadow-brand-primary/20 hover:scale-[1.02] active:scale-95 transition-all"
+                  >
+                    Apply Now
+                  </Link>
+                  <a 
+                    href={`tel:${CONTACTS.phone1}`}
+                    className="flex-1 bg-white text-brand-primary text-center py-4 rounded-2xl font-black border-2 border-brand-primary/10 hover:bg-slate-50 transition-all flex items-center justify-center gap-2"
+                  >
+                    <Phone size={18} />
+                    {CONTACTS.phone1}
+                  </a>
+                </div>
+              </div>
+            </div>
+          </motion.div>
+        </div>
+      </section>
+
       {/* Mission & Vision */}
       <section className="py-24 bg-white transition-colors duration-300">
         <div className="max-w-7xl mx-auto px-4 md:px-8">
