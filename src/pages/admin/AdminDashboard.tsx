@@ -30,7 +30,7 @@ export default function AdminDashboard() {
   const [inquiries, setInquiries] = React.useState<any[]>([]);
   const [reviews, setReviews] = React.useState<any[]>([]);
   const [isSidebarOpen, setIsSidebarOpen] = React.useState(true);
-  const [activeTab, setActiveTab] = React.useState('notices');
+  const [activeTab, setActiveTab] = React.useState('settings');
 
   // Notice Form State
   const [noticeTitle, setNoticeTitle] = React.useState('');

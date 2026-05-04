@@ -15,7 +15,7 @@ export default function Faculty() {
   useEffect(() => {
     const fetchFaculties = async () => {
       try {
-        const q = query(collection(db, 'faculties'), orderBy('createdAt', 'desc'));
+        const q = query(collection(db, 'faculties'), orderBy('order', 'asc'));
         const snap = await getDocs(q);
         if (!snap.empty) {
           const fbFaculties = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));

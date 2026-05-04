@@ -58,7 +58,7 @@ service cloud.firestore {
 
     function isValidFaculty(data) {
       return data.keys().hasAll(['name', 'designation', 'createdAt']) &&
-             data.keys().size() <= 9 &&
+             data.keys().size() <= 10 &&
              data.name is string && data.name.size() > 0 && data.name.size() <= 100 &&
              data.designation is string && data.designation.size() > 0 && data.designation.size() <= 100 &&
              (data.get('qualification', '') is string && data.get('qualification', '').size() <= 200) &&
@@ -67,6 +67,7 @@ service cloud.firestore {
              (data.get('philosophy', '') is string && data.get('philosophy', '').size() <= 1000) &&
              (data.get('achievements', '') is string && data.get('achievements', '').size() <= 1000) &&
              (data.get('imageUrl', '') is string && data.get('imageUrl', '').size() <= 1000) &&
+             (data.get('order', 0) is number) &&
              data.createdAt is timestamp;
     }
 
