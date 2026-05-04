@@ -37,17 +37,97 @@ export const FACULTY = [
     experience: "15+ Years of dedicated teaching experience",
     philosophy: "I believe every student has a unique potential that needs the right direction. My focus is on strengthening basic concepts and developing an analytical mindset rather than rote learning.",
     achievements: "Mentored over 500+ students to achieve 90%+ in board exams and top ranks in school entrance tests like Navodaya and Sainik school.",
-    image: "https://drive.google.com/thumbnail?id=177DpFjIU-A6BMeVHCqvorTDdXiQ1KonR&sz=w1000"
+    image: "https://lh3.googleusercontent.com/d/177DpFjIU-A6BMeVHCqvorTDdXiQ1KonR"
   },
   {
-    name: "Our Elite Faculty Team",
-    designation: "Subject Specialists",
-    qualification: "Post-Graduates & B.Ed Experts",
-    specialization: "Physics, Chemistry, Biology, Commerce & Humanities",
-    experience: "Collective experience of 20+ years",
-    philosophy: "We prioritize individual student development through interactive sessions and personalized attention in limited batch sizes. Every student deserves a mentor who understands their pace.",
-    achievements: "Consistent 100% pass rate in board exams for the last 4 years and multiple selections in IIT/NEET foundation levels.",
-    image: "https://images.unsplash.com/photo-1524178232363-1fb2b075b655?q=80&w=2070&auto=format&fit=crop"
+    name: "Avinash Sir",
+    designation: "Senior Faculty",
+    qualification: "Msc. B.ed, UPSC IAS ASPIRANT",
+    specialization: "General Studies & Social Sciences",
+    experience: "15+ Years of Experience",
+    philosophy: "Education is the most powerful weapon which you can use to change the world.",
+    image: "https://lh3.googleusercontent.com/d/11hbAR8K_zD1SXr8eGW1EwV0z-LDSeuEy"
+  },
+  {
+    name: "Akash Chaudhary Sir",
+    designation: "Maths Faculty (IIT-JEE)",
+    qualification: "B.tech, LLB, UPSC IAS ASPIRANT",
+    specialization: "Advanced Mathematics for IIT-JEE",
+    experience: "15+ Years of Experience",
+    philosophy: "Mathematics is not about numbers, equations, computations, or algorithms: it is about understanding.",
+    image: "https://lh3.googleusercontent.com/d/1ukNUPotWdeUF1XtHNty0lOBhg5_3z1pb"
+  },
+  {
+    name: "Pavan Sir",
+    designation: "Chemistry Faculty",
+    qualification: "M.Sc, B.Ed",
+    specialization: "Inorganic & Organic Chemistry",
+    experience: "15+ Years of Experience",
+    philosophy: "Everything is theoretically impossible, until it is done.",
+    image: "https://lh3.googleusercontent.com/d/1P2DVzUP6Vb5emxaLImG-E5IZBWtw_x-v"
+  },
+  {
+    name: "Akash Chaudhary Sir",
+    designation: "Biology Faculty (NEET)",
+    qualification: "M.sc, B.ed",
+    specialization: "Zoology and Botany for NEET",
+    experience: "15+ Years of Experience",
+    philosophy: "Biology is the study of complicated things that have the appearance of having been designed with a purpose.",
+    image: "https://lh3.googleusercontent.com/d/1QKAQr57LmpZ9YydEttOuJGsFG0rlN3uC"
+  },
+  {
+    name: "Akash Kuntal Sir",
+    designation: "Chemistry Faculty",
+    qualification: "M.sc, B.ed",
+    specialization: "Chemical Sciences",
+    experience: "10+ Years of Experience",
+    philosophy: "Chemistry is the study of matter, but I prefer to see it as the study of change.",
+    image: "https://lh3.googleusercontent.com/d/1BoDo_aFkOir4sApgodJX17VSMXCFvhg_"
+  },
+  {
+    name: "Keshav Sir",
+    designation: "Science Faculty",
+    qualification: "M.sc, B.ed",
+    specialization: "General Science & Physics",
+    experience: "15+ Years of Experience",
+    philosophy: "The important thing is not to stop questioning. Curiosity has its own reason for existence.",
+    image: "https://lh3.googleusercontent.com/d/19oq_9C7R_jaZowOAlzS1-sroxucmtdyA"
+  },
+  {
+    name: "Umashankar Sir",
+    designation: "Physics Faculty",
+    qualification: "M.sc, B.ed",
+    specialization: "Theoretical & Applied Physics",
+    experience: "15+ Years of Experience",
+    philosophy: "Physics is what happens when you decide to take the universe apart and see how it works.",
+    image: "https://lh3.googleusercontent.com/d/1YkO97FcV3hALwSFt47uJMfjftUY9uK8v"
+  },
+  {
+    name: "Rajesh Gupta Sir",
+    designation: "English Faculty",
+    qualification: "Double M.A, B.ed",
+    specialization: "English Literature & Communication Skills",
+    experience: "25+ Years of Experience",
+    philosophy: "The limit of my language means the limit of my world.",
+    image: "https://lh3.googleusercontent.com/d/1Rge8KT4b6dZv9VFXAmGnDBiM8muNRYFL"
+  },
+  {
+    name: "Jitendra Goyal Sir",
+    designation: "Science & Maths Specialist",
+    qualification: "M.sc, Chemical Engineer",
+    specialization: "Science + Maths Foundation",
+    experience: "15+ Years of Experience",
+    philosophy: "Logic will get you from A to B. Imagination will take you everywhere.",
+    image: "https://lh3.googleusercontent.com/d/1G4gaLyMKkUeP7KNf1WcxDd1Z9NyCzImK"
+  },
+  {
+    name: "Radhe Shyam Sir",
+    designation: "Physics Faculty",
+    qualification: "M.tech, B.ed",
+    specialization: "Applied Physics",
+    experience: "15+ Years of Experience",
+    philosophy: "Physics is the only real science. The rest is just stamp collecting.",
+    image: "https://lh3.googleusercontent.com/d/1j7EN76ZTmBtUPcu7-N72DyhDenqXN60p"
   }
 ];
 
@@ -206,9 +286,12 @@ export const TRANSLATIONS = {
     heroSub: "Dedicated coaching for Class 1st to 12th.",
     admission: "Admission Open",
     contactUs: "Contact Us",
+    home: "Home",
     courses: "Our Courses",
     results: "Our Results",
     faculty: "Expert Faculty",
+    gallery: "Gallery",
+    blog: "Blog",
     resources: "Resources"
   },
   hi: {
@@ -216,9 +299,12 @@ export const TRANSLATIONS = {
     heroSub: "कक्षा 1 से 12 तक के लिए समर्पित कोचिंग।",
     admission: "प्रवेश प्रारंभ",
     contactUs: "संपर्क करें",
+    home: "होम",
     courses: "हमारे कोर्सेस",
     results: "हमारे परिणाम",
     faculty: "विशेषज्ञ शिक्षक",
+    gallery: "गैलरी",
+    blog: "ब्लॉग",
     resources: "संसाधन"
   }
 };

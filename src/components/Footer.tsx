@@ -38,11 +38,20 @@ export default function Footer() {
           <div className="space-y-4">
             <h3 className="font-bold text-brand-primary uppercase tracking-wider text-sm">Quick Links</h3>
             <ul className="space-y-2">
-              {['Home', 'Courses', 'Results', 'Faculty', 'Gallery', 'Blog', 'Resources', 'Contact'].map((item) => (
-                <li key={item}>
-                  <Link to={item === 'Home' ? '/' : `/${item.toLowerCase()}`} className="text-slate-500 hover:text-brand-primary text-sm transition-colors flex items-center gap-2">
-                    <span className="w-1.5 h-1.5 rounded-full bg-brand-secondary/30"></span>
-                    {item}
+              {[
+                { label: t.home, path: '/' },
+                { label: t.courses, path: '/courses' },
+                { label: t.results, path: '/results' },
+                { label: t.faculty, path: '/faculty' },
+                { label: t.gallery, path: '/gallery' },
+                { label: t.blog, path: '/blog' },
+                { label: t.resources, path: '/resources' },
+                { label: t.contactUs, path: '/contact' }
+              ].map((item) => (
+                <li key={item.path}>
+                  <Link to={item.path} className="text-slate-500 hover:text-brand-primary text-sm transition-colors flex items-center gap-2 group/link">
+                    <span className="w-1.5 h-1.5 rounded-full bg-brand-secondary/30 group-hover/link:bg-brand-secondary transition-colors"></span>
+                    {item.label}
                   </Link>
                 </li>
               ))}

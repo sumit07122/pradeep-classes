@@ -41,10 +41,10 @@ export default function Header() {
     { name: t.courses, path: '/courses' },
     { name: t.results, path: '/results' },
     { name: t.faculty, path: '/faculty' },
-    { name: 'Gallery', path: '/gallery' },
-    { name: 'Blog', path: '/blog' },
-    { name: 'Resources', path: '/resources' },
-    { name: 'Contact', path: '/contact' }
+    { name: t.gallery, path: '/gallery' },
+    { name: t.blog, path: '/blog' },
+    { name: t.resources, path: '/resources' },
+    { name: t.contactUs, path: '/contact' }
   ];
 
   return (
