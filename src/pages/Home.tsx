@@ -5,6 +5,7 @@ import { Award, Users, Phone, Trophy, CheckCircle2, BookOpen, Target, Graduation
 import { Link } from 'react-router-dom';
 import Counter from '../components/Counter';
 import WhatsAppFloatingButton from '../components/WhatsAppFloatingButton';
+import QuickLinks from '../components/QuickLinks';
 
 const ReviewsSection = lazy(() => import('../components/ReviewsSection'));
 const NoticeBoard = lazy(() => import('../components/NoticeBoard'));
@@ -93,6 +94,7 @@ export default function Home() {
       <Suspense fallback={<div>Loading...</div>}>
         <NoticeBoard />
       </Suspense>
+      <QuickLinks />
       {/* Hero Section */}
       <section className="relative pt-12 pb-24 overflow-hidden">
         <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">

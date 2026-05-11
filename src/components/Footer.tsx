@@ -37,7 +37,7 @@ export default function Footer() {
           
           <div className="space-y-4">
             <h3 className="font-bold text-brand-primary uppercase tracking-wider text-sm">Quick Links</h3>
-            <ul className="space-y-2">
+            <ul className="space-y-1">
               {[
                 { label: t.home, path: '/' },
                 { label: t.courses, path: '/courses' },
@@ -49,9 +49,9 @@ export default function Footer() {
                 { label: t.contactUs, path: '/contact' }
               ].map((item) => (
                 <li key={item.path}>
-                  <Link to={item.path} className="text-slate-500 hover:text-brand-primary text-sm transition-colors flex items-center gap-2 group/link">
-                    <span className="w-1.5 h-1.5 rounded-full bg-brand-secondary/30 group-hover/link:bg-brand-secondary transition-colors"></span>
-                    {item.label}
+                  <Link to={item.path} className="text-slate-500 hover:text-brand-primary text-sm transition-all flex items-center gap-2 group/link py-1.5 px-3 -ml-3 rounded-xl hover:bg-white hover:shadow-sm relative z-10">
+                    <span className="w-1.5 h-1.5 rounded-full bg-brand-secondary/30 group-hover/link:bg-brand-secondary transition-colors shrink-0"></span>
+                    <span className="font-semibold">{item.label}</span>
                   </Link>
                 </li>
               ))}

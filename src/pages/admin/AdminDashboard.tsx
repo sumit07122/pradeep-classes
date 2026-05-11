@@ -170,22 +170,30 @@ export default function AdminDashboard() {
 
   return (
     <div className="min-h-screen bg-slate-50 flex font-sans">
+      {/* Mobile Sidebar Overlay */}
+      {isSidebarOpen && (
+        <div 
+          className="fixed inset-0 bg-slate-900/50 z-40 md:hidden transition-opacity"
+          onClick={() => setIsSidebarOpen(false)}
+        />
+      )}
+
       {/* Sidebar */}
       <aside 
         className={`fixed inset-y-0 left-0 z-50 w-64 bg-white border-r border-gray-200 transform transition-transform duration-300 ease-in-out md:relative md:translate-x-0 ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}
       >
         <div className="h-full flex flex-col">
-          <div className="p-6 flex items-center justify-between border-b border-white/10">
+          <div className="p-6 flex items-center justify-between border-b border-slate-100">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 bg-brand-secondary rounded-xl flex items-center justify-center text-brand-primary">
                 <LayoutDashboard size={24} />
               </div>
               <div>
-                <h2 className="font-black text-lg tracking-tight">Admin CMS</h2>
-                <p className="text-[10px] text-white/50 uppercase font-bold tracking-widest">Pradeep Classes</p>
+                <h2 className="font-black text-lg text-slate-800 tracking-tight">Admin CMS</h2>
+                <p className="text-[10px] text-slate-500 uppercase font-bold tracking-widest">Pradeep Classes</p>
               </div>
             </div>
-            <button onClick={() => setIsSidebarOpen(false)} className="md:hidden text-white/50 hover:text-white">
+            <button onClick={() => setIsSidebarOpen(false)} className="md:hidden text-slate-400 hover:text-slate-600 bg-slate-50 hover:bg-slate-100 rounded-lg p-1 transition-colors">
               <X size={20} />
             </button>
           </div>
@@ -197,7 +205,10 @@ export default function AdminDashboard() {
                 {MENU_ITEMS.map((item) => (
                   <button
                     key={item.id}
-                    onClick={() => setActiveTab(item.id)}
+                    onClick={() => {
+                      setActiveTab(item.id);
+                      setIsSidebarOpen(false);
+                    }}
                     className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl font-bold transition-all group ${
                       activeTab === item.id 
                         ? 'bg-brand-primary/10 text-brand-primary shadow-sm' 
@@ -218,7 +229,10 @@ export default function AdminDashboard() {
                 {CONTENT_ITEMS.map((item) => (
                   <button
                     key={item.id}
-                    onClick={() => setActiveTab(item.id)}
+                    onClick={() => {
+                      setActiveTab(item.id);
+                      setIsSidebarOpen(false);
+                    }}
                     className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl font-bold transition-all group ${
                       activeTab === item.id 
                         ? 'bg-brand-primary/10 text-brand-primary shadow-sm' 
@@ -237,7 +251,10 @@ export default function AdminDashboard() {
               <div>
                 <h3 className="px-4 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-4">System</h3>
                 <button
-                  onClick={() => setActiveTab('admins')}
+                  onClick={() => {
+                    setActiveTab('admins');
+                    setIsSidebarOpen(false);
+                  }}
                   className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl font-bold transition-all group ${
                     activeTab === 'admins' 
                       ? 'bg-brand-primary/10 text-brand-primary shadow-sm' 

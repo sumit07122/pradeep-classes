@@ -188,7 +188,7 @@ export default function Faculty() {
                         <img 
                           src={f.imageUrl || f.image || 'https://images.unsplash.com/photo-1524178232363-1fb2b075b655?q=80&w=2070&auto=format&fit=crop'} 
                           alt={f.name}
-                          className={`w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 ${f.name.includes('Rajesh') ? 'object-center' : 'object-top'}`}
+                          className={`w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 ${f.name.includes('Rajesh') ? 'object-[center_20%]' : 'object-top'}`}
                           referrerPolicy="no-referrer"
                           onError={(e) => {
                             e.currentTarget.src = 'https://images.unsplash.com/photo-1524178232363-1fb2b075b655?q=80&w=2070&auto=format&fit=crop';
