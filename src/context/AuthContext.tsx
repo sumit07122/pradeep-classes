@@ -1,16 +1,44 @@
-import React, { createContext, useContext, useEffect, useState } from 'react';
+import React, { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import { User, onAuthStateChanged, signInWithPopup, GoogleAuthProvider, signOut } from 'firebase/auth';
 import { doc, getDoc } from 'firebase/firestore';
 import { auth, db } from '../lib/firebase';
-import { handleFirestoreError, OperationType } from '../lib/firestore-errors';
+import { fetchErpSessionData, fetchInstituteById } from '../erp/authService';
+import { hasAnyErpRole, hasErpPermission, selectActiveMembership } from '../erp/rbac';
+import type {
+  ErpPermission,
+  ErpRole,
+  ErpUserProfile,
+  Institute,
+  InstituteMembership,
+} from '../erp/types';
+
+const SUPER_ADMIN_EMAILS = [
+  'sumitdevthakur@gmail.com',
+  'pradeepclasses.in@gmail.com',
+  'krishna0202thakur@gmail.com',
+];
 
 interface AuthContextType {
+  // Existing CMS Admin & Firebase Auth properties (preserved)
   user: User | null;
   isAdmin: boolean;
   isSuperAdmin: boolean;
   loading: boolean;
   signInWithGoogle: () => Promise<void>;
   logout: () => Promise<void>;
+
+  // ERP Foundation properties
+  userProfile: ErpUserProfile | null;
+  memberships: InstituteMembership[];
+  activeMembership: InstituteMembership | null;
+  activeInstitute: Institute | null;
+  erpRole: ErpRole | null;
+  erpLoading: boolean;
+  erpError: string | null;
+  switchInstitute: (instituteId: string) => Promise<void>;
+  refreshErpContext: () => Promise<void>;
+  hasPermission: (permission: ErpPermission) => boolean;
+  hasRole: (roles: ErpRole | readonly ErpRole[]) => boolean;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -21,15 +49,79 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [isSuperAdmin, setIsSuperAdmin] = useState(false);
   const [loading, setLoading] = useState(true);
 
+  const [userProfile, setUserProfile] = useState<ErpUserProfile | null>(null);
+  const [memberships, setMemberships] = useState<InstituteMembership[]>([]);
+  const [activeMembership, setActiveMembership] = useState<InstituteMembership | null>(null);
+  const [activeInstitute, setActiveInstitute] = useState<Institute | null>(null);
+  const [erpLoading, setErpLoading] = useState(false);
+  const [erpError, setErpError] = useState<string | null>(null);
+  const [selectedInstituteId, setSelectedInstituteId] = useState<string | null>(null);
+
+  const loadErpContext = useCallback(
+    async (currentUser: User | null, preferredId?: string | null) => {
+      if (!currentUser) {
+        setUserProfile(null);
+        setMemberships([]);
+        setActiveMembership(null);
+        setActiveInstitute(null);
+        setErpError(null);
+        setErpLoading(false);
+        return;
+      }
+
+      if (!currentUser.emailVerified) {
+        setUserProfile(null);
+        setMemberships([]);
+        setActiveMembership(null);
+        setActiveInstitute(null);
+        setErpError('Your email address must be verified before accessing the ERP portal.');
+        setErpLoading(false);
+        return;
+      }
+
+      setErpLoading(true);
+      setErpError(null);
+      try {
+        const snapshot = await fetchErpSessionData(
+          currentUser.uid,
+          preferredId ?? selectedInstituteId
+        );
+        setUserProfile(snapshot.userProfile);
+        setMemberships(snapshot.memberships);
+        setActiveMembership(snapshot.activeMembership);
+        setActiveInstitute(snapshot.activeInstitute);
+        if (snapshot.activeMembership) {
+          setSelectedInstituteId(snapshot.activeMembership.instituteId);
+        }
+      } catch (error) {
+        console.error('Failed to load ERP session context:', error);
+        setUserProfile(null);
+        setMemberships([]);
+        setActiveMembership(null);
+        setActiveInstitute(null);
+        setErpError(
+          'Unable to verify your institute membership right now. Please try refreshing or contact your institute administrator.'
+        );
+      } finally {
+        setErpLoading(false);
+      }
+    },
+    [selectedInstituteId]
+  );
+
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
       setUser(currentUser);
-      
+
       if (currentUser) {
-        // Check super admin email
-        const isSuper = (currentUser.email === 'sumitdevthakur@gmail.com' || currentUser.email === 'pradeepclasses.in@gmail.com') && currentUser.emailVerified;
+        // Legacy CMS Admin check (preserved)
+        const isSuper = Boolean(
+          currentUser.email &&
+            SUPER_ADMIN_EMAILS.includes(currentUser.email) &&
+            currentUser.emailVerified
+        );
         setIsSuperAdmin(isSuper);
-        
+
         let isAdminUser = false;
         if (isSuper) {
           isAdminUser = true;
@@ -46,15 +138,25 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           }
         }
         setIsAdmin(isAdminUser);
+
+        // Load ERP profile, memberships, and active institute
+        await loadErpContext(currentUser);
       } else {
         setIsAdmin(false);
         setIsSuperAdmin(false);
+        setUserProfile(null);
+        setMemberships([]);
+        setActiveMembership(null);
+        setActiveInstitute(null);
+        setSelectedInstituteId(null);
+        setErpError(null);
+        setErpLoading(false);
       }
       setLoading(false);
     });
 
     return () => unsubscribe();
-  }, []);
+  }, [loadErpContext]);
 
   const signInWithGoogle = async () => {
     const provider = new GoogleAuthProvider();
@@ -75,8 +177,79 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
+  const refreshErpContext = useCallback(async () => {
+    await loadErpContext(user, selectedInstituteId);
+  }, [loadErpContext, selectedInstituteId, user]);
+
+  const switchInstitute = useCallback(
+    async (instituteId: string) => {
+      const nextMembership = selectActiveMembership(memberships, instituteId);
+      if (!nextMembership || nextMembership.instituteId !== instituteId) {
+        return;
+      }
+      setErpLoading(true);
+      setErpError(null);
+      try {
+        const institute = await fetchInstituteById(instituteId);
+        setSelectedInstituteId(instituteId);
+        setActiveMembership(nextMembership);
+        setActiveInstitute(institute);
+      } catch (error) {
+        console.error('Failed to switch institute:', error);
+        setErpError('Unable to load the selected institute workspace.');
+      } finally {
+        setErpLoading(false);
+      }
+    },
+    [memberships]
+  );
+
+  const erpRole: ErpRole | null = useMemo(() => {
+    if (!activeMembership || activeMembership.status !== 'active') {
+      return null;
+    }
+    if (userProfile && userProfile.status === 'disabled') {
+      return null;
+    }
+    return activeMembership.role;
+  }, [activeMembership, userProfile]);
+
+  const hasPermission = useCallback(
+    (permission: ErpPermission) => {
+      return hasErpPermission(erpRole, permission, activeMembership?.status);
+    },
+    [activeMembership?.status, erpRole]
+  );
+
+  const hasRole = useCallback(
+    (roles: ErpRole | readonly ErpRole[]) => {
+      return hasAnyErpRole(erpRole, roles, activeMembership?.status);
+    },
+    [activeMembership?.status, erpRole]
+  );
+
   return (
-    <AuthContext.Provider value={{ user, isAdmin, isSuperAdmin, loading, signInWithGoogle, logout }}>
+    <AuthContext.Provider
+      value={{
+        user,
+        isAdmin,
+        isSuperAdmin,
+        loading,
+        signInWithGoogle,
+        logout,
+        userProfile,
+        memberships,
+        activeMembership,
+        activeInstitute,
+        erpRole,
+        erpLoading,
+        erpError,
+        switchInstitute,
+        refreshErpContext,
+        hasPermission,
+        hasRole,
+      }}
+    >
       {children}
     </AuthContext.Provider>
   );

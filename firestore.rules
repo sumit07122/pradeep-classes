@@ -6,17 +6,43 @@ service cloud.firestore {
     }
 
     function isSignedIn() { return request.auth != null; }
-    function isValidId(id) { return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$'); }
+    function isVerifiedUser() { return isSignedIn() && request.auth.token.email_verified == true; }
+    function isValidId(id) { return id is string && id.size() >= 1 && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$'); }
     function isValidEmailId(id) { return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_.@\\-]+$'); }
     function incoming() { return request.resource.data; }
     function existing() { return resource.data; }
     function isSuperAdmin() { 
-      return request.auth != null && (request.auth.token.email == 'sumitdevthakur@gmail.com' || request.auth.token.email == 'pradeepclasses.in@gmail.com') && request.auth.token.email_verified == true; 
+      return isVerifiedUser() && (
+        request.auth.token.email == 'sumitdevthakur@gmail.com' ||
+        request.auth.token.email == 'pradeepclasses.in@gmail.com' ||
+        request.auth.token.email == 'krishna0202thakur@gmail.com'
+      ); 
     }
     function isAdmin() { 
       return isSuperAdmin() || (isSignedIn() && exists(/databases/$(database)/documents/admins/$(request.auth.token.email))); 
     }
 
+    // ERP Membership & Institute Helpers
+    function membershipPath(instituteId, uid) {
+      return /databases/$(database)/documents/memberships/$(instituteId + '_' + uid);
+    }
+    function isActiveInstituteMember(instituteId) {
+      return isVerifiedUser() &&
+             exists(membershipPath(instituteId, request.auth.uid)) &&
+             get(membershipPath(instituteId, request.auth.uid)).data.status == 'active';
+    }
+    function hasInstituteRole(instituteId, allowedRoles) {
+      return isActiveInstituteMember(instituteId) &&
+             get(membershipPath(instituteId, request.auth.uid)).data.role in allowedRoles;
+    }
+    function isInstituteOwner(instituteId) {
+      return hasInstituteRole(instituteId, ['institute_owner']);
+    }
+    function isInstitutePrivileged(instituteId) {
+      return hasInstituteRole(instituteId, ['institute_owner', 'institute_admin']);
+    }
+
+    // Legacy Public Website & CMS Validators
     function isValidNotice(data) {
       return data.keys().hasAll(['title', 'content', 'date', 'createdAt', 'createdBy']) &&
              data.keys().size() <= 5 &&
@@ -118,8 +144,51 @@ service cloud.firestore {
              data.lastUpdated is timestamp;
     }
 
+    // ERP Foundation Validators
+    function isValidInstitute(data) {
+      return data.keys().hasAll(['name', 'code', 'status', 'ownerUid', 'academicSession', 'timezone', 'createdAt', 'updatedAt']) &&
+             data.keys().hasOnly(['name', 'code', 'status', 'ownerUid', 'academicSession', 'timezone', 'createdAt', 'updatedAt']) &&
+             data.name is string && data.name.size() >= 2 && data.name.size() <= 120 &&
+             data.code is string && data.code.size() >= 2 && data.code.size() <= 32 && data.code.matches('^[A-Z0-9\\-]+$') &&
+             data.status is string && data.status in ['active', 'suspended'] &&
+             data.ownerUid is string && isValidId(data.ownerUid) &&
+             data.academicSession is string && data.academicSession.size() >= 4 && data.academicSession.size() <= 40 &&
+             data.timezone is string && data.timezone.size() >= 2 && data.timezone.size() <= 60 &&
+             data.createdAt is timestamp &&
+             data.updatedAt is timestamp;
+    }
+
+    function isValidErpUser(data) {
+      return data.keys().hasAll(['uid', 'email', 'displayName', 'status', 'createdAt', 'updatedAt']) &&
+             data.keys().hasOnly(['uid', 'email', 'displayName', 'phone', 'photoURL', 'status', 'defaultInstituteId', 'createdAt', 'updatedAt']) &&
+             data.uid is string && isValidId(data.uid) &&
+             data.email is string && data.email.size() >= 3 && data.email.size() <= 150 &&
+             data.displayName is string && data.displayName.size() >= 1 && data.displayName.size() <= 120 &&
+             (!('phone' in data) || (data.phone is string && data.phone.size() <= 20)) &&
+             (!('photoURL' in data) || (data.photoURL is string && data.photoURL.size() <= 1000)) &&
+             data.status is string && data.status in ['active', 'disabled'] &&
+             (!('defaultInstituteId' in data) || (data.defaultInstituteId is string && isValidId(data.defaultInstituteId))) &&
+             data.createdAt is timestamp &&
+             data.updatedAt is timestamp;
+    }
+
+    function isValidMembership(data) {
+      return data.keys().hasAll(['uid', 'instituteId', 'role', 'status', 'displayName', 'createdBy', 'createdAt', 'updatedAt']) &&
+             data.keys().hasOnly(['uid', 'instituteId', 'role', 'status', 'displayName', 'designation', 'createdBy', 'createdAt', 'updatedAt']) &&
+             data.uid is string && isValidId(data.uid) &&
+             data.instituteId is string && isValidId(data.instituteId) &&
+             data.role is string && data.role in ['institute_owner', 'institute_admin', 'accountant', 'teacher'] &&
+             data.status is string && data.status in ['active', 'suspended', 'revoked'] &&
+             data.displayName is string && data.displayName.size() >= 1 && data.displayName.size() <= 120 &&
+             (!('designation' in data) || (data.designation is string && data.designation.size() <= 100)) &&
+             data.createdBy is string && isValidId(data.createdBy) &&
+             data.createdAt is timestamp &&
+             data.updatedAt is timestamp;
+    }
+
+    // Legacy Public Website & CMS Collections
     match /notices/{noticeId} {
-      allow read: if true; // Publicly readable
+      allow read: if true;
       allow create: if isValidId(noticeId) && isAdmin() && isValidNotice(incoming()) && incoming().createdAt == request.time;
       allow update: if isValidId(noticeId) && isAdmin() && isValidNotice(incoming()) && incoming().createdBy == existing().createdBy && incoming().createdAt == existing().createdAt;
       allow delete: if isValidId(noticeId) && isAdmin();
@@ -130,7 +199,7 @@ service cloud.firestore {
       allow create: if isValidId(inquiryId) && isValidInquiry(incoming()) && incoming().status == 'new' && incoming().createdAt == request.time;
       allow update: if isValidId(inquiryId) && isAdmin() && isValidInquiry(incoming()) && incoming().createdAt == existing().createdAt && incoming().diff(existing()).affectedKeys().hasOnly(['status']);
       allow delete: if isValidId(inquiryId) && isAdmin();
-      allow list: if isAdmin(); // Needed for queries by admin
+      allow list: if isAdmin();
     }
 
     match /admins/{adminId} {
@@ -145,7 +214,7 @@ service cloud.firestore {
       allow read: if true;
       allow create: if settingId == 'general' && isAdmin() && isValidSetting(incoming()) && incoming().updatedAt == request.time;
       allow update: if settingId == 'general' && isAdmin() && isValidSetting(incoming()) && incoming().diff(existing()).affectedKeys().hasOnly(['heroTitle', 'heroSubtitle', 'announcementText', 'announcementLink', 'announcementActive', 'updatedAt']) && incoming().updatedAt == request.time;
-      allow delete: if false; // Settings shouldn't be deleted
+      allow delete: if false;
     }
 
     match /faculties/{facultyId} {
@@ -187,6 +256,102 @@ service cloud.firestore {
     match /automated_content/{docId} {
       allow read: if true;
       allow write: if isAdmin() && isValidAutomatedContent(incoming());
+    }
+
+    // ERP Foundation Collections (Institute-Scoped Zero-Trust RBAC)
+    match /institutes/{instituteId} {
+      allow get: if isValidId(instituteId) && (isActiveInstituteMember(instituteId) || isSuperAdmin());
+      allow list: if isSuperAdmin() || (isVerifiedUser() && resource.data.ownerUid == request.auth.uid);
+      allow create: if isValidId(instituteId) &&
+                       isSuperAdmin() &&
+                       isValidInstitute(incoming()) &&
+                       incoming().createdAt == request.time &&
+                       incoming().updatedAt == request.time;
+      allow update: if isValidId(instituteId) &&
+                       isValidInstitute(incoming()) &&
+                       incoming().ownerUid == existing().ownerUid &&
+                       incoming().createdAt == existing().createdAt &&
+                       incoming().updatedAt == request.time &&
+                       (
+                         isSuperAdmin() ||
+                         (
+                           isInstituteOwner(instituteId) &&
+                           existing().status == 'active' &&
+                           incoming().status == existing().status &&
+                           incoming().diff(existing()).affectedKeys().hasOnly(['name', 'code', 'academicSession', 'timezone', 'updatedAt'])
+                         )
+                       );
+      allow delete: if isValidId(instituteId) && isSuperAdmin();
+    }
+
+    match /users/{userId} {
+      allow get: if isValidId(userId) && ((isVerifiedUser() && request.auth.uid == userId) || isSuperAdmin());
+      allow list: if isSuperAdmin() || (isVerifiedUser() && resource.data.uid == request.auth.uid);
+      allow create: if isValidId(userId) &&
+                       isSuperAdmin() &&
+                       isValidErpUser(incoming()) &&
+                       incoming().uid == userId &&
+                       incoming().createdAt == request.time &&
+                       incoming().updatedAt == request.time;
+      allow update: if isValidId(userId) &&
+                       isValidErpUser(incoming()) &&
+                       incoming().uid == existing().uid &&
+                       incoming().email == existing().email &&
+                       incoming().createdAt == existing().createdAt &&
+                       incoming().updatedAt == request.time &&
+                       (
+                         isSuperAdmin() ||
+                         (
+                           isVerifiedUser() &&
+                           request.auth.uid == userId &&
+                           existing().status == 'active' &&
+                           incoming().status == existing().status &&
+                           incoming().diff(existing()).affectedKeys().hasOnly(['displayName', 'phone', 'photoURL', 'defaultInstituteId', 'updatedAt'])
+                         )
+                       );
+      allow delete: if isValidId(userId) && isSuperAdmin();
+    }
+
+    match /memberships/{membershipId} {
+      allow get: if isValidId(membershipId) &&
+                    isVerifiedUser() &&
+                    (
+                      resource.data.uid == request.auth.uid ||
+                      isInstitutePrivileged(resource.data.instituteId) ||
+                      isSuperAdmin()
+                    );
+      allow list: if isVerifiedUser() && (resource.data.uid == request.auth.uid || isSuperAdmin());
+      allow create: if isValidId(membershipId) &&
+                       isValidMembership(incoming()) &&
+                       membershipId == (incoming().instituteId + '_' + incoming().uid) &&
+                       exists(/databases/$(database)/documents/institutes/$(incoming().instituteId)) &&
+                       incoming().createdBy == request.auth.uid &&
+                       incoming().createdAt == request.time &&
+                       incoming().updatedAt == request.time &&
+                       (
+                         isSuperAdmin() ||
+                         (
+                           isInstituteOwner(incoming().instituteId) &&
+                           incoming().role != 'institute_owner'
+                         )
+                       );
+      allow update: if isValidId(membershipId) &&
+                       isValidMembership(incoming()) &&
+                       incoming().uid == existing().uid &&
+                       incoming().instituteId == existing().instituteId &&
+                       incoming().createdBy == existing().createdBy &&
+                       incoming().createdAt == existing().createdAt &&
+                       incoming().updatedAt == request.time &&
+                       incoming().diff(existing()).affectedKeys().hasOnly(['role', 'status', 'displayName', 'designation', 'updatedAt']) &&
+                       (
+                         isSuperAdmin() ||
+                         (
+                           isInstituteOwner(existing().instituteId) &&
+                           existing().role != 'institute_owner' &&
+                           incoming().role != 'institute_owner'
+                         )
+                       );
+      allow delete: if isValidId(membershipId) && isSuperAdmin();
     }
   }
 }
