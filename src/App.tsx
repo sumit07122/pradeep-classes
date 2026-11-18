@@ -1,7 +1,6 @@
 import React from 'react';
 import { HelmetProvider } from 'react-helmet-async';
 import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
-import { Analytics } from '@vercel/analytics/react';
 import { AppProvider } from './context/AppContext';
 import { AuthProvider } from './context/AuthContext';
 import Header from './components/Header';
@@ -63,7 +62,6 @@ export default function App() {
               <Footer />
               <WhatsAppFloatingButton />
               <InquiryPopup />
-              <Analytics />
             </div>
           </Router>
         </AppProvider>

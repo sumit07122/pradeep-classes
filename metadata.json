@@ -2,5 +2,5 @@
   "name": "Pradeep Classes",
   "description": "Premium coaching institute for classes 1-12, IIT/NEET Foundation, and competitive exams in Mathura.",
   "requestFramePermissions": [],
-  "majorCapabilities": []
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
 }
