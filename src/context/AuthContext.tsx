@@ -1,5 +1,14 @@
 import React, { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
-import { User, onAuthStateChanged, signInWithPopup, GoogleAuthProvider, signOut } from 'firebase/auth';
+import {
+  GoogleAuthProvider,
+  User,
+  onAuthStateChanged,
+  sendEmailVerification,
+  sendPasswordResetEmail,
+  signInWithEmailAndPassword,
+  signInWithPopup,
+  signOut,
+} from 'firebase/auth';
 import { doc, getDoc } from 'firebase/firestore';
 import { auth, db } from '../lib/firebase';
 import { fetchErpSessionData, fetchInstituteById } from '../erp/authService';
@@ -15,17 +24,23 @@ import type {
 const SUPER_ADMIN_EMAILS = [
   'sumitdevthakur@gmail.com',
   'pradeepclasses.in@gmail.com',
-  'krishna0202thakur@gmail.com',
 ];
 
 interface AuthContextType {
-  // Existing CMS Admin & Firebase Auth properties (preserved)
+  // Existing CMS Admin & Firebase Auth properties (preserved for /admin/*)
   user: User | null;
   isAdmin: boolean;
   isSuperAdmin: boolean;
   loading: boolean;
   signInWithGoogle: () => Promise<void>;
   logout: () => Promise<void>;
+
+  // ERP Email/Password Authentication & Verification methods
+  signInWithEmail: (email: string, password: string) => Promise<void>;
+  sendPasswordReset: (email: string) => Promise<void>;
+  resendVerificationEmail: () => Promise<void>;
+  reloadVerificationStatus: () => Promise<boolean>;
+  emailVerificationRequired: boolean;
 
   // ERP Foundation properties
   userProfile: ErpUserProfile | null;
@@ -57,25 +72,24 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [erpError, setErpError] = useState<string | null>(null);
   const [selectedInstituteId, setSelectedInstituteId] = useState<string | null>(null);
 
+  const clearErpState = useCallback(() => {
+    setUserProfile(null);
+    setMemberships([]);
+    setActiveMembership(null);
+    setActiveInstitute(null);
+    setErpError(null);
+    setErpLoading(false);
+  }, []);
+
   const loadErpContext = useCallback(
     async (currentUser: User | null, preferredId?: string | null) => {
       if (!currentUser) {
-        setUserProfile(null);
-        setMemberships([]);
-        setActiveMembership(null);
-        setActiveInstitute(null);
-        setErpError(null);
-        setErpLoading(false);
+        clearErpState();
         return;
       }
 
       if (!currentUser.emailVerified) {
-        setUserProfile(null);
-        setMemberships([]);
-        setActiveMembership(null);
-        setActiveInstitute(null);
-        setErpError('Your email address must be verified before accessing the ERP portal.');
-        setErpLoading(false);
+        clearErpState();
         return;
       }
 
@@ -106,7 +120,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         setErpLoading(false);
       }
     },
-    [selectedInstituteId]
+    [clearErpState, selectedInstituteId]
   );
 
   useEffect(() => {
@@ -114,7 +128,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setUser(currentUser);
 
       if (currentUser) {
-        // Legacy CMS Admin check (preserved)
+        // Legacy CMS Admin check (preserved independently for /admin/*)
         const isSuper = Boolean(
           currentUser.email &&
             SUPER_ADMIN_EMAILS.includes(currentUser.email) &&
@@ -144,20 +158,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       } else {
         setIsAdmin(false);
         setIsSuperAdmin(false);
-        setUserProfile(null);
-        setMemberships([]);
-        setActiveMembership(null);
-        setActiveInstitute(null);
         setSelectedInstituteId(null);
-        setErpError(null);
-        setErpLoading(false);
+        clearErpState();
       }
       setLoading(false);
     });
 
     return () => unsubscribe();
-  }, [loadErpContext]);
+  }, [clearErpState, loadErpContext]);
 
+  // Legacy CMS Google OAuth sign-in
   const signInWithGoogle = async () => {
     const provider = new GoogleAuthProvider();
     try {
@@ -166,6 +176,41 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       console.error('Error signing in with Google', error);
       throw error;
     }
+  };
+
+  // ERP Staff Email/Password sign-in (no self-registration)
+  const signInWithEmail = async (email: string, password: string) => {
+    await signInWithEmailAndPassword(auth, email.trim(), password);
+  };
+
+  // ERP Staff Password Reset email
+  const sendPasswordReset = async (email: string) => {
+    await sendPasswordResetEmail(auth, email.trim());
+  };
+
+  // ERP Staff Email Verification resend
+  const resendVerificationEmail = async () => {
+    if (!auth.currentUser) {
+      throw new Error('You must be signed in to request a verification email.');
+    }
+    if (!auth.currentUser.emailVerified) {
+      await sendEmailVerification(auth.currentUser);
+    }
+  };
+
+  // Reload Firebase user verification state and load ERP context once verified
+  const reloadVerificationStatus = async (): Promise<boolean> => {
+    if (!auth.currentUser) {
+      return false;
+    }
+    await auth.currentUser.reload();
+    const refreshedUser = auth.currentUser;
+    setUser(refreshedUser);
+    if (refreshedUser.emailVerified) {
+      await loadErpContext(refreshedUser, selectedInstituteId);
+      return true;
+    }
+    return false;
   };
 
   const logout = async () => {
@@ -204,7 +249,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     [memberships]
   );
 
+  const emailVerificationRequired = Boolean(user && !user.emailVerified);
+
   const erpRole: ErpRole | null = useMemo(() => {
+    if (!user || !user.emailVerified) {
+      return null;
+    }
     if (!activeMembership || activeMembership.status !== 'active') {
       return null;
     }
@@ -212,7 +262,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       return null;
     }
     return activeMembership.role;
-  }, [activeMembership, userProfile]);
+  }, [activeMembership, user, userProfile]);
 
   const hasPermission = useCallback(
     (permission: ErpPermission) => {
@@ -237,6 +287,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         loading,
         signInWithGoogle,
         logout,
+        signInWithEmail,
+        sendPasswordReset,
+        resendVerificationEmail,
+        reloadVerificationStatus,
+        emailVerificationRequired,
         userProfile,
         memberships,
         activeMembership,

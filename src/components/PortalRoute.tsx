@@ -1,6 +1,13 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link, Navigate, Outlet, useLocation } from 'react-router-dom';
-import { AlertTriangle, Building2, LogOut, RefreshCw, ShieldAlert } from 'lucide-react';
+import {
+  AlertTriangle,
+  Building2,
+  LogOut,
+  MailCheck,
+  RefreshCw,
+  ShieldAlert,
+} from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { getRoleDefinition } from '../erp/rbac';
 import type { ErpPermission, ErpRole } from '../erp/types';
@@ -21,12 +28,18 @@ export default function PortalRoute({ requiredPermission, allowedRoles }: Portal
     loading,
     erpLoading,
     erpError,
+    emailVerificationRequired,
+    resendVerificationEmail,
+    reloadVerificationStatus,
     refreshErpContext,
     hasPermission,
     hasRole,
     logout,
   } = useAuth();
   const location = useLocation();
+  const [verifyNotice, setVerifyNotice] = useState<string | null>(null);
+  const [verifyError, setVerifyError] = useState<string | null>(null);
+  const [verifyBusy, setVerifyBusy] = useState(false);
 
   if (loading || erpLoading) {
     return (
@@ -43,6 +56,99 @@ export default function PortalRoute({ requiredPermission, allowedRoles }: Portal
 
   if (!user) {
     return <Navigate to="/portal/login" state={{ from: location }} replace />;
+  }
+
+  if (emailVerificationRequired) {
+    const handleResend = async () => {
+      setVerifyBusy(true);
+      setVerifyError(null);
+      setVerifyNotice(null);
+      try {
+        await resendVerificationEmail();
+        setVerifyNotice(`Verification link sent to ${user.email}.`);
+      } catch (err) {
+        setVerifyError(err instanceof Error ? err.message : 'Unable to send verification email.');
+      } finally {
+        setVerifyBusy(false);
+      }
+    };
+
+    const handleCheck = async () => {
+      setVerifyBusy(true);
+      setVerifyError(null);
+      setVerifyNotice(null);
+      try {
+        const verified = await reloadVerificationStatus();
+        if (!verified) {
+          setVerifyError('Email is still unverified. Check your inbox and try again.');
+        }
+      } catch (err) {
+        setVerifyError(err instanceof Error ? err.message : 'Unable to reload verification status.');
+      } finally {
+        setVerifyBusy(false);
+      }
+    };
+
+    return (
+      <div className="min-h-screen bg-slate-50 flex items-center justify-center p-6">
+        <div className="w-full max-w-lg bg-white border border-slate-200 rounded-xl p-8">
+          <div className="w-11 h-11 rounded-lg bg-amber-50 text-amber-700 flex items-center justify-center mb-5">
+            <MailCheck className="w-5 h-5" aria-hidden="true" />
+          </div>
+          <h1 className="text-xl font-bold text-slate-900">Email Verification Required</h1>
+          <p className="mt-2 text-sm text-slate-600 leading-relaxed">
+            Your staff account (<span className="font-medium text-slate-900">{user.email}</span>)
+            must verify its email address before accessing any ERP institute workspace.
+          </p>
+
+          {verifyError && (
+            <div
+              role="alert"
+              className="mt-4 p-3.5 rounded-lg bg-red-50 border border-red-200 text-xs text-red-700"
+            >
+              {verifyError}
+            </div>
+          )}
+
+          {verifyNotice && (
+            <div
+              role="status"
+              className="mt-4 p-3.5 rounded-lg bg-emerald-50 border border-emerald-200 text-xs text-emerald-800"
+            >
+              {verifyNotice}
+            </div>
+          )}
+
+          <div className="mt-6 flex flex-wrap items-center gap-3">
+            <button
+              type="button"
+              disabled={verifyBusy}
+              onClick={() => void handleCheck()}
+              className="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg bg-brand-primary text-white text-sm font-medium hover:bg-brand-primary/90 transition-colors disabled:opacity-60 cursor-pointer"
+            >
+              <RefreshCw className="w-4 h-4" aria-hidden="true" />
+              <span>Check Verification Status</span>
+            </button>
+            <button
+              type="button"
+              disabled={verifyBusy}
+              onClick={() => void handleResend()}
+              className="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg border border-slate-200 bg-white text-sm font-medium text-slate-700 hover:bg-slate-50 transition-colors disabled:opacity-60 cursor-pointer"
+            >
+              <span>Resend Email</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => void logout()}
+              className="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-medium text-slate-600 hover:text-slate-900 cursor-pointer"
+            >
+              <LogOut className="w-4 h-4" aria-hidden="true" />
+              <span>Sign Out</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    );
   }
 
   if (erpError) {

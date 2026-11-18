@@ -5,9 +5,9 @@
 1. **Identity Authority**: Every ERP user profile (`users/{uid}`) is keyed strictly by Firebase Authentication `uid`. Client code cannot impersonate another UID or forge `createdBy` fields.
 2. **No Self-Assigned Roles**: Public or unprovisioned users cannot create `memberships` documents or write `role` / `status` / `instituteId` privileges to their own profile.
 3. **Deterministic Membership Key**: Every `memberships/{membershipId}` document uses the deterministic ID `${instituteId}_${uid}` so a user holds at most one role per institute, preventing duplicate/conflicting privilege records.
-4. **Master Gate & Referential Integrity**: Every membership references an existing `institutes/{instituteId}` document (`exists(...)`). Revoking or suspending a membership (`status != 'active'`) immediately removes institute access across all rules.
-5. **Email Verification Mandate**: All privileged writes and Super Admin checks require `request.auth.token.email_verified == true`.
-6. **PII Isolation**: `users/{uid}` (containing personal email and phone) is readable only by the owning user (`request.auth.uid == uid`) or `isSuperAdmin()`. No blanket `isSignedIn()` reads are permitted.
+4. **Master Gate & Referential Integrity**: Every membership references an existing `institutes/{instituteId}` document with `status == 'active'` on staff membership creation/updates (`isActiveInstitute(...)`). Revoking/suspending a membership (`status != 'active'`) or disabling the user profile (`users/{uid}.status != 'active'`) immediately removes institute access across all rules.
+5. **Email Verification Mandate**: All privileged writes, ERP reads/writes, and Super Admin checks (`sumitdevthakur@gmail.com`, `pradeepclasses.in@gmail.com`) require `request.auth.token.email_verified == true`.
+6. **PII Isolation & Cross-Institute Guard**: `users/{uid}` (containing personal email and phone) is readable only by the owning user (`request.auth.uid == uid`) or `isSuperAdmin()`. Self-updates to `defaultInstituteId` are restricted to institutes where the user holds an active membership.
 7. **Zero Query Trust**: Every `allow list` rule evaluates `resource.data` directly (e.g., `resource.data.uid == request.auth.uid`) without calling `get()` or `exists()` inside `allow list`.
 8. **Legacy CMS Preservation**: Existing public website collections (`notices`, `inquiries`, `admins`, `settings`, `faculties`, `toppers`, `gallery`, `reviews`, `siteImages`, `automated_content`) retain their exact security invariants.
 

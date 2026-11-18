@@ -18,9 +18,22 @@ export default function AdminLogin() {
     setError(null);
     try {
       await signInWithGoogle();
-    } catch (err: any) {
-      console.error(err);
-      setError(err.message || 'Failed to sign in with Google');
+    } catch (err: unknown) {
+      const code =
+        typeof err === 'object' && err !== null && 'code' in err
+          ? String((err as { code?: unknown }).code)
+          : '';
+      if (code === 'auth/unauthorized-domain') {
+        setError(
+          `This domain (${window.location.hostname}) is not authorized in Firebase Authentication -> Settings -> Authorized domains.`
+        );
+      } else if (code === 'auth/popup-blocked') {
+        setError('Sign-in popup was blocked by your browser. Allow popups for this site and try again.');
+      } else if (code === 'auth/popup-closed-by-user') {
+        setError('Sign-in popup was closed before completing Google authentication.');
+      } else {
+        setError(err instanceof Error ? err.message : 'Failed to sign in with Google');
+      }
     }
   };
 

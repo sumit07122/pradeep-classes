@@ -14,8 +14,7 @@ service cloud.firestore {
     function isSuperAdmin() { 
       return isVerifiedUser() && (
         request.auth.token.email == 'sumitdevthakur@gmail.com' ||
-        request.auth.token.email == 'pradeepclasses.in@gmail.com' ||
-        request.auth.token.email == 'krishna0202thakur@gmail.com'
+        request.auth.token.email == 'pradeepclasses.in@gmail.com'
       ); 
     }
     function isAdmin() { 
@@ -26,10 +25,19 @@ service cloud.firestore {
     function membershipPath(instituteId, uid) {
       return /databases/$(database)/documents/memberships/$(instituteId + '_' + uid);
     }
+    function isActiveUserRecord() {
+      return !exists(/databases/$(database)/documents/users/$(request.auth.uid)) ||
+             get(/databases/$(database)/documents/users/$(request.auth.uid)).data.status == 'active';
+    }
     function isActiveInstituteMember(instituteId) {
       return isVerifiedUser() &&
+             isActiveUserRecord() &&
              exists(membershipPath(instituteId, request.auth.uid)) &&
              get(membershipPath(instituteId, request.auth.uid)).data.status == 'active';
+    }
+    function isActiveInstitute(instituteId) {
+      return exists(/databases/$(database)/documents/institutes/$(instituteId)) &&
+             get(/databases/$(database)/documents/institutes/$(instituteId)).data.status == 'active';
     }
     function hasInstituteRole(instituteId, allowedRoles) {
       return isActiveInstituteMember(instituteId) &&
@@ -306,7 +314,12 @@ service cloud.firestore {
                            request.auth.uid == userId &&
                            existing().status == 'active' &&
                            incoming().status == existing().status &&
-                           incoming().diff(existing()).affectedKeys().hasOnly(['displayName', 'phone', 'photoURL', 'defaultInstituteId', 'updatedAt'])
+                           incoming().diff(existing()).affectedKeys().hasOnly(['displayName', 'phone', 'photoURL', 'defaultInstituteId', 'updatedAt']) &&
+                           (
+                             !('defaultInstituteId' in incoming()) ||
+                             incoming().defaultInstituteId == existing().get('defaultInstituteId', '') ||
+                             isActiveInstituteMember(incoming().defaultInstituteId)
+                           )
                          )
                        );
       allow delete: if isValidId(userId) && isSuperAdmin();
@@ -324,7 +337,7 @@ service cloud.firestore {
       allow create: if isValidId(membershipId) &&
                        isValidMembership(incoming()) &&
                        membershipId == (incoming().instituteId + '_' + incoming().uid) &&
-                       exists(/databases/$(database)/documents/institutes/$(incoming().instituteId)) &&
+                       isActiveInstitute(incoming().instituteId) &&
                        incoming().createdBy == request.auth.uid &&
                        incoming().createdAt == request.time &&
                        incoming().updatedAt == request.time &&
@@ -347,6 +360,7 @@ service cloud.firestore {
                          isSuperAdmin() ||
                          (
                            isInstituteOwner(existing().instituteId) &&
+                           isActiveInstitute(existing().instituteId) &&
                            existing().role != 'institute_owner' &&
                            incoming().role != 'institute_owner'
                          )
