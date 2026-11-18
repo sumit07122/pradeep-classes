@@ -252,17 +252,21 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const emailVerificationRequired = Boolean(user && !user.emailVerified);
 
   const erpRole: ErpRole | null = useMemo(() => {
+    // Fail-closed security policy: require authenticated, email-verified, active profile, active membership, and active institute
     if (!user || !user.emailVerified) {
+      return null;
+    }
+    if (!userProfile || userProfile.status !== 'active') {
       return null;
     }
     if (!activeMembership || activeMembership.status !== 'active') {
       return null;
     }
-    if (userProfile && userProfile.status === 'disabled') {
+    if (!activeInstitute || activeInstitute.status !== 'active') {
       return null;
     }
     return activeMembership.role;
-  }, [activeMembership, user, userProfile]);
+  }, [activeInstitute, activeMembership, user, userProfile]);
 
   const hasPermission = useCallback(
     (permission: ErpPermission) => {

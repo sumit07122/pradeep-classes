@@ -26,7 +26,7 @@ service cloud.firestore {
       return /databases/$(database)/documents/memberships/$(instituteId + '_' + uid);
     }
     function isActiveUserRecord() {
-      return !exists(/databases/$(database)/documents/users/$(request.auth.uid)) ||
+      return exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
              get(/databases/$(database)/documents/users/$(request.auth.uid)).data.status == 'active';
     }
     function isActiveInstituteMember(instituteId) {
@@ -333,7 +333,11 @@ service cloud.firestore {
                       isInstitutePrivileged(resource.data.instituteId) ||
                       isSuperAdmin()
                     );
-      allow list: if isVerifiedUser() && (resource.data.uid == request.auth.uid || isSuperAdmin());
+      allow list: if isVerifiedUser() && (
+        resource.data.uid == request.auth.uid ||
+        (isActiveInstitute(resource.data.instituteId) && isInstitutePrivileged(resource.data.instituteId)) ||
+        isSuperAdmin()
+      );
       allow create: if isValidId(membershipId) &&
                        isValidMembership(incoming()) &&
                        membershipId == (incoming().instituteId + '_' + incoming().uid) &&

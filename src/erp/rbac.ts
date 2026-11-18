@@ -31,6 +31,13 @@ export const ROLE_DEFINITIONS: Record<ErpRole, RoleDefinition> = {
       'institute:settings:view',
       'institute:settings:manage',
       'staff:view',
+      'staff:create',
+      'staff:invite',
+      'staff:designation:manage',
+      'staff:role:manage',
+      'staff:suspend',
+      'staff:reactivate',
+      'staff:revoke',
       'staff:manage',
       'academics:view',
       'academics:manage',
@@ -56,6 +63,11 @@ export const ROLE_DEFINITIONS: Record<ErpRole, RoleDefinition> = {
       'dashboard:teacher:view',
       'institute:settings:view',
       'staff:view',
+      'staff:create',
+      'staff:invite',
+      'staff:designation:manage',
+      'staff:suspend',
+      'staff:reactivate',
       'academics:view',
       'academics:manage',
       'attendance:view',
@@ -201,3 +213,46 @@ export function selectActiveMembership(
 
   return active[0];
 }
+
+/**
+ * Evaluates whether an actor role has authority to create, invite, suspend, or reactivate a target staff role.
+ * - Institute Owner can manage all roles (Owner, Admin, Accountant, Teacher).
+ * - Institute Admin can only manage non-owner staff (Accountant, Teacher). Admins cannot manage Owner or other Admins.
+ * - Other roles (Accountant, Teacher) cannot manage any staff members.
+ */
+export function canManageTargetRole(
+  actorRole: ErpRole | null | undefined,
+  targetRole: ErpRole,
+  status: MembershipStatus | null | undefined = 'active'
+): boolean {
+  if (status !== 'active' || !actorRole || !isValidErpRole(actorRole)) return false;
+  if (!isValidErpRole(targetRole)) return false;
+  if (actorRole === 'institute_owner') return true;
+  if (actorRole === 'institute_admin') {
+    return targetRole === 'accountant' || targetRole === 'teacher';
+  }
+  return false;
+}
+
+/**
+ * Evaluates whether an actor role can modify the role assigned to a staff membership.
+ * Strictly limited to Institute Owners.
+ */
+export function canAlterStaffRole(
+  actorRole: ErpRole | null | undefined,
+  status: MembershipStatus | null | undefined = 'active'
+): boolean {
+  return hasErpPermission(actorRole, 'staff:role:manage', status);
+}
+
+/**
+ * Evaluates whether an actor role can revoke a staff membership permanently.
+ * Strictly limited to Institute Owners.
+ */
+export function canRevokeStaffMembership(
+  actorRole: ErpRole | null | undefined,
+  status: MembershipStatus | null | undefined = 'active'
+): boolean {
+  return hasErpPermission(actorRole, 'staff:revoke', status);
+}
+

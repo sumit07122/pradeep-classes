@@ -3,6 +3,9 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
 import {
+  canAlterStaffRole,
+  canManageTargetRole,
+  canRevokeStaffMembership,
   getDefaultPortalRoute,
   getVisibleNavItems,
   hasAnyErpRole,
@@ -23,6 +26,10 @@ const adminLoginSource = fs.readFileSync(
 );
 const authContextSource = fs.readFileSync(
   path.join(rootDir, 'src/context/AuthContext.tsx'),
+  'utf8'
+);
+const portalRouteSource = fs.readFileSync(
+  path.join(rootDir, 'src/components/PortalRoute.tsx'),
   'utf8'
 );
 
@@ -179,5 +186,109 @@ test('7. Legacy CMS authentication, super-admin allowlist, and collections remai
     'automated_content',
   ]) {
     assert.match(firestoreRules, new RegExp(`match /${col}/`));
+  }
+});
+
+test('8. Institute-scoped membership listing enforces privileged institute scope and blocks cross-institute leaks', () => {
+  // Firestore rules allow list only for:
+  // (a) querying own memberships (uid == request.auth.uid)
+  // (b) privileged institute members (Owner/Admin of that active institute)
+  // (c) super admin
+  assert.match(
+    firestoreRules,
+    /allow list: if isVerifiedUser\(\) && \(\s*resource\.data\.uid == request\.auth\.uid \|\|\s*\(isActiveInstitute\(resource\.data\.instituteId\) && isInstitutePrivileged\(resource\.data\.instituteId\)\) \|\|\s*isSuperAdmin\(\)\s*\);/
+  );
+
+  // In RBAC, teachers and accountants cannot list staff
+  assert.equal(hasErpPermission('teacher', 'staff:view'), false);
+  assert.equal(hasErpPermission('accountant', 'staff:view'), false);
+  assert.equal(hasErpPermission('institute_admin', 'staff:view'), true);
+  assert.equal(hasErpPermission('institute_owner', 'staff:view'), true);
+});
+
+test('9. Missing user profile fails closed across rules, auth context, and portal route', () => {
+  // 1. In firestore.rules: isActiveUserRecord requires profile document existence and active status
+  assert.match(
+    firestoreRules,
+    /function isActiveUserRecord\(\) \{\s*return exists\(\/databases\/\$\(database\)\/documents\/users\/\$\(request\.auth\.uid\)\) &&\s*get\(\/databases\/\$\(database\)\/documents\/users\/\$\(request\.auth\.uid\)\)\.data\.status == 'active';\s*\}/
+  );
+  // Ensure !exists() pattern is completely gone
+  assert.equal(firestoreRules.includes('!exists(/databases/$(database)/documents/users/$(request.auth.uid))'), false);
+
+  // 2. In AuthContext: erpRole is null if userProfile is missing or not active
+  assert.match(authContextSource, /if \(!userProfile \|\| userProfile\.status !== 'active'\) \{\s*return null;\s*\}/);
+
+  // 3. In PortalRoute: missing userProfile or inactive userProfile denies access with security notice
+  assert.match(portalRouteSource, /if \(!userProfile \|\| userProfile\.status !== 'active'\)/);
+  assert.match(portalRouteSource, /console\.warn\('\[SECURITY\] ERP Route access denied: Missing or disabled user profile'/);
+  assert.match(portalRouteSource, /Staff Profile Not Found/);
+});
+
+test('10. Missing or inactive institute fails closed in auth context and portal route', () => {
+  // 1. In AuthContext: erpRole is null if activeInstitute is missing or not active
+  assert.match(authContextSource, /if \(!activeInstitute \|\| activeInstitute\.status !== 'active'\) \{\s*return null;\s*\}/);
+
+  // 2. In PortalRoute: missing or inactive activeInstitute denies access with security notice
+  assert.match(portalRouteSource, /if \(!activeInstitute \|\| activeInstitute\.status !== 'active'\)/);
+  assert.match(portalRouteSource, /console\.warn\('\[SECURITY\] ERP Route access denied: Missing or inactive institute'/);
+  assert.match(portalRouteSource, /Institute Workspace Not Found/);
+  assert.match(portalRouteSource, /Institute Workspace Suspended/);
+});
+
+test('11. Staff management permission matrix enforces owner vs admin boundaries', () => {
+  // Owner permissions: full lifecycle
+  const ownerStaffPerms = [
+    'staff:view',
+    'staff:create',
+    'staff:invite',
+    'staff:designation:manage',
+    'staff:role:manage',
+    'staff:suspend',
+    'staff:reactivate',
+    'staff:revoke',
+  ] as const;
+
+  for (const perm of ownerStaffPerms) {
+    assert.equal(hasErpPermission('institute_owner', perm), true, `Owner must have ${perm}`);
+  }
+
+  // Owner can manage all target roles and change roles/revoke
+  assert.equal(canManageTargetRole('institute_owner', 'institute_owner'), true);
+  assert.equal(canManageTargetRole('institute_owner', 'institute_admin'), true);
+  assert.equal(canManageTargetRole('institute_owner', 'accountant'), true);
+  assert.equal(canManageTargetRole('institute_owner', 'teacher'), true);
+  assert.equal(canAlterStaffRole('institute_owner'), true);
+  assert.equal(canRevokeStaffMembership('institute_owner'), true);
+
+  // Admin permissions: limited non-owner staff management
+  assert.equal(hasErpPermission('institute_admin', 'staff:view'), true);
+  assert.equal(hasErpPermission('institute_admin', 'staff:create'), true);
+  assert.equal(hasErpPermission('institute_admin', 'staff:invite'), true);
+  assert.equal(hasErpPermission('institute_admin', 'staff:designation:manage'), true);
+  assert.equal(hasErpPermission('institute_admin', 'staff:suspend'), true);
+  assert.equal(hasErpPermission('institute_admin', 'staff:reactivate'), true);
+
+  // Admin STRICTLY CANNOT change role, revoke, or hold staff:manage
+  assert.equal(hasErpPermission('institute_admin', 'staff:role:manage'), false);
+  assert.equal(hasErpPermission('institute_admin', 'staff:revoke'), false);
+  assert.equal(hasErpPermission('institute_admin', 'staff:manage'), false);
+  assert.equal(canAlterStaffRole('institute_admin'), false);
+  assert.equal(canRevokeStaffMembership('institute_admin'), false);
+
+  // Admin cannot create/promote to Owner or Admin
+  assert.equal(canManageTargetRole('institute_admin', 'institute_owner'), false);
+  assert.equal(canManageTargetRole('institute_admin', 'institute_admin'), false);
+  // Admin can manage Accountant and Teacher
+  assert.equal(canManageTargetRole('institute_admin', 'accountant'), true);
+  assert.equal(canManageTargetRole('institute_admin', 'teacher'), true);
+
+  // Accountant and Teacher: no staff management permissions
+  for (const role of ['accountant', 'teacher'] as const) {
+    for (const perm of ownerStaffPerms) {
+      assert.equal(hasErpPermission(role, perm), false, `${role} must NOT have ${perm}`);
+    }
+    assert.equal(canManageTargetRole(role, 'teacher'), false);
+    assert.equal(canAlterStaffRole(role), false);
+    assert.equal(canRevokeStaffMembership(role), false);
   }
 });

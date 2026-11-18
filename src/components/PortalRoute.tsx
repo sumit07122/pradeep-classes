@@ -183,17 +183,36 @@ export default function PortalRoute({ requiredPermission, allowedRoles }: Portal
     );
   }
 
-  if (userProfile?.status === 'disabled') {
+  if (!userProfile || userProfile.status !== 'active') {
+    console.warn('[SECURITY] ERP Route access denied: Missing or disabled user profile', {
+      uid: user.uid,
+      status: userProfile?.status ?? 'missing',
+      path: location.pathname,
+    });
+
+    const isMissing = !userProfile;
     return (
       <div className="min-h-screen bg-slate-50 flex items-center justify-center p-6">
         <div className="w-full max-w-lg bg-white border border-slate-200 rounded-xl p-8">
           <div className="w-11 h-11 rounded-lg bg-red-50 text-red-700 flex items-center justify-center mb-5">
             <ShieldAlert className="w-5 h-5" aria-hidden="true" />
           </div>
-          <h1 className="text-xl font-bold text-slate-900">Staff Account Disabled</h1>
+          <h1 className="text-xl font-bold text-slate-900">
+            {isMissing ? 'Staff Profile Not Found' : 'Staff Account Disabled'}
+          </h1>
           <p className="mt-2 text-sm text-slate-600 leading-relaxed">
-            Your ERP profile for <span className="font-medium text-slate-900">{user.email}</span> is
-            currently disabled. Contact the Institute Owner to restore access.
+            {isMissing ? (
+              <>
+                No active ERP staff profile was found for{' '}
+                <span className="font-medium text-slate-900">{user.email}</span>. Staff accounts
+                must be provisioned through trusted administrative channels.
+              </>
+            ) : (
+              <>
+                Your ERP profile for <span className="font-medium text-slate-900">{user.email}</span>{' '}
+                is currently disabled. Contact the Institute Owner to restore access.
+              </>
+            )}
           </p>
           <div className="mt-6 flex flex-wrap items-center gap-3">
             <button
@@ -216,7 +235,12 @@ export default function PortalRoute({ requiredPermission, allowedRoles }: Portal
     );
   }
 
-  if (!activeMembership || !erpRole) {
+  if (!activeMembership || activeMembership.status !== 'active') {
+    console.warn('[SECURITY] ERP Route access denied: Missing or inactive membership', {
+      uid: user.uid,
+      path: location.pathname,
+    });
+
     const inactiveList = memberships.filter((m) => m.status !== 'active');
 
     return (
@@ -296,17 +320,36 @@ export default function PortalRoute({ requiredPermission, allowedRoles }: Portal
     );
   }
 
-  if (activeInstitute && activeInstitute.status === 'suspended') {
+  if (!activeInstitute || activeInstitute.status !== 'active') {
+    console.warn('[SECURITY] ERP Route access denied: Missing or inactive institute', {
+      uid: user.uid,
+      instituteId: activeMembership.instituteId,
+      status: activeInstitute?.status ?? 'missing',
+      path: location.pathname,
+    });
+
+    const isMissingInstitute = !activeInstitute;
     return (
       <div className="min-h-screen bg-slate-50 flex items-center justify-center p-6">
         <div className="w-full max-w-lg bg-white border border-slate-200 rounded-xl p-8">
           <div className="w-11 h-11 rounded-lg bg-amber-50 text-amber-700 flex items-center justify-center mb-5">
             <AlertTriangle className="w-5 h-5" aria-hidden="true" />
           </div>
-          <h1 className="text-xl font-bold text-slate-900">Institute Workspace Suspended</h1>
+          <h1 className="text-xl font-bold text-slate-900">
+            {isMissingInstitute ? 'Institute Workspace Not Found' : 'Institute Workspace Suspended'}
+          </h1>
           <p className="mt-2 text-sm text-slate-600 leading-relaxed">
-            Access to <span className="font-medium text-slate-900">{activeInstitute.name}</span> is
-            currently suspended. Please contact your system administrator.
+            {isMissingInstitute ? (
+              <>
+                The institute workspace linked to your membership could not be found or loaded.
+                Please contact the Institute Owner.
+              </>
+            ) : (
+              <>
+                Access to <span className="font-medium text-slate-900">{activeInstitute.name}</span>{' '}
+                is currently suspended. Please contact your system administrator.
+              </>
+            )}
           </p>
           <div className="mt-6 flex items-center gap-3">
             <button
@@ -317,13 +360,39 @@ export default function PortalRoute({ requiredPermission, allowedRoles }: Portal
               <LogOut className="w-4 h-4" aria-hidden="true" />
               <span>Sign Out</span>
             </button>
+            <Link
+              to="/"
+              className="inline-flex items-center px-4 py-2.5 rounded-lg border border-slate-200 bg-white text-sm font-medium text-slate-700 hover:bg-slate-50 transition-colors"
+            >
+              Return to Public Site
+            </Link>
           </div>
         </div>
       </div>
     );
   }
 
+  if (!erpRole) {
+    console.warn('[SECURITY] ERP Route access denied: No active role resolved', {
+      uid: user.uid,
+      path: location.pathname,
+    });
+    return (
+      <Navigate
+        to="/portal/unauthorized"
+        state={{ attemptedPath: location.pathname }}
+        replace
+      />
+    );
+  }
+
   if (requiredPermission && !hasPermission(requiredPermission)) {
+    console.warn('[SECURITY] ERP Route access denied: Missing required permission', {
+      uid: user.uid,
+      role: erpRole,
+      requiredPermission,
+      path: location.pathname,
+    });
     return (
       <Navigate
         to="/portal/unauthorized"
@@ -334,6 +403,12 @@ export default function PortalRoute({ requiredPermission, allowedRoles }: Portal
   }
 
   if (allowedRoles && allowedRoles.length > 0 && !hasRole(allowedRoles)) {
+    console.warn('[SECURITY] ERP Route access denied: Role not allowed', {
+      uid: user.uid,
+      role: erpRole,
+      allowedRoles,
+      path: location.pathname,
+    });
     return (
       <Navigate
         to="/portal/unauthorized"
