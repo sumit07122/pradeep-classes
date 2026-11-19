@@ -259,6 +259,23 @@ export interface ExamResult {
   updatedAt?: unknown;
 }
 
+export type AnnouncementAudience = 'all' | 'staff' | 'students' | 'batch';
+export type AnnouncementPriority = 'normal' | 'important' | 'urgent';
+
+export interface Announcement {
+  id: string;
+  instituteId: string;
+  title: string;
+  content: string;
+  targetAudience: AnnouncementAudience;
+  batchId?: string;
+  batchName?: string;
+  priority: AnnouncementPriority;
+  publishedBy: string;
+  createdAt?: unknown;
+  updatedAt?: unknown;
+}
+
 export interface FeePayment {
   id: string;
   instituteId: string;

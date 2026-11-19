@@ -38,6 +38,7 @@ import StudentManagement from './pages/portal/StudentManagement';
 import AttendanceManagement from './pages/portal/AttendanceManagement';
 import AcademicManagement from './pages/portal/AcademicManagement';
 import FeeManagement from './pages/portal/FeeManagement';
+import CommunicationManagement from './pages/portal/CommunicationManagement';
 import PortalUnauthorized from './pages/portal/PortalUnauthorized';
 
 function ScrollToTop() {
@@ -124,6 +125,10 @@ export default function App() {
 
                   <Route element={<PortalRoute requiredPermission="finance:view" />}>
                     <Route path="fees" element={<FeeManagement />} />
+                  </Route>
+
+                  <Route element={<PortalRoute requiredPermission="portal:access" />}>
+                    <Route path="communication" element={<CommunicationManagement />} />
                   </Route>
 
                   <Route element={<PortalRoute requiredPermission="portal:access" />}>

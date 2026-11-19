@@ -20,9 +20,9 @@
 | **TASK 08** | Student Management | COMPLETED | `aa828f3` | 2026-11-19 |
 | **TASK 09** | Fees & Financial Management | COMPLETED | `57cf738` | 2026-11-19 |
 | **TASK 10** | Attendance Management | COMPLETED | `b25918e` | 2026-11-19 |
-| **TASK 11** | Academic Management | COMPLETED | *Current* | 2026-11-19 |
-| **TASK 12** | Notifications & Communication | PENDING | - | Next |
-| **TASK 13** | Production Readiness & Release QA | PENDING | - | Queued |
+| **TASK 11** | Academic Management | COMPLETED | `95bb80c` | 2026-11-19 |
+| **TASK 12** | Notifications & Communication | COMPLETED | *Pending Commit* | 2026-11-19 |
+| **TASK 13** | Production Readiness & Release QA | PENDING | - | Next |
 
 ---
 
@@ -336,7 +336,7 @@
 ### TASK 11 — Academic Management (Timetable, Homework, Exams & Marks)
 - **Status**: Completed
 - **Starting Commit**: `b25918e`
-- **Final Commit**: *Pending Commit*
+- **Final Commit**: `95bb80c`
 - **Changed Files**:
   - `firestore.rules`
   - `src/erp/types.ts`
@@ -373,3 +373,63 @@
   - Teachers are restricted to assigned academic actions and cannot modify legal institute structure.
 - **Blockers**: None.
 - **Next Task**: TASK 12 — Notifications & Communication.
+
+---
+
+### TASK 12 — Notifications & Communication
+- **Status**: Completed
+- **Starting Commit**: `95bb80c`
+- **Final Commit**: *Pending Commit*
+- **Changed Files**:
+  - `firestore.rules`
+  - `src/erp/types.ts`
+  - `src/erp/rbac.ts`
+  - `src/erp/rbac.test.ts`
+  - `src/erp/communicationService.ts`
+  - `src/pages/portal/CommunicationManagement.tsx`
+  - `src/App.tsx`
+  - `src/erp/communication.test.ts`
+  - `ERP_EXECUTION_TRACKER.md`
+- **Features**:
+  - Implemented Firestore Security Rules for `/announcements/{announcementId}`:
+    - Multi-tenant institute scoping (`resource.data.instituteId == activeInstituteId`).
+    - Read access for all active verified institute staff.
+    - Authoring/modifying access for Owner, Admin, and Teacher roles.
+  - Added TypeScript definitions for `AnnouncementAudience`, `AnnouncementPriority`, and `Announcement`.
+  - Added `/portal/communication` route guarded by `portal:access` accessible to all staff roles.
+  - Added `communication-center` navigation item under `Administration` in `ERP_NAV_ITEMS`.
+  - Built `communicationService.ts` providing:
+    - `fetchAnnouncements`, `saveAnnouncement`, `deleteAnnouncement`.
+    - Phone number cleaner and WhatsApp direct message link generator (`https://wa.me/...`).
+    - Pre-formatted, professional template generators:
+      - Fee Reminder Notice (student name, balance, UPI ID).
+      - Daily Absence Notice (student name, date, batch).
+      - Examination Marks & Grade Report (student, exam, score, grade).
+  - Built comprehensive `CommunicationManagement.tsx` component:
+    - Tab 1: "Notice Board & Announcements":
+      - Filter announcements by audience (`all`, `staff`, `students`, `batch`) and priority (`all`, `normal`, `important`, `urgent`).
+      - Priority-tagged badges, author attribution, and date stamps.
+      - Announcement publishing wizard with modal form, priority picker, target audience, and optional batch assignment.
+      - Delete action with confirmation prompt.
+    - Tab 2: "WhatsApp Parent Messenger":
+      - Direct contact input or quick-select from active enrolled student directory.
+      - Pre-defined message templates (Fee Reminder, Daily Absence, Exam Results, General Notice).
+      - Live smartphone message preview bubble showing real-time formatting.
+      - Instant click-to-dispatch "Open WhatsApp Chat" button opening pre-filled WhatsApp web/app link.
+- **Tests**:
+  - `src/erp/communication.test.ts` (6/6 passing).
+  - `src/erp/rbac.test.ts` (7/7 passing).
+  - `src/erp/exam.test.ts` (3/3 passing).
+  - `src/erp/attendance.test.ts` (2/2 passing).
+  - `src/erp/fee.test.ts` (2/2 passing).
+  - `src/erp/student.test.ts` (2/2 passing).
+  - `src/erp/academic.test.ts` (2/2 passing).
+  - `src/erp/staff.test.ts` (5/5 passing).
+  - `src/erp/security.test.ts` (11/11 passing).
+  - `npm run lint` (0 errors).
+  - `npm run build` (Clean production build).
+- **Security Findings**:
+  - Announcements are strictly partitioned by institute.
+  - WhatsApp messenger creates direct client-side wa.me links, eliminating reliance on third-party SMS gateways and protecting student PII from third-party webhook leaks.
+- **Blockers**: None.
+- **Next Task**: TASK 13 — Production Readiness & Release QA.

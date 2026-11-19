@@ -475,5 +475,13 @@ service cloud.firestore {
       allow update: if isVerifiedUser() && isValidId(resultId) && hasInstituteRole(existing().instituteId, ['institute_owner', 'institute_admin', 'teacher']) && incoming().instituteId == existing().instituteId;
       allow delete: if isVerifiedUser() && isInstitutePrivileged(existing().instituteId);
     }
+
+    // Announcements & Communications (Institute Scoped)
+    match /announcements/{announcementId} {
+      allow get, list: if isVerifiedUser() && isValidId(announcementId) && (isActiveInstituteMember(resource.data.instituteId) || isSuperAdmin());
+      allow create: if isVerifiedUser() && isValidId(announcementId) && hasInstituteRole(incoming().instituteId, ['institute_owner', 'institute_admin', 'teacher']) && isActiveInstitute(incoming().instituteId);
+      allow update: if isVerifiedUser() && isValidId(announcementId) && hasInstituteRole(existing().instituteId, ['institute_owner', 'institute_admin', 'teacher']) && incoming().instituteId == existing().instituteId;
+      allow delete: if isVerifiedUser() && isInstitutePrivileged(existing().instituteId);
+    }
   }
 }

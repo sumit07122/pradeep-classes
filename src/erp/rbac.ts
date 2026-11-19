@@ -195,6 +195,14 @@ export const ERP_NAV_ITEMS: readonly ErpNavItem[] = [
     requiredPermission: 'finance:view',
   },
   {
+    id: 'communication-center',
+    label: 'Notice & Comms',
+    path: '/portal/communication',
+    icon: 'communication',
+    section: 'Administration',
+    requiredPermission: 'portal:access',
+  },
+  {
     id: 'profile-access',
     label: 'Profile & Access',
     path: '/portal/profile',
