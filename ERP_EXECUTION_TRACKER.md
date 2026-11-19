@@ -16,9 +16,9 @@
 | **TASK 05A** | Staff Management Security Hardening & Architecture | COMPLETED | `c5bba38` | 2026-11-19 |
 | **TASK 05B** | Firebase Infrastructure & Trusted Provisioning | COMPLETED | `e4ab84b` | 2026-11-19 |
 | **TASK 06** | Staff Management UI & Workflows | COMPLETED | `8fe153f` | 2026-11-19 |
-| **TASK 07** | Institute Settings & Academic Structure | COMPLETED | *Current* | 2026-11-19 |
-| **TASK 08** | Student Management | PENDING | - | Next |
-| **TASK 09** | Fees & Financial Management | PENDING | - | Queued |
+| **TASK 07** | Institute Settings & Academic Structure | COMPLETED | `a39f80c` | 2026-11-19 |
+| **TASK 08** | Student Management | COMPLETED | *Current* | 2026-11-19 |
+| **TASK 09** | Fees & Financial Management | PENDING | - | Next |
 | **TASK 10** | Attendance Management | PENDING | - | Queued |
 | **TASK 11** | Academic Management | PENDING | - | Queued |
 | **TASK 12** | Notifications & Communication | PENDING | - | Queued |
@@ -149,7 +149,7 @@
 ### TASK 07 — Institute Settings & Academic Structure
 - **Status**: Completed
 - **Starting Commit**: `8fe153f`
-- **Final Commit**: *Pending Commit*
+- **Final Commit**: `a39f80c`
 - **Changed Files**:
   - `firestore.rules`
   - `src/erp/types.ts`
@@ -191,3 +191,49 @@
   - Legal profile updates restricted strictly to `institute_owner`.
 - **Blockers**: None.
 - **Next Task**: TASK 08 — Student Management.
+
+---
+
+### TASK 08 — Student Management
+- **Status**: Completed
+- **Starting Commit**: `a39f80c`
+- **Final Commit**: *Pending Commit*
+- **Changed Files**:
+  - `firestore.rules`
+  - `src/erp/types.ts`
+  - `src/erp/rbac.ts`
+  - `src/erp/rbac.test.ts`
+  - `src/erp/studentService.ts`
+  - `src/pages/portal/StudentManagement.tsx`
+  - `src/App.tsx`
+  - `src/erp/student.test.ts`
+  - `ERP_EXECUTION_TRACKER.md`
+- **Features**:
+  - Established institute-scoped Firestore Security Rules for `/students/{studentId}`.
+  - Introduced `Student` and `StudentStatus` TypeScript interfaces in `src/erp/types.ts`.
+  - Added `students:view` and `students:manage` permissions in `src/erp/rbac.ts` across Owner, Admin, Accountant, and Teacher roles.
+  - Added `/portal/students` navigation item under the `Academics` section in `ERP_NAV_ITEMS`.
+  - Built `studentService.ts` providing filtered search, single lookup, new admission creation, profile updating, batch transfers, and enrollment status management.
+  - Built production-grade `StudentManagement.tsx` page featuring:
+    - Real-time search by student name, admission number, roll number, student phone, guardian phone.
+    - Filtering by Course, Batch, and Status (`active`, `suspended`, `graduated`, `dropped`).
+    - Live KPI summary stats (Total Enrolled, Active Students, Courses, Batches).
+    - Responsive student directory table with status badges and quick action controls.
+    - New Student Admission multi-section modal with course and batch assignment.
+    - Student Profile Drawer displaying complete personal, guardian, and academic history.
+    - Student Batch Transfer modal with batch capacity context.
+    - Student Enrollment Status update modal.
+  - Mounted `/portal/students` route in `App.tsx` guarded by `students:view`.
+- **Tests**:
+  - `src/erp/student.test.ts` (2/2 passing).
+  - `src/erp/academic.test.ts` (2/2 passing).
+  - `src/erp/rbac.test.ts` (7/7 passing).
+  - `src/erp/staff.test.ts` (5/5 passing).
+  - `src/erp/security.test.ts` (11/11 passing).
+  - `npm run lint` (0 errors).
+  - `npm run build` (Clean production build).
+- **Security Findings**:
+  - Verified student data isolation: members can only list students matching `resource.data.instituteId == activeInstituteId`.
+  - Verified that non-privileged roles (Teachers, Accountants) have read access only and cannot create or modify student enrollment records.
+- **Blockers**: None.
+- **Next Task**: TASK 09 — Fees & Financial Management.

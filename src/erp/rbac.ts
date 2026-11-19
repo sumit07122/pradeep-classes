@@ -39,6 +39,8 @@ export const ROLE_DEFINITIONS: Record<ErpRole, RoleDefinition> = {
       'staff:reactivate',
       'staff:revoke',
       'staff:manage',
+      'students:view',
+      'students:manage',
       'academics:view',
       'academics:manage',
       'finance:view',
@@ -68,6 +70,8 @@ export const ROLE_DEFINITIONS: Record<ErpRole, RoleDefinition> = {
       'staff:designation:manage',
       'staff:suspend',
       'staff:reactivate',
+      'students:view',
+      'students:manage',
       'academics:view',
       'academics:manage',
       'attendance:view',
@@ -85,6 +89,7 @@ export const ROLE_DEFINITIONS: Record<ErpRole, RoleDefinition> = {
     permissions: [
       'portal:access',
       'dashboard:accountant:view',
+      'students:view',
       'finance:view',
       'finance:manage',
       'reports:financial',
@@ -100,6 +105,7 @@ export const ROLE_DEFINITIONS: Record<ErpRole, RoleDefinition> = {
     permissions: [
       'portal:access',
       'dashboard:teacher:view',
+      'students:view',
       'academics:view',
       'attendance:view',
       'attendance:mark',
@@ -155,6 +161,14 @@ export const ERP_NAV_ITEMS: readonly ErpNavItem[] = [
     icon: 'settings',
     section: 'Administration',
     requiredPermission: 'institute:settings:view',
+  },
+  {
+    id: 'student-directory',
+    label: 'Students',
+    path: '/portal/students',
+    icon: 'students',
+    section: 'Academics',
+    requiredPermission: 'students:view',
   },
   {
     id: 'profile-access',

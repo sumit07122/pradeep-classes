@@ -412,5 +412,13 @@ service cloud.firestore {
       allow update: if isVerifiedUser() && isValidId(subjectId) && isInstitutePrivileged(existing().instituteId) && incoming().instituteId == existing().instituteId;
       allow delete: if isVerifiedUser() && isInstituteOwner(existing().instituteId);
     }
+
+    // Student Management (Institute Scoped)
+    match /students/{studentId} {
+      allow get, list: if isVerifiedUser() && isValidId(studentId) && (isActiveInstituteMember(resource.data.instituteId) || isSuperAdmin());
+      allow create: if isVerifiedUser() && isValidId(studentId) && isInstitutePrivileged(incoming().instituteId) && isActiveInstitute(incoming().instituteId);
+      allow update: if isVerifiedUser() && isValidId(studentId) && isInstitutePrivileged(existing().instituteId) && incoming().instituteId == existing().instituteId;
+      allow delete: if isVerifiedUser() && isInstituteOwner(existing().instituteId);
+    }
   }
 }

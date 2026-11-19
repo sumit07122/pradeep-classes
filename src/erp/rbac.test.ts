@@ -66,6 +66,7 @@ test('getVisibleNavItems filters workspace routes per role', () => {
     '/portal/teacher',
     '/portal/staff',
     '/portal/settings',
+    '/portal/students',
     '/portal/profile',
   ]);
 
@@ -75,14 +76,15 @@ test('getVisibleNavItems filters workspace routes per role', () => {
     '/portal/teacher',
     '/portal/staff',
     '/portal/settings',
+    '/portal/students',
     '/portal/profile',
   ]);
 
   const accountantLinks = getVisibleNavItems('accountant').map((i) => i.path);
-  assert.deepEqual(accountantLinks, ['/portal/accounts', '/portal/profile']);
+  assert.deepEqual(accountantLinks, ['/portal/accounts', '/portal/students', '/portal/profile']);
 
   const teacherLinks = getVisibleNavItems('teacher').map((i) => i.path);
-  assert.deepEqual(teacherLinks, ['/portal/teacher', '/portal/profile']);
+  assert.deepEqual(teacherLinks, ['/portal/teacher', '/portal/students', '/portal/profile']);
 
   assert.deepEqual(getVisibleNavItems('teacher', 'suspended'), []);
 });

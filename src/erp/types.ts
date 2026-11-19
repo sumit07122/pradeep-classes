@@ -27,6 +27,8 @@ export type ErpPermission =
   | 'staff:reactivate'
   | 'staff:revoke'
   | 'staff:manage'
+  | 'students:view'
+  | 'students:manage'
   | 'academics:view'
   | 'academics:manage'
   | 'finance:view'
@@ -128,6 +130,36 @@ export interface Subject {
   teacherUid?: string;
   teacherName?: string;
   status: 'active' | 'archived';
+  createdAt?: unknown;
+  updatedAt?: unknown;
+}
+
+export type StudentStatus = 'active' | 'suspended' | 'graduated' | 'dropped';
+
+export interface Student {
+  id: string;
+  instituteId: string;
+  admissionNumber: string;
+  rollNumber?: string;
+  fullName: string;
+  gender: 'male' | 'female' | 'other';
+  dob?: string;
+  phone: string;
+  email?: string;
+  bloodGroup?: string;
+  guardianName: string;
+  guardianPhone: string;
+  guardianRelation: string;
+  address?: string;
+  courseId: string;
+  courseName: string;
+  batchId: string;
+  batchName: string;
+  academicSessionId: string;
+  admissionDate: string;
+  status: StudentStatus;
+  photoURL?: string;
+  emergencyContact?: string;
   createdAt?: unknown;
   updatedAt?: unknown;
 }
