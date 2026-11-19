@@ -32,6 +32,7 @@ import AdminErpDashboard from './pages/portal/AdminErpDashboard';
 import AccountantDashboard from './pages/portal/AccountantDashboard';
 import TeacherDashboard from './pages/portal/TeacherDashboard';
 import PortalProfile from './pages/portal/PortalProfile';
+import StaffManagement from './pages/portal/StaffManagement';
 import PortalUnauthorized from './pages/portal/PortalUnauthorized';
 
 function ScrollToTop() {
@@ -94,6 +95,10 @@ export default function App() {
 
                   <Route element={<PortalRoute requiredPermission="dashboard:teacher:view" />}>
                     <Route path="teacher" element={<TeacherDashboard />} />
+                  </Route>
+
+                  <Route element={<PortalRoute requiredPermission="staff:view" />}>
+                    <Route path="staff" element={<StaffManagement />} />
                   </Route>
 
                   <Route element={<PortalRoute requiredPermission="portal:access" />}>

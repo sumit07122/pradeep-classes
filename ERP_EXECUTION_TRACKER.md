@@ -14,9 +14,9 @@
 |---|---|:---:|---|---|
 | **TASK 01-04** | Foundation, Auth, Shell & Project Audit | COMPLETED | `0db404f` | 2026-11-19 |
 | **TASK 05A** | Staff Management Security Hardening & Architecture | COMPLETED | `c5bba38` | 2026-11-19 |
-| **TASK 05B** | Firebase Infrastructure & Trusted Provisioning | COMPLETED | *Current* | 2026-11-19 |
-| **TASK 06** | Staff Management UI & Workflows | PENDING | - | Next |
-| **TASK 07** | Institute Settings & Academic Structure | PENDING | - | Queued |
+| **TASK 05B** | Firebase Infrastructure & Trusted Provisioning | COMPLETED | `e4ab84b` | 2026-11-19 |
+| **TASK 06** | Staff Management UI & Workflows | COMPLETED | *Current* | 2026-11-19 |
+| **TASK 07** | Institute Settings & Academic Structure | PENDING | - | Next |
 | **TASK 08** | Student Management | PENDING | - | Queued |
 | **TASK 09** | Fees & Financial Management | PENDING | - | Queued |
 | **TASK 10** | Attendance Management | PENDING | - | Queued |
@@ -60,7 +60,7 @@
 ### TASK 05B — Firebase Infrastructure & Trusted Provisioning
 - **Status**: Completed
 - **Starting Commit**: `c5bba38`
-- **Final Commit**: *Pending Commit*
+- **Final Commit**: `e4ab84b`
 - **Changed Files**:
   - `package.json`
   - `server.ts`
@@ -100,3 +100,46 @@
 - **Blockers**:
   - Production deployment of Admin SDK requires setting `FIREBASE_SERVICE_ACCOUNT_KEY` in environment variables or attaching service account in GCP Cloud Run / App Hosting.
 - **Next Task**: TASK 06 — Staff Management UI & Workflows.
+
+---
+
+### TASK 06 — Staff Management UI & Workflows
+- **Status**: Completed
+- **Starting Commit**: `e4ab84b`
+- **Final Commit**: *Pending Commit*
+- **Changed Files**:
+  - `src/erp/types.ts`
+  - `src/erp/rbac.ts`
+  - `src/erp/rbac.test.ts`
+  - `src/erp/staffService.ts`
+  - `src/pages/portal/StaffManagement.tsx`
+  - `src/layouts/ErpLayout.tsx`
+  - `src/App.tsx`
+  - `src/erp/staff.test.ts`
+  - `ERP_EXECUTION_TRACKER.md`
+- **Features**:
+  - Built responsive, accessible `StaffManagement` page:
+    - Search by staff name, email, designation, phone.
+    - Filter by role (`All`, `institute_owner`, `institute_admin`, `accountant`, `teacher`).
+    - Filter by status (`All`, `active`, `suspended`, `revoked`).
+    - Pagination controls with configurable view sizing.
+    - Role badges, status badges, and KPI stats summary cards.
+    - Create Staff Wizard modal with permission-gated role dropdown (Admin cannot create Owner or Admin).
+    - Staff Details Drawer modal showing full profile, contact, timestamps, and permissions.
+    - Change Role modal (Owner only) with confirmation workflow.
+    - Suspend / Reactivate action modal with immediate token revocation.
+    - Revoke Membership modal (Owner only) with destructive action protection.
+  - Created `staffService.ts` connecting Firestore reads and trusted backend provisioning endpoints.
+  - Updated `ErpLayout.tsx` and `ERP_NAV_ITEMS` to display the `Administration` section with `/portal/staff` for authorized roles (Owner and Admin).
+- **Tests**:
+  - `src/erp/staff.test.ts` (5/5 passing).
+  - `src/erp/rbac.test.ts` (7/7 passing).
+  - `src/erp/security.test.ts` (11/11 passing).
+  - `server/provisioning.test.ts` (3/3 passing).
+  - `npm run lint` (0 errors).
+  - `npm run build` (Clean production build).
+- **Security Findings**:
+  - Verified that `/portal/staff` route is inaccessible to Teacher and Accountant roles.
+  - Verified that Admins cannot create Owner/Admin or alter roles or revoke memberships.
+- **Blockers**: None.
+- **Next Task**: TASK 07 — Institute Settings & Academic Structure.

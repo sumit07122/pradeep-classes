@@ -68,7 +68,10 @@ export interface InstituteMembership {
   role: ErpRole;
   status: MembershipStatus;
   displayName: string;
+  email?: string;
   designation?: string;
+  department?: string;
+  phone?: string;
   createdBy: string;
   createdAt?: unknown;
   updatedAt?: unknown;
@@ -88,13 +91,20 @@ export type ErpNavIcon =
   | 'admin'
   | 'accounts'
   | 'teacher'
-  | 'profile';
+  | 'profile'
+  | 'staff'
+  | 'students'
+  | 'fees'
+  | 'attendance'
+  | 'academics'
+  | 'communication'
+  | 'settings';
 
 export interface ErpNavItem {
   id: string;
   label: string;
   path: string;
   icon: ErpNavIcon;
-  section: 'Workspaces' | 'Account';
+  section: 'Workspaces' | 'Administration' | 'Academics' | 'Account';
   requiredPermission: ErpPermission;
 }

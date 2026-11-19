@@ -64,11 +64,12 @@ test('getVisibleNavItems filters workspace routes per role', () => {
     '/portal/admin',
     '/portal/accounts',
     '/portal/teacher',
+    '/portal/staff',
     '/portal/profile',
   ]);
 
   const adminLinks = getVisibleNavItems('institute_admin').map((i) => i.path);
-  assert.deepEqual(adminLinks, ['/portal/admin', '/portal/teacher', '/portal/profile']);
+  assert.deepEqual(adminLinks, ['/portal/admin', '/portal/teacher', '/portal/staff', '/portal/profile']);
 
   const accountantLinks = getVisibleNavItems('accountant').map((i) => i.path);
   assert.deepEqual(accountantLinks, ['/portal/accounts', '/portal/profile']);

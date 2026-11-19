@@ -141,6 +141,14 @@ export const ERP_NAV_ITEMS: readonly ErpNavItem[] = [
     requiredPermission: 'dashboard:teacher:view',
   },
   {
+    id: 'staff-management',
+    label: 'Staff Directory',
+    path: '/portal/staff',
+    icon: 'staff',
+    section: 'Administration',
+    requiredPermission: 'staff:view',
+  },
+  {
     id: 'profile-access',
     label: 'Profile & Access',
     path: '/portal/profile',
