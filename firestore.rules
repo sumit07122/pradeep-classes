@@ -49,6 +49,9 @@ service cloud.firestore {
     function isInstitutePrivileged(instituteId) {
       return hasInstituteRole(instituteId, ['institute_owner', 'institute_admin']);
     }
+    function isFinancePrivileged(instituteId) {
+      return hasInstituteRole(instituteId, ['institute_owner', 'accountant']);
+    }
 
     // Legacy Public Website & CMS Validators
     function isValidNotice(data) {
@@ -419,6 +422,21 @@ service cloud.firestore {
       allow create: if isVerifiedUser() && isValidId(studentId) && isInstitutePrivileged(incoming().instituteId) && isActiveInstitute(incoming().instituteId);
       allow update: if isVerifiedUser() && isValidId(studentId) && isInstitutePrivileged(existing().instituteId) && incoming().instituteId == existing().instituteId;
       allow delete: if isVerifiedUser() && isInstituteOwner(existing().instituteId);
+    }
+
+    // Financial Collections (Fee Structures & Ledger Payments)
+    match /fee_structures/{structureId} {
+      allow get, list: if isVerifiedUser() && isValidId(structureId) && (isActiveInstituteMember(resource.data.instituteId) || isSuperAdmin());
+      allow create: if isVerifiedUser() && isValidId(structureId) && isFinancePrivileged(incoming().instituteId) && isActiveInstitute(incoming().instituteId);
+      allow update: if isVerifiedUser() && isValidId(structureId) && isFinancePrivileged(existing().instituteId) && incoming().instituteId == existing().instituteId;
+      allow delete: if isVerifiedUser() && isInstituteOwner(existing().instituteId);
+    }
+
+    match /fee_payments/{paymentId} {
+      allow get, list: if isVerifiedUser() && isValidId(paymentId) && (isFinancePrivileged(resource.data.instituteId) || isSuperAdmin());
+      allow create: if isVerifiedUser() && isValidId(paymentId) && isFinancePrivileged(incoming().instituteId) && isActiveInstitute(incoming().instituteId);
+      allow update: if isVerifiedUser() && isValidId(paymentId) && isInstituteOwner(existing().instituteId) && incoming().instituteId == existing().instituteId;
+      allow delete: if isValidId(paymentId) && isSuperAdmin();
     }
   }
 }

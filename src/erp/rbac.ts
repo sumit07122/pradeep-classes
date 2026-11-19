@@ -171,6 +171,14 @@ export const ERP_NAV_ITEMS: readonly ErpNavItem[] = [
     requiredPermission: 'students:view',
   },
   {
+    id: 'fees-management',
+    label: 'Fee Desk & Accounts',
+    path: '/portal/fees',
+    icon: 'fees',
+    section: 'Administration',
+    requiredPermission: 'finance:view',
+  },
+  {
     id: 'profile-access',
     label: 'Profile & Access',
     path: '/portal/profile',

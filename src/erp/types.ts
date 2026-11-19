@@ -136,6 +136,52 @@ export interface Subject {
 
 export type StudentStatus = 'active' | 'suspended' | 'graduated' | 'dropped';
 
+export interface FeeComponent {
+  name: string;
+  amount: number;
+}
+
+export interface FeeStructure {
+  id: string;
+  instituteId: string;
+  courseId: string;
+  courseName: string;
+  academicSessionId: string;
+  title: string;
+  totalAmount: number;
+  currency: string;
+  installments: number;
+  components: FeeComponent[];
+  status: 'active' | 'archived';
+  createdAt?: unknown;
+  updatedAt?: unknown;
+}
+
+export type PaymentMode = 'cash' | 'upi' | 'bank_transfer' | 'cheque' | 'card';
+export type PaymentStatus = 'completed' | 'refunded' | 'void';
+
+export interface FeePayment {
+  id: string;
+  instituteId: string;
+  studentId: string;
+  studentName: string;
+  studentAdmissionNumber: string;
+  batchName: string;
+  receiptNumber: string;
+  amountPaid: number;
+  totalPayable: number;
+  balanceRemaining: number;
+  paymentMode: PaymentMode;
+  transactionReference?: string;
+  paymentDate: string;
+  academicSessionId: string;
+  collectedBy: string;
+  notes?: string;
+  status: PaymentStatus;
+  createdAt?: unknown;
+  updatedAt?: unknown;
+}
+
 export interface Student {
   id: string;
   instituteId: string;
