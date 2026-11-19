@@ -3,6 +3,8 @@ import express from 'express';
 import type { Request, Response } from 'express';
 import path from 'path';
 import { GoogleGenAI, Type } from '@google/genai';
+import provisioningRoutes from './server/routes/provisioningRoutes';
+import { initFirebaseAdmin } from './server/firebaseAdmin';
 
 const PORT = 3000;
 const HOST = '0.0.0.0';
@@ -25,6 +27,12 @@ function getAiClient() {
 async function startServer() {
   const app = express();
   app.use(express.json());
+
+  // Initialize Firebase Admin SDK if configured
+  initFirebaseAdmin();
+
+  // ERP Trusted Provisioning API
+  app.use('/api/erp/provisioning', provisioningRoutes);
 
   app.post('/api/daily-gs', async (_req: Request, res: Response) => {
     const ai = getAiClient();

@@ -281,3 +281,38 @@ All staff lifecycle operations must generate an immutable audit log document in 
    - `firestore.rules` blocks modification of `uid`, `instituteId`, `createdBy`, and `createdAt` on existing memberships.
 7. **Strict Cross-Institute Isolation**:
    - Membership queries must be bounded by `where('instituteId', '==', activeInstituteId)`. Unbound or cross-institute queries are rejected by security rules.
+
+---
+
+## 6. Live Server Implementation & Endpoint Reference
+
+The trusted provisioning service is implemented in `server/services/provisioningService.ts` and mounted in `server.ts` under `/api/erp/provisioning`:
+
+| Method | Endpoint | Authorization | Rate Limit | Purpose |
+|---|---|---|---|---|
+| `GET` | `/health` | Public | None | Status of Firebase Admin SDK & readiness |
+| `POST` | `/bootstrap-owner` | `BOOTSTRAP_SECRET` or SuperAdmin email | 15 req/min | Initial institute & owner creation |
+| `POST` | `/staff` | Bearer Token (`institute_owner`, `institute_admin`) | 15 req/min | Staff creation with compensating rollback |
+| `POST` | `/staff/:uid/invite` | Bearer Token (`institute_owner`, `institute_admin`) | 15 req/min | Generate onboarding / password reset link |
+| `PATCH` | `/staff/:uid/role` | Bearer Token (`institute_owner` only) | Standard | Update staff role (Admin forbidden) |
+| `PATCH` | `/staff/:uid/status` | Bearer Token (`institute_owner`, `institute_admin`) | Standard | Suspend/reactivate with token revocation |
+| `POST` | `/staff/:uid/revoke` | Bearer Token (`institute_owner` only) | Standard | Permanent membership revocation with token revocation |
+
+### Production Environment Variables Configuration
+
+For live Firebase Admin SDK operations, configure the following environment secrets in your hosting environment (Cloud Run, Vercel, or VPS):
+
+```bash
+# Firebase Admin Service Account (JSON string format or file path)
+FIREBASE_SERVICE_ACCOUNT_KEY='{"type":"service_account","project_id":"...","private_key":"...","client_email":"..."}'
+
+# Alternatively, standard Google Application Credentials path:
+# GOOGLE_APPLICATION_CREDENTIALS="/etc/secrets/firebase-service-account.json"
+
+# Institute bootstrap authorization secret
+BOOTSTRAP_SECRET="secure_random_bootstrap_token_here"
+
+# Firebase Project ID
+FIREBASE_PROJECT_ID="pradeep-classes-production"
+```
+
