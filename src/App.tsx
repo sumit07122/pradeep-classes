@@ -36,6 +36,7 @@ import StaffManagement from './pages/portal/StaffManagement';
 import InstituteSettings from './pages/portal/InstituteSettings';
 import StudentManagement from './pages/portal/StudentManagement';
 import AttendanceManagement from './pages/portal/AttendanceManagement';
+import AcademicManagement from './pages/portal/AcademicManagement';
 import FeeManagement from './pages/portal/FeeManagement';
 import PortalUnauthorized from './pages/portal/PortalUnauthorized';
 
@@ -115,6 +116,10 @@ export default function App() {
 
                   <Route element={<PortalRoute requiredPermission="attendance:view" />}>
                     <Route path="attendance" element={<AttendanceManagement />} />
+                  </Route>
+
+                  <Route element={<PortalRoute requiredPermission="academics:view" />}>
+                    <Route path="academics" element={<AcademicManagement />} />
                   </Route>
 
                   <Route element={<PortalRoute requiredPermission="finance:view" />}>

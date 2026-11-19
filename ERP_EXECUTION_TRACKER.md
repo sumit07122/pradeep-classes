@@ -19,9 +19,9 @@
 | **TASK 07** | Institute Settings & Academic Structure | COMPLETED | `a39f80c` | 2026-11-19 |
 | **TASK 08** | Student Management | COMPLETED | `aa828f3` | 2026-11-19 |
 | **TASK 09** | Fees & Financial Management | COMPLETED | `57cf738` | 2026-11-19 |
-| **TASK 10** | Attendance Management | COMPLETED | *Current* | 2026-11-19 |
-| **TASK 11** | Academic Management | PENDING | - | Next |
-| **TASK 12** | Notifications & Communication | PENDING | - | Queued |
+| **TASK 10** | Attendance Management | COMPLETED | `b25918e` | 2026-11-19 |
+| **TASK 11** | Academic Management | COMPLETED | *Current* | 2026-11-19 |
+| **TASK 12** | Notifications & Communication | PENDING | - | Next |
 | **TASK 13** | Production Readiness & Release QA | PENDING | - | Queued |
 
 ---
@@ -286,7 +286,7 @@
 ### TASK 10 — Attendance Management
 - **Status**: Completed
 - **Starting Commit**: `57cf738`
-- **Final Commit**: *Pending Commit*
+- **Final Commit**: `b25918e`
 - **Changed Files**:
   - `firestore.rules`
   - `src/erp/types.ts`
@@ -330,3 +330,46 @@
   - Attendance records are strictly partitioned by institute and batch.
 - **Blockers**: None.
 - **Next Task**: TASK 11 — Academic Management (Timetable, Homework, Exams & Marks).
+
+---
+
+### TASK 11 — Academic Management (Timetable, Homework, Exams & Marks)
+- **Status**: Completed
+- **Starting Commit**: `b25918e`
+- **Final Commit**: *Pending Commit*
+- **Changed Files**:
+  - `firestore.rules`
+  - `src/erp/types.ts`
+  - `src/erp/rbac.ts`
+  - `src/erp/rbac.test.ts`
+  - `src/erp/curriculumService.ts`
+  - `src/pages/portal/AcademicManagement.tsx`
+  - `src/App.tsx`
+  - `src/erp/exam.test.ts`
+  - `ERP_EXECUTION_TRACKER.md`
+- **Features**:
+  - Hardened Firestore Security Rules for `timetables`, `homework`, `exams`, and `exam_results`.
+  - Added TypeScript definitions for `TimetableSlot`, `DayOfWeek`, `Homework`, `Exam`, and `ExamResult`.
+  - Mounted `/portal/academics` route in `App.tsx` guarded by `academics:view`.
+  - Added `academics-management` navigation item to `ERP_NAV_ITEMS` for Owner, Admin, and Teacher roles.
+  - Created `curriculumService.ts` supporting batch timetable scheduling, homework assignments, exam creation, and batch student grading with atomic batch writes.
+  - Built comprehensive `AcademicManagement.tsx` component:
+    - Tab 1: "Weekly Timetable": Interactive timetable view by day of week (Monday–Sunday) with class slot scheduling and faculty assignments.
+    - Tab 2: "Homework & Assignments": Assignment publishing, due date alerts, and student instructions.
+    - Tab 3: "Exams & Student Marks": Examination scheduler, batch grading modal with student roster, live percentage & letter grade computation (`A+`, `A`, `B`, `C`, `D`, `F`), and detailed rank/scorecard modal.
+- **Tests**:
+  - `src/erp/exam.test.ts` (3/3 passing).
+  - `src/erp/attendance.test.ts` (2/2 passing).
+  - `src/erp/fee.test.ts` (2/2 passing).
+  - `src/erp/student.test.ts` (2/2 passing).
+  - `src/erp/academic.test.ts` (2/2 passing).
+  - `src/erp/rbac.test.ts` (7/7 passing).
+  - `src/erp/staff.test.ts` (5/5 passing).
+  - `src/erp/security.test.ts` (11/11 passing).
+  - `npm run lint` (0 errors).
+  - `npm run build` (Clean production build).
+- **Security Findings**:
+  - Accountant role has zero access to academic and exam management routes and collections.
+  - Teachers are restricted to assigned academic actions and cannot modify legal institute structure.
+- **Blockers**: None.
+- **Next Task**: TASK 12 — Notifications & Communication.

@@ -446,5 +446,34 @@ service cloud.firestore {
       allow update: if isVerifiedUser() && isValidId(recordId) && hasInstituteRole(existing().instituteId, ['institute_owner', 'institute_admin', 'teacher']) && incoming().instituteId == existing().instituteId;
       allow delete: if isVerifiedUser() && isInstituteOwner(existing().instituteId);
     }
+
+    // Academic Operations (Timetable, Homework, Exams & Results)
+    match /timetables/{slotId} {
+      allow get, list: if isVerifiedUser() && isValidId(slotId) && (isActiveInstituteMember(resource.data.instituteId) || isSuperAdmin());
+      allow create: if isVerifiedUser() && isValidId(slotId) && hasInstituteRole(incoming().instituteId, ['institute_owner', 'institute_admin', 'teacher']) && isActiveInstitute(incoming().instituteId);
+      allow update: if isVerifiedUser() && isValidId(slotId) && hasInstituteRole(existing().instituteId, ['institute_owner', 'institute_admin', 'teacher']) && incoming().instituteId == existing().instituteId;
+      allow delete: if isVerifiedUser() && isInstitutePrivileged(existing().instituteId);
+    }
+
+    match /homework/{hwId} {
+      allow get, list: if isVerifiedUser() && isValidId(hwId) && (isActiveInstituteMember(resource.data.instituteId) || isSuperAdmin());
+      allow create: if isVerifiedUser() && isValidId(hwId) && hasInstituteRole(incoming().instituteId, ['institute_owner', 'institute_admin', 'teacher']) && isActiveInstitute(incoming().instituteId);
+      allow update: if isVerifiedUser() && isValidId(hwId) && hasInstituteRole(existing().instituteId, ['institute_owner', 'institute_admin', 'teacher']) && incoming().instituteId == existing().instituteId;
+      allow delete: if isVerifiedUser() && hasInstituteRole(existing().instituteId, ['institute_owner', 'institute_admin', 'teacher']);
+    }
+
+    match /exams/{examId} {
+      allow get, list: if isVerifiedUser() && isValidId(examId) && (isActiveInstituteMember(resource.data.instituteId) || isSuperAdmin());
+      allow create: if isVerifiedUser() && isValidId(examId) && hasInstituteRole(incoming().instituteId, ['institute_owner', 'institute_admin', 'teacher']) && isActiveInstitute(incoming().instituteId);
+      allow update: if isVerifiedUser() && isValidId(examId) && hasInstituteRole(existing().instituteId, ['institute_owner', 'institute_admin', 'teacher']) && incoming().instituteId == existing().instituteId;
+      allow delete: if isVerifiedUser() && isInstitutePrivileged(existing().instituteId);
+    }
+
+    match /exam_results/{resultId} {
+      allow get, list: if isVerifiedUser() && isValidId(resultId) && (isActiveInstituteMember(resource.data.instituteId) || isSuperAdmin());
+      allow create: if isVerifiedUser() && isValidId(resultId) && hasInstituteRole(incoming().instituteId, ['institute_owner', 'institute_admin', 'teacher']) && isActiveInstitute(incoming().instituteId);
+      allow update: if isVerifiedUser() && isValidId(resultId) && hasInstituteRole(existing().instituteId, ['institute_owner', 'institute_admin', 'teacher']) && incoming().instituteId == existing().instituteId;
+      allow delete: if isVerifiedUser() && isInstitutePrivileged(existing().instituteId);
+    }
   }
 }

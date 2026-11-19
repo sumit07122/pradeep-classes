@@ -68,6 +68,7 @@ test('getVisibleNavItems filters workspace routes per role', () => {
     '/portal/settings',
     '/portal/students',
     '/portal/attendance',
+    '/portal/academics',
     '/portal/fees',
     '/portal/profile',
   ]);
@@ -80,6 +81,7 @@ test('getVisibleNavItems filters workspace routes per role', () => {
     '/portal/settings',
     '/portal/students',
     '/portal/attendance',
+    '/portal/academics',
     '/portal/profile',
   ]);
 
@@ -96,6 +98,7 @@ test('getVisibleNavItems filters workspace routes per role', () => {
     '/portal/teacher',
     '/portal/students',
     '/portal/attendance',
+    '/portal/academics',
     '/portal/profile',
   ]);
 

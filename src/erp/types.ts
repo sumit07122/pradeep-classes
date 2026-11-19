@@ -190,6 +190,75 @@ export interface AttendanceRecord {
   updatedAt?: unknown;
 }
 
+export type DayOfWeek =
+  | 'Monday'
+  | 'Tuesday'
+  | 'Wednesday'
+  | 'Thursday'
+  | 'Friday'
+  | 'Saturday'
+  | 'Sunday';
+
+export interface TimetableSlot {
+  id: string;
+  instituteId: string;
+  batchId: string;
+  batchName: string;
+  dayOfWeek: DayOfWeek;
+  startTime: string;
+  endTime: string;
+  subjectName: string;
+  teacherName: string;
+  room?: string;
+  createdAt?: unknown;
+  updatedAt?: unknown;
+}
+
+export interface Homework {
+  id: string;
+  instituteId: string;
+  batchId: string;
+  batchName: string;
+  subjectName: string;
+  title: string;
+  description: string;
+  dueDate: string;
+  assignedBy: string;
+  createdAt?: unknown;
+  updatedAt?: unknown;
+}
+
+export interface Exam {
+  id: string;
+  instituteId: string;
+  batchId: string;
+  batchName: string;
+  title: string;
+  subjectName: string;
+  examDate: string;
+  totalMarks: number;
+  passingMarks: number;
+  status: 'scheduled' | 'completed' | 'graded';
+  createdAt?: unknown;
+  updatedAt?: unknown;
+}
+
+export interface ExamResult {
+  id: string;
+  instituteId: string;
+  examId: string;
+  studentId: string;
+  studentName: string;
+  admissionNumber: string;
+  marksObtained: number;
+  totalMarks: number;
+  percentage: number;
+  grade: string;
+  remarks?: string;
+  createdAt?: unknown;
+  updatedAt?: unknown;
+}
+
 export interface FeePayment {
   id: string;
   instituteId: string;
