@@ -79,12 +79,28 @@ test('2. Wrong-role access is strictly blocked across all four ERP roles', () =>
 
   assert.deepEqual(
     getVisibleNavItems('teacher').map((item) => item.path),
-    ['/portal/teacher', '/portal/profile']
+    ['/portal/teacher', '/portal/students', '/portal/attendance', '/portal/academics', '/portal/communication', '/portal/profile']
   );
   assert.deepEqual(
     getVisibleNavItems('accountant').map((item) => item.path),
-    ['/portal/accounts', '/portal/profile']
+    ['/portal/accounts', '/portal/students', '/portal/fees', '/portal/communication', '/portal/profile']
   );
+
+  // Assert strictly that unauthorized administrative & financial routes are never visible
+  const teacherPaths = getVisibleNavItems('teacher').map((item) => item.path);
+  assert.equal(teacherPaths.includes('/portal/owner'), false);
+  assert.equal(teacherPaths.includes('/portal/admin'), false);
+  assert.equal(teacherPaths.includes('/portal/staff'), false);
+  assert.equal(teacherPaths.includes('/portal/settings'), false);
+  assert.equal(teacherPaths.includes('/portal/fees'), false);
+
+  const accountantPaths = getVisibleNavItems('accountant').map((item) => item.path);
+  assert.equal(accountantPaths.includes('/portal/owner'), false);
+  assert.equal(accountantPaths.includes('/portal/admin'), false);
+  assert.equal(accountantPaths.includes('/portal/staff'), false);
+  assert.equal(accountantPaths.includes('/portal/settings'), false);
+  assert.equal(accountantPaths.includes('/portal/attendance'), false);
+  assert.equal(accountantPaths.includes('/portal/academics'), false);
 });
 
 test('3. Cross-institute access cannot be escalated via preferred institute or profile update', () => {
