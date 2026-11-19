@@ -160,6 +160,36 @@ export interface FeeStructure {
 export type PaymentMode = 'cash' | 'upi' | 'bank_transfer' | 'cheque' | 'card';
 export type PaymentStatus = 'completed' | 'refunded' | 'void';
 
+export type AttendanceStatus = 'present' | 'absent' | 'late' | 'excused';
+
+export interface AttendanceEntry {
+  studentId: string;
+  studentName: string;
+  admissionNumber: string;
+  rollNumber?: string;
+  status: AttendanceStatus;
+  remarks?: string;
+}
+
+export interface AttendanceRecord {
+  id: string;
+  instituteId: string;
+  batchId: string;
+  batchName: string;
+  courseId: string;
+  date: string; // YYYY-MM-DD
+  markedBy: string;
+  markedByName: string;
+  totalStudents: number;
+  presentCount: number;
+  absentCount: number;
+  lateCount: number;
+  excusedCount: number;
+  entries: AttendanceEntry[];
+  createdAt?: unknown;
+  updatedAt?: unknown;
+}
+
 export interface FeePayment {
   id: string;
   instituteId: string;
