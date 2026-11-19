@@ -6,7 +6,7 @@ import { GoogleGenAI, Type } from '@google/genai';
 import provisioningRoutes from './server/routes/provisioningRoutes';
 import { initFirebaseAdmin } from './server/firebaseAdmin';
 
-const PORT = 3000;
+const PORT = Number(process.env.PORT) || 5173;
 const HOST = '0.0.0.0';
 
 function getAiClient() {
