@@ -155,13 +155,18 @@ service cloud.firestore {
     // ERP Foundation Validators
     function isValidInstitute(data) {
       return data.keys().hasAll(['name', 'code', 'status', 'ownerUid', 'academicSession', 'timezone', 'createdAt', 'updatedAt']) &&
-             data.keys().hasOnly(['name', 'code', 'status', 'ownerUid', 'academicSession', 'timezone', 'createdAt', 'updatedAt']) &&
+             data.keys().hasOnly(['name', 'code', 'status', 'ownerUid', 'academicSession', 'timezone', 'logo', 'address', 'phone', 'email', 'website', 'createdAt', 'updatedAt']) &&
              data.name is string && data.name.size() >= 2 && data.name.size() <= 120 &&
              data.code is string && data.code.size() >= 2 && data.code.size() <= 32 && data.code.matches('^[A-Z0-9\\-]+$') &&
              data.status is string && data.status in ['active', 'suspended'] &&
              data.ownerUid is string && isValidId(data.ownerUid) &&
              data.academicSession is string && data.academicSession.size() >= 4 && data.academicSession.size() <= 40 &&
              data.timezone is string && data.timezone.size() >= 2 && data.timezone.size() <= 60 &&
+             (!('logo' in data) || (data.logo is string && data.logo.size() <= 1000)) &&
+             (!('address' in data) || (data.address is string && data.address.size() <= 500)) &&
+             (!('phone' in data) || (data.phone is string && data.phone.size() <= 25)) &&
+             (!('email' in data) || (data.email is string && data.email.size() <= 120)) &&
+             (!('website' in data) || (data.website is string && data.website.size() <= 200)) &&
              data.createdAt is timestamp &&
              data.updatedAt is timestamp;
     }
@@ -286,7 +291,7 @@ service cloud.firestore {
                            isInstituteOwner(instituteId) &&
                            existing().status == 'active' &&
                            incoming().status == existing().status &&
-                           incoming().diff(existing()).affectedKeys().hasOnly(['name', 'code', 'academicSession', 'timezone', 'updatedAt'])
+                           incoming().diff(existing()).affectedKeys().hasOnly(['name', 'code', 'academicSession', 'timezone', 'logo', 'address', 'phone', 'email', 'website', 'updatedAt'])
                          )
                        );
       allow delete: if isValidId(instituteId) && isSuperAdmin();
@@ -370,6 +375,42 @@ service cloud.firestore {
                          )
                        );
       allow delete: if isValidId(membershipId) && isSuperAdmin();
+    }
+
+    // Academic Structure Collections (Institute Scoped)
+    match /academic_sessions/{sessionId} {
+      allow get, list: if isVerifiedUser() && isValidId(sessionId) && (isActiveInstituteMember(resource.data.instituteId) || isSuperAdmin());
+      allow create: if isVerifiedUser() && isValidId(sessionId) && isInstitutePrivileged(incoming().instituteId) && isActiveInstitute(incoming().instituteId);
+      allow update: if isVerifiedUser() && isValidId(sessionId) && isInstitutePrivileged(existing().instituteId) && incoming().instituteId == existing().instituteId;
+      allow delete: if isVerifiedUser() && isInstituteOwner(existing().instituteId);
+    }
+
+    match /courses/{courseId} {
+      allow get, list: if isVerifiedUser() && isValidId(courseId) && (isActiveInstituteMember(resource.data.instituteId) || isSuperAdmin());
+      allow create: if isVerifiedUser() && isValidId(courseId) && isInstitutePrivileged(incoming().instituteId) && isActiveInstitute(incoming().instituteId);
+      allow update: if isVerifiedUser() && isValidId(courseId) && isInstitutePrivileged(existing().instituteId) && incoming().instituteId == existing().instituteId;
+      allow delete: if isVerifiedUser() && isInstituteOwner(existing().instituteId);
+    }
+
+    match /batches/{batchId} {
+      allow get, list: if isVerifiedUser() && isValidId(batchId) && (isActiveInstituteMember(resource.data.instituteId) || isSuperAdmin());
+      allow create: if isVerifiedUser() && isValidId(batchId) && isInstitutePrivileged(incoming().instituteId) && isActiveInstitute(incoming().instituteId);
+      allow update: if isVerifiedUser() && isValidId(batchId) && isInstitutePrivileged(existing().instituteId) && incoming().instituteId == existing().instituteId;
+      allow delete: if isVerifiedUser() && isInstituteOwner(existing().instituteId);
+    }
+
+    match /classrooms/{roomId} {
+      allow get, list: if isVerifiedUser() && isValidId(roomId) && (isActiveInstituteMember(resource.data.instituteId) || isSuperAdmin());
+      allow create: if isVerifiedUser() && isValidId(roomId) && isInstitutePrivileged(incoming().instituteId) && isActiveInstitute(incoming().instituteId);
+      allow update: if isVerifiedUser() && isValidId(roomId) && isInstitutePrivileged(existing().instituteId) && incoming().instituteId == existing().instituteId;
+      allow delete: if isVerifiedUser() && isInstituteOwner(existing().instituteId);
+    }
+
+    match /subjects/{subjectId} {
+      allow get, list: if isVerifiedUser() && isValidId(subjectId) && (isActiveInstituteMember(resource.data.instituteId) || isSuperAdmin());
+      allow create: if isVerifiedUser() && isValidId(subjectId) && isInstitutePrivileged(incoming().instituteId) && isActiveInstitute(incoming().instituteId);
+      allow update: if isVerifiedUser() && isValidId(subjectId) && isInstitutePrivileged(existing().instituteId) && incoming().instituteId == existing().instituteId;
+      allow delete: if isVerifiedUser() && isInstituteOwner(existing().instituteId);
     }
   }
 }

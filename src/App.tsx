@@ -33,6 +33,7 @@ import AccountantDashboard from './pages/portal/AccountantDashboard';
 import TeacherDashboard from './pages/portal/TeacherDashboard';
 import PortalProfile from './pages/portal/PortalProfile';
 import StaffManagement from './pages/portal/StaffManagement';
+import InstituteSettings from './pages/portal/InstituteSettings';
 import PortalUnauthorized from './pages/portal/PortalUnauthorized';
 
 function ScrollToTop() {
@@ -99,6 +100,10 @@ export default function App() {
 
                   <Route element={<PortalRoute requiredPermission="staff:view" />}>
                     <Route path="staff" element={<StaffManagement />} />
+                  </Route>
+
+                  <Route element={<PortalRoute requiredPermission="institute:settings:view" />}>
+                    <Route path="settings" element={<InstituteSettings />} />
                   </Route>
 
                   <Route element={<PortalRoute requiredPermission="portal:access" />}>

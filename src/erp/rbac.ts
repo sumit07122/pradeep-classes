@@ -149,6 +149,14 @@ export const ERP_NAV_ITEMS: readonly ErpNavItem[] = [
     requiredPermission: 'staff:view',
   },
   {
+    id: 'institute-settings',
+    label: 'Institute & Academics',
+    path: '/portal/settings',
+    icon: 'settings',
+    section: 'Administration',
+    requiredPermission: 'institute:settings:view',
+  },
+  {
     id: 'profile-access',
     label: 'Profile & Access',
     path: '/portal/profile',

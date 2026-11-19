@@ -57,6 +57,77 @@ export interface Institute {
   ownerUid: string;
   academicSession: string;
   timezone: string;
+  logo?: string;
+  address?: string;
+  phone?: string;
+  email?: string;
+  website?: string;
+  createdAt?: unknown;
+  updatedAt?: unknown;
+}
+
+export interface AcademicSession {
+  id: string;
+  instituteId: string;
+  name: string; // e.g. "2026-2027"
+  startDate: string;
+  endDate: string;
+  isCurrent: boolean;
+  status: 'active' | 'archived';
+  createdAt?: unknown;
+  updatedAt?: unknown;
+}
+
+export interface Course {
+  id: string;
+  instituteId: string;
+  name: string; // e.g. "Class 10 CBSE Foundation"
+  code: string; // e.g. "C10-CBSE"
+  description?: string;
+  durationMonths?: number;
+  status: 'active' | 'archived';
+  createdAt?: unknown;
+  updatedAt?: unknown;
+}
+
+export interface Batch {
+  id: string;
+  instituteId: string;
+  courseId: string;
+  courseName?: string;
+  name: string; // e.g. "Morning Alpha Batch"
+  code: string; // e.g. "B-MOR-01"
+  academicSessionId: string;
+  startDate: string;
+  endDate?: string;
+  maxCapacity: number;
+  room?: string;
+  teacherUid?: string;
+  status: 'active' | 'completed' | 'archived';
+  createdAt?: unknown;
+  updatedAt?: unknown;
+}
+
+export interface Classroom {
+  id: string;
+  instituteId: string;
+  roomNumber: string; // e.g. "Room 101"
+  name: string; // e.g. "Aryabhata Hall"
+  capacity: number;
+  status: 'active' | 'inactive';
+  createdAt?: unknown;
+  updatedAt?: unknown;
+}
+
+export interface Subject {
+  id: string;
+  instituteId: string;
+  courseId?: string;
+  name: string; // e.g. "Advanced Mathematics"
+  code: string; // e.g. "MATH-ADV"
+  teacherUid?: string;
+  teacherName?: string;
+  status: 'active' | 'archived';
   createdAt?: unknown;
   updatedAt?: unknown;
 }

@@ -15,9 +15,9 @@
 | **TASK 01-04** | Foundation, Auth, Shell & Project Audit | COMPLETED | `0db404f` | 2026-11-19 |
 | **TASK 05A** | Staff Management Security Hardening & Architecture | COMPLETED | `c5bba38` | 2026-11-19 |
 | **TASK 05B** | Firebase Infrastructure & Trusted Provisioning | COMPLETED | `e4ab84b` | 2026-11-19 |
-| **TASK 06** | Staff Management UI & Workflows | COMPLETED | *Current* | 2026-11-19 |
-| **TASK 07** | Institute Settings & Academic Structure | PENDING | - | Next |
-| **TASK 08** | Student Management | PENDING | - | Queued |
+| **TASK 06** | Staff Management UI & Workflows | COMPLETED | `8fe153f` | 2026-11-19 |
+| **TASK 07** | Institute Settings & Academic Structure | COMPLETED | *Current* | 2026-11-19 |
+| **TASK 08** | Student Management | PENDING | - | Next |
 | **TASK 09** | Fees & Financial Management | PENDING | - | Queued |
 | **TASK 10** | Attendance Management | PENDING | - | Queued |
 | **TASK 11** | Academic Management | PENDING | - | Queued |
@@ -143,3 +143,51 @@
   - Verified that Admins cannot create Owner/Admin or alter roles or revoke memberships.
 - **Blockers**: None.
 - **Next Task**: TASK 07 — Institute Settings & Academic Structure.
+
+---
+
+### TASK 07 — Institute Settings & Academic Structure
+- **Status**: Completed
+- **Starting Commit**: `8fe153f`
+- **Final Commit**: *Pending Commit*
+- **Changed Files**:
+  - `firestore.rules`
+  - `src/erp/types.ts`
+  - `src/erp/rbac.ts`
+  - `src/erp/rbac.test.ts`
+  - `src/erp/academicService.ts`
+  - `src/pages/portal/InstituteSettings.tsx`
+  - `src/App.tsx`
+  - `src/erp/academic.test.ts`
+  - `ERP_EXECUTION_TRACKER.md`
+- **Features**:
+  - Hardened Firestore Security Rules with institute-scoped authorization and validators for:
+    - Extended institute profile (`logo`, `phone`, `email`, `website`, `address`).
+    - Academic sessions (`academic_sessions`).
+    - Course programs (`courses`).
+    - Student batches (`batches`).
+    - Classrooms & halls (`classrooms`).
+    - Curriculum subjects (`subjects`).
+  - Added TypeScript definitions for academic data structures and settings.
+  - Implemented `academicService.ts` with complete CRUD and non-destructive archival support.
+  - Built comprehensive `InstituteSettings.tsx` component with:
+    - Tab 1: Institute Profile (legal details, contact info, owner-only update guard).
+    - Tab 2: Academic Sessions (session management, current session marker).
+    - Tab 3: Courses (course catalog, duration, code, archival).
+    - Tab 4: Batches (batch creation, course/session linking, room allocation, capacity tracking).
+    - Tab 5: Classrooms (physical halls, seating capacity, room identifiers).
+    - Tab 6: Subjects (subject catalogue, course association).
+  - Mounted `/portal/settings` in `App.tsx` guarded by `institute:settings:view`.
+  - Added `institute-settings` navigation item in `rbac.ts` for Owner and Admin roles.
+- **Tests**:
+  - `src/erp/academic.test.ts` (2/2 passing).
+  - `src/erp/rbac.test.ts` (7/7 passing).
+  - `src/erp/staff.test.ts` (5/5 passing).
+  - `src/erp/security.test.ts` (11/11 passing).
+  - `npm run lint` (0 errors).
+  - `npm run build` (Clean production build).
+- **Security Findings**:
+  - Academic collections enforce strict multi-tenant scoping (`resource.data.instituteId == activeInstituteId`).
+  - Legal profile updates restricted strictly to `institute_owner`.
+- **Blockers**: None.
+- **Next Task**: TASK 08 — Student Management.
