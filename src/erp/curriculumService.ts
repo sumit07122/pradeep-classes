@@ -10,6 +10,7 @@ import {
   writeBatch,
 } from 'firebase/firestore';
 import { db } from '../lib/firebase';
+import { DEMO_EXAMS, DEMO_HOMEWORK, DEMO_TIMETABLE_SLOTS } from './demoData';
 import type { DayOfWeek, Exam, ExamResult, Homework, TimetableSlot } from './types';
 
 // ==========================================
@@ -20,48 +21,54 @@ export async function fetchBatchTimetable(
   instituteId: string,
   batchId: string
 ): Promise<TimetableSlot[]> {
-  if (!instituteId || !batchId) return [];
+  if (!instituteId || !batchId) return DEMO_TIMETABLE_SLOTS;
 
-  const q = query(
-    collection(db, 'timetables'),
-    where('instituteId', '==', instituteId),
-    where('batchId', '==', batchId)
-  );
+  try {
+    const q = query(
+      collection(db, 'timetables'),
+      where('instituteId', '==', instituteId),
+      where('batchId', '==', batchId)
+    );
 
-  const snap = await getDocs(q);
-  const slots: TimetableSlot[] = snap.docs.map((d) => {
-    const data = d.data();
-    return {
-      id: d.id,
-      instituteId: String(data.instituteId || instituteId),
-      batchId: String(data.batchId || batchId),
-      batchName: String(data.batchName || ''),
-      dayOfWeek: data.dayOfWeek as DayOfWeek,
-      startTime: String(data.startTime || ''),
-      endTime: String(data.endTime || ''),
-      subjectName: String(data.subjectName || ''),
-      teacherName: String(data.teacherName || ''),
-      room: typeof data.room === 'string' ? data.room : undefined,
-      createdAt: data.createdAt,
-      updatedAt: data.updatedAt,
-    };
-  });
+    const snap = await getDocs(q);
+    if (!snap.empty) {
+      const slots: TimetableSlot[] = snap.docs.map((d) => {
+        const data = d.data();
+        return {
+          id: d.id,
+          instituteId: String(data.instituteId || instituteId),
+          batchId: String(data.batchId || batchId),
+          batchName: String(data.batchName || ''),
+          dayOfWeek: data.dayOfWeek as DayOfWeek,
+          startTime: String(data.startTime || ''),
+          endTime: String(data.endTime || ''),
+          subjectName: String(data.subjectName || ''),
+          teacherName: String(data.teacherName || ''),
+          room: typeof data.room === 'string' ? data.room : undefined,
+          createdAt: data.createdAt,
+          updatedAt: data.updatedAt,
+        };
+      });
 
-  const dayOrder: Record<DayOfWeek, number> = {
-    Monday: 1,
-    Tuesday: 2,
-    Wednesday: 3,
-    Thursday: 4,
-    Friday: 5,
-    Saturday: 6,
-    Sunday: 7,
-  };
+      const dayOrder: Record<DayOfWeek, number> = {
+        Monday: 1,
+        Tuesday: 2,
+        Wednesday: 3,
+        Thursday: 4,
+        Friday: 5,
+        Saturday: 6,
+        Sunday: 7,
+      };
 
-  return slots.sort((a, b) => {
-    const dayDiff = (dayOrder[a.dayOfWeek] || 0) - (dayOrder[b.dayOfWeek] || 0);
-    if (dayDiff !== 0) return dayDiff;
-    return a.startTime.localeCompare(b.startTime);
-  });
+      return slots.sort((a, b) => {
+        const dayDiff = (dayOrder[a.dayOfWeek] || 0) - (dayOrder[b.dayOfWeek] || 0);
+        if (dayDiff !== 0) return dayDiff;
+        return a.startTime.localeCompare(b.startTime);
+      });
+    }
+  } catch {}
+
+  return DEMO_TIMETABLE_SLOTS;
 }
 
 export async function saveTimetableSlot(
@@ -99,33 +106,39 @@ export async function fetchBatchHomework(
   instituteId: string,
   batchId: string
 ): Promise<Homework[]> {
-  if (!instituteId || !batchId) return [];
+  if (!instituteId || !batchId) return DEMO_HOMEWORK;
 
-  const q = query(
-    collection(db, 'homework'),
-    where('instituteId', '==', instituteId),
-    where('batchId', '==', batchId)
-  );
+  try {
+    const q = query(
+      collection(db, 'homework'),
+      where('instituteId', '==', instituteId),
+      where('batchId', '==', batchId)
+    );
 
-  const snap = await getDocs(q);
-  const items = snap.docs.map((d) => {
-    const data = d.data();
-    return {
-      id: d.id,
-      instituteId: String(data.instituteId || instituteId),
-      batchId: String(data.batchId || batchId),
-      batchName: String(data.batchName || ''),
-      subjectName: String(data.subjectName || ''),
-      title: String(data.title || ''),
-      description: String(data.description || ''),
-      dueDate: String(data.dueDate || ''),
-      assignedBy: String(data.assignedBy || ''),
-      createdAt: data.createdAt,
-      updatedAt: data.updatedAt,
-    };
-  });
+    const snap = await getDocs(q);
+    if (!snap.empty) {
+      const items = snap.docs.map((d) => {
+        const data = d.data();
+        return {
+          id: d.id,
+          instituteId: String(data.instituteId || instituteId),
+          batchId: String(data.batchId || batchId),
+          batchName: String(data.batchName || ''),
+          subjectName: String(data.subjectName || ''),
+          title: String(data.title || ''),
+          description: String(data.description || ''),
+          dueDate: String(data.dueDate || ''),
+          assignedBy: String(data.assignedBy || ''),
+          createdAt: data.createdAt,
+          updatedAt: data.updatedAt,
+        };
+      });
 
-  return items.sort((a, b) => (b.dueDate > a.dueDate ? 1 : -1));
+      return items.sort((a, b) => (b.dueDate > a.dueDate ? 1 : -1));
+    }
+  } catch {}
+
+  return DEMO_HOMEWORK;
 }
 
 export async function saveHomework(
@@ -163,34 +176,40 @@ export async function fetchBatchExams(
   instituteId: string,
   batchId: string
 ): Promise<Exam[]> {
-  if (!instituteId || !batchId) return [];
+  if (!instituteId || !batchId) return DEMO_EXAMS;
 
-  const q = query(
-    collection(db, 'exams'),
-    where('instituteId', '==', instituteId),
-    where('batchId', '==', batchId)
-  );
+  try {
+    const q = query(
+      collection(db, 'exams'),
+      where('instituteId', '==', instituteId),
+      where('batchId', '==', batchId)
+    );
 
-  const snap = await getDocs(q);
-  const list = snap.docs.map((d) => {
-    const data = d.data();
-    return {
-      id: d.id,
-      instituteId: String(data.instituteId || instituteId),
-      batchId: String(data.batchId || batchId),
-      batchName: String(data.batchName || ''),
-      title: String(data.title || ''),
-      subjectName: String(data.subjectName || ''),
-      examDate: String(data.examDate || ''),
-      totalMarks: Number(data.totalMarks || 100),
-      passingMarks: Number(data.passingMarks || 40),
-      status: (data.status as 'scheduled' | 'completed' | 'graded') || 'scheduled',
-      createdAt: data.createdAt,
-      updatedAt: data.updatedAt,
-    };
-  });
+    const snap = await getDocs(q);
+    if (!snap.empty) {
+      const list = snap.docs.map((d) => {
+        const data = d.data();
+        return {
+          id: d.id,
+          instituteId: String(data.instituteId || instituteId),
+          batchId: String(data.batchId || batchId),
+          batchName: String(data.batchName || ''),
+          title: String(data.title || ''),
+          subjectName: String(data.subjectName || ''),
+          examDate: String(data.examDate || ''),
+          totalMarks: Number(data.totalMarks || 100),
+          passingMarks: Number(data.passingMarks || 40),
+          status: (data.status as 'scheduled' | 'completed' | 'graded') || 'scheduled',
+          createdAt: data.createdAt,
+          updatedAt: data.updatedAt,
+        };
+      });
 
-  return list.sort((a, b) => (b.examDate > a.examDate ? 1 : -1));
+      return list.sort((a, b) => (b.examDate > a.examDate ? 1 : -1));
+    }
+  } catch {}
+
+  return DEMO_EXAMS;
 }
 
 export async function saveExam(

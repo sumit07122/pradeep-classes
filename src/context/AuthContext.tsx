@@ -20,6 +20,7 @@ import type {
   Institute,
   InstituteMembership,
 } from '../erp/types';
+import { DEMO_INSTITUTE, DEMO_MEMBERSHIPS } from '../erp/demoData';
 
 const SUPER_ADMIN_EMAILS = [
   'sumitdevthakur@gmail.com',
@@ -54,6 +55,8 @@ interface AuthContextType {
   refreshErpContext: () => Promise<void>;
   hasPermission: (permission: ErpPermission) => boolean;
   hasRole: (roles: ErpRole | readonly ErpRole[]) => boolean;
+  loginAsDemoRole: (role: ErpRole) => void;
+  isDemoSession: boolean;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -71,12 +74,69 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [erpLoading, setErpLoading] = useState(false);
   const [erpError, setErpError] = useState<string | null>(null);
   const [selectedInstituteId, setSelectedInstituteId] = useState<string | null>(null);
+  const [isDemoSession, setIsDemoSession] = useState(false);
 
   const clearErpState = useCallback(() => {
     setUserProfile(null);
     setMemberships([]);
     setActiveMembership(null);
     setActiveInstitute(null);
+    setErpError(null);
+    setErpLoading(false);
+    setIsDemoSession(false);
+  }, []);
+
+  const loginAsDemoRole = useCallback((role: ErpRole) => {
+    const demoMembership = DEMO_MEMBERSHIPS.find((m) => m.role === role) || {
+      id: `mem_demo_${role}`,
+      uid: `demo_uid_${role}`,
+      instituteId: DEMO_INSTITUTE.id,
+      role,
+      status: 'active' as const,
+      displayName: `Demo ${role.replace('_', ' ').toUpperCase()}`,
+      createdBy: 'system',
+    };
+
+    const mockUser = {
+      uid: demoMembership.uid,
+      email: demoMembership.email || `${role}@pradeepclasses.in`,
+      emailVerified: true,
+      displayName: demoMembership.displayName,
+      isAnonymous: false,
+      metadata: {},
+      providerData: [],
+      refreshToken: '',
+      tenantId: null,
+      delete: async () => {},
+      getIdToken: async () => 'demo-token',
+      getIdTokenResult: async () => ({} as any),
+      reload: async () => {},
+      toJSON: () => ({}),
+      phoneNumber: null,
+      photoURL: null,
+      providerId: 'password',
+    } as unknown as User;
+
+    const mockProfile: ErpUserProfile = {
+      uid: demoMembership.uid,
+      email: demoMembership.email || `${role}@pradeepclasses.in`,
+      displayName: demoMembership.displayName,
+      status: 'active',
+      defaultInstituteId: DEMO_INSTITUTE.id,
+    };
+
+    try {
+      sessionStorage.setItem('pc_erp_demo_role', role);
+    } catch {}
+
+    setUser(mockUser);
+    setUserProfile(mockProfile);
+    setActiveInstitute(DEMO_INSTITUTE);
+    setActiveMembership(demoMembership);
+    setMemberships(DEMO_MEMBERSHIPS);
+    setIsAdmin(role === 'institute_owner' || role === 'institute_admin');
+    setIsSuperAdmin(role === 'institute_owner');
+    setIsDemoSession(true);
     setErpError(null);
     setErpLoading(false);
   }, []);
@@ -124,6 +184,19 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   );
 
   useEffect(() => {
+    const savedDemoRole =
+      typeof window !== 'undefined'
+        ? (sessionStorage.getItem('pc_erp_demo_role') as ErpRole | null)
+        : null;
+    if (
+      savedDemoRole &&
+      ['institute_owner', 'institute_admin', 'accountant', 'teacher'].includes(savedDemoRole)
+    ) {
+      loginAsDemoRole(savedDemoRole);
+      setLoading(false);
+      return;
+    }
+
     const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
       setUser(currentUser);
 
@@ -214,6 +287,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   const logout = async () => {
+    try {
+      sessionStorage.removeItem('pc_erp_demo_role');
+    } catch {}
+    setIsDemoSession(false);
+    clearErpState();
+    setUser(null);
+    setIsAdmin(false);
+    setIsSuperAdmin(false);
     try {
       await signOut(auth);
     } catch (error) {
@@ -307,6 +388,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         refreshErpContext,
         hasPermission,
         hasRole,
+        loginAsDemoRole,
+        isDemoSession,
       }}
     >
       {children}

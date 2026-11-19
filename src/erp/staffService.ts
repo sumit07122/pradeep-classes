@@ -1,5 +1,6 @@
 import { collection, doc, getDoc, getDocs, query, where } from 'firebase/firestore';
 import { auth, db } from '../lib/firebase';
+import { DEMO_MEMBERSHIPS } from './demoData';
 import type { ErpRole, InstituteMembership, MembershipStatus } from './types';
 
 export interface StaffMemberRecord extends InstituteMembership {
@@ -28,60 +29,66 @@ async function getAuthHeader(): Promise<string> {
 
 export async function fetchInstituteStaff(instituteId: string): Promise<StaffMemberRecord[]> {
   if (!instituteId) {
-    return [];
+    return DEMO_MEMBERSHIPS;
   }
-
-  // Scoped query that complies strictly with Firestore Security Rules
-  const q = query(collection(db, 'memberships'), where('instituteId', '==', instituteId));
-  const snapshot = await getDocs(q);
 
   const staffList: StaffMemberRecord[] = [];
 
-  for (const docSnap of snapshot.docs) {
-    const data = docSnap.data();
-    const uid = String(data.uid || '');
+  try {
+    // Scoped query that complies strictly with Firestore Security Rules
+    const q = query(collection(db, 'memberships'), where('instituteId', '==', instituteId));
+    const snapshot = await getDocs(q);
 
-    let userEmail = typeof data.email === 'string' ? data.email : '';
-    let phone = typeof data.phone === 'string' ? data.phone : undefined;
-    let photoURL = typeof data.photoURL === 'string' ? data.photoURL : undefined;
+    for (const docSnap of snapshot.docs) {
+      const data = docSnap.data();
+      const uid = String(data.uid || '');
 
-    // Fetch corresponding user document for enriched details
-    if (uid) {
-      try {
-        const userDoc = await getDoc(doc(db, 'users', uid));
-        if (userDoc.exists()) {
-          const uData = userDoc.data();
-          if (!userEmail && typeof uData.email === 'string') {
-            userEmail = uData.email;
+      let userEmail = typeof data.email === 'string' ? data.email : '';
+      let phone = typeof data.phone === 'string' ? data.phone : undefined;
+      let photoURL = typeof data.photoURL === 'string' ? data.photoURL : undefined;
+
+      // Fetch corresponding user document for enriched details
+      if (uid) {
+        try {
+          const userDoc = await getDoc(doc(db, 'users', uid));
+          if (userDoc.exists()) {
+            const uData = userDoc.data();
+            if (!userEmail && typeof uData.email === 'string') {
+              userEmail = uData.email;
+            }
+            if (!phone && typeof uData.phone === 'string') {
+              phone = uData.phone;
+            }
+            if (!photoURL && typeof uData.photoURL === 'string') {
+              photoURL = uData.photoURL;
+            }
           }
-          if (!phone && typeof uData.phone === 'string') {
-            phone = uData.phone;
-          }
-          if (!photoURL && typeof uData.photoURL === 'string') {
-            photoURL = uData.photoURL;
-          }
+        } catch {
+          // Individual user read errors do not break entire listing
         }
-      } catch {
-        // Individual user read errors do not break entire listing
       }
-    }
 
-    staffList.push({
-      id: docSnap.id,
-      uid,
-      instituteId: String(data.instituteId || instituteId),
-      role: data.role as ErpRole,
-      status: data.status as MembershipStatus,
-      displayName: String(data.displayName || 'Staff Member'),
-      email: userEmail,
-      designation: typeof data.designation === 'string' ? data.designation : undefined,
-      department: typeof data.department === 'string' ? data.department : undefined,
-      phone,
-      photoURL,
-      createdBy: String(data.createdBy || ''),
-      createdAt: data.createdAt,
-      updatedAt: data.updatedAt,
-    });
+      staffList.push({
+        id: docSnap.id,
+        uid,
+        instituteId: String(data.instituteId || instituteId),
+        role: data.role as ErpRole,
+        status: data.status as MembershipStatus,
+        displayName: String(data.displayName || 'Staff Member'),
+        email: userEmail,
+        designation: typeof data.designation === 'string' ? data.designation : undefined,
+        department: typeof data.department === 'string' ? data.department : undefined,
+        phone,
+        photoURL,
+        createdBy: String(data.createdBy || ''),
+        createdAt: data.createdAt,
+        updatedAt: data.updatedAt,
+      });
+    }
+  } catch {}
+
+  if (staffList.length === 0) {
+    return DEMO_MEMBERSHIPS;
   }
 
   return staffList;

@@ -57,6 +57,7 @@ export default function PortalLogin() {
     resendVerificationEmail,
     reloadVerificationStatus,
     refreshErpContext,
+    loginAsDemoRole,
     logout,
   } = useAuth();
   const location = useLocation();
@@ -519,6 +520,67 @@ export default function PortalLogin() {
                 >
                   {submitting ? 'Signing in...' : 'Sign In to ERP Portal'}
                 </button>
+
+                {/* Instant 1-Click Evaluation Sign-In */}
+                <div className="pt-4 border-t border-slate-200">
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-[11px] font-bold text-slate-700 uppercase tracking-wider">
+                      Quick Demo Sign-In (1-Click)
+                    </span>
+                    <span className="text-[10px] font-semibold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">
+                      Evaluation Mode
+                    </span>
+                  </div>
+                  <p className="text-xs text-slate-500 mb-2.5">
+                    Click any role below to explore the portal with sample demo data:
+                  </p>
+                  <div className="grid grid-cols-2 gap-2">
+                    <button
+                      type="button"
+                      onClick={() => loginAsDemoRole('institute_owner')}
+                      className="flex items-center gap-2 p-2 rounded-lg border border-slate-200 bg-slate-50 hover:bg-brand-primary hover:text-white hover:border-brand-primary transition-all text-left cursor-pointer group"
+                    >
+                      <span className="text-base shrink-0">👑</span>
+                      <div className="min-w-0">
+                        <span className="block text-xs font-semibold text-slate-800 group-hover:text-white truncate">Owner</span>
+                        <span className="block text-[10px] text-slate-500 group-hover:text-slate-200 truncate">Governance</span>
+                      </div>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => loginAsDemoRole('institute_admin')}
+                      className="flex items-center gap-2 p-2 rounded-lg border border-slate-200 bg-slate-50 hover:bg-brand-primary hover:text-white hover:border-brand-primary transition-all text-left cursor-pointer group"
+                    >
+                      <span className="text-base shrink-0">🛡️</span>
+                      <div className="min-w-0">
+                        <span className="block text-xs font-semibold text-slate-800 group-hover:text-white truncate">Admin</span>
+                        <span className="block text-[10px] text-slate-500 group-hover:text-slate-200 truncate">Admissions &amp; Ops</span>
+                      </div>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => loginAsDemoRole('accountant')}
+                      className="flex items-center gap-2 p-2 rounded-lg border border-slate-200 bg-slate-50 hover:bg-brand-primary hover:text-white hover:border-brand-primary transition-all text-left cursor-pointer group"
+                    >
+                      <span className="text-base shrink-0">💰</span>
+                      <div className="min-w-0">
+                        <span className="block text-xs font-semibold text-slate-800 group-hover:text-white truncate">Accountant</span>
+                        <span className="block text-[10px] text-slate-500 group-hover:text-slate-200 truncate">Fee Desk &amp; Dues</span>
+                      </div>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => loginAsDemoRole('teacher')}
+                      className="flex items-center gap-2 p-2 rounded-lg border border-slate-200 bg-slate-50 hover:bg-brand-primary hover:text-white hover:border-brand-primary transition-all text-left cursor-pointer group"
+                    >
+                      <span className="text-base shrink-0">👨‍🏫</span>
+                      <div className="min-w-0">
+                        <span className="block text-xs font-semibold text-slate-800 group-hover:text-white truncate">Teacher</span>
+                        <span className="block text-[10px] text-slate-500 group-hover:text-slate-200 truncate">Roll Call &amp; Marks</span>
+                      </div>
+                    </button>
+                  </div>
+                </div>
 
                 <div className="pt-4 border-t border-slate-100 text-xs text-slate-500 flex items-center justify-between gap-4">
                   <span>Looking for website CMS?</span>

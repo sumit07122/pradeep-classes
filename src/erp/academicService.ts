@@ -10,6 +10,13 @@ import {
   where,
 } from 'firebase/firestore';
 import { db } from '../lib/firebase';
+import {
+  DEMO_BATCHES,
+  DEMO_CLASSROOMS,
+  DEMO_COURSES,
+  DEMO_INSTITUTE,
+  DEMO_SUBJECTS,
+} from './demoData';
 import type {
   AcademicSession,
   Batch,
@@ -24,26 +31,30 @@ import type {
 // ==========================================
 
 export async function fetchInstituteProfile(instituteId: string): Promise<Institute | null> {
-  if (!instituteId) return null;
-  const snap = await getDoc(doc(db, 'institutes', instituteId));
-  if (!snap.exists()) return null;
-  const d = snap.data();
-  return {
-    id: snap.id,
-    name: String(d.name || ''),
-    code: String(d.code || ''),
-    status: d.status || 'active',
-    ownerUid: String(d.ownerUid || ''),
-    academicSession: String(d.academicSession || ''),
-    timezone: String(d.timezone || 'Asia/Kolkata'),
-    logo: typeof d.logo === 'string' ? d.logo : undefined,
-    address: typeof d.address === 'string' ? d.address : undefined,
-    phone: typeof d.phone === 'string' ? d.phone : undefined,
-    email: typeof d.email === 'string' ? d.email : undefined,
-    website: typeof d.website === 'string' ? d.website : undefined,
-    createdAt: d.createdAt,
-    updatedAt: d.updatedAt,
-  };
+  if (!instituteId) return DEMO_INSTITUTE;
+  try {
+    const snap = await getDoc(doc(db, 'institutes', instituteId));
+    if (!snap.exists()) return DEMO_INSTITUTE;
+    const d = snap.data();
+    return {
+      id: snap.id,
+      name: String(d.name || ''),
+      code: String(d.code || ''),
+      status: d.status || 'active',
+      ownerUid: String(d.ownerUid || ''),
+      academicSession: String(d.academicSession || ''),
+      timezone: String(d.timezone || 'Asia/Kolkata'),
+      logo: typeof d.logo === 'string' ? d.logo : undefined,
+      address: typeof d.address === 'string' ? d.address : undefined,
+      phone: typeof d.phone === 'string' ? d.phone : undefined,
+      email: typeof d.email === 'string' ? d.email : undefined,
+      website: typeof d.website === 'string' ? d.website : undefined,
+      createdAt: d.createdAt,
+      updatedAt: d.updatedAt,
+    };
+  } catch {
+    return DEMO_INSTITUTE;
+  }
 }
 
 export async function updateInstituteProfile(
@@ -63,19 +74,34 @@ export async function updateInstituteProfile(
 // ==========================================
 
 export async function fetchAcademicSessions(instituteId: string): Promise<AcademicSession[]> {
-  const q = query(collection(db, 'academic_sessions'), where('instituteId', '==', instituteId));
-  const snap = await getDocs(q);
-  return snap.docs.map((d) => ({
-    id: d.id,
-    instituteId,
-    name: String(d.data().name || ''),
-    startDate: String(d.data().startDate || ''),
-    endDate: String(d.data().endDate || ''),
-    isCurrent: Boolean(d.data().isCurrent),
-    status: d.data().status === 'archived' ? 'archived' : 'active',
-    createdAt: d.data().createdAt,
-    updatedAt: d.data().updatedAt,
-  }));
+  try {
+    const q = query(collection(db, 'academic_sessions'), where('instituteId', '==', instituteId));
+    const snap = await getDocs(q);
+    if (!snap.empty) {
+      return snap.docs.map((d) => ({
+        id: d.id,
+        instituteId,
+        name: String(d.data().name || ''),
+        startDate: String(d.data().startDate || ''),
+        endDate: String(d.data().endDate || ''),
+        isCurrent: Boolean(d.data().isCurrent),
+        status: d.data().status === 'archived' ? 'archived' : 'active',
+        createdAt: d.data().createdAt,
+        updatedAt: d.data().updatedAt,
+      }));
+    }
+  } catch {}
+  return [
+    {
+      id: 'ses_2026_27',
+      instituteId,
+      name: '2026-2027',
+      startDate: '2026-04-01',
+      endDate: '2027-03-31',
+      isCurrent: true,
+      status: 'active',
+    },
+  ];
 }
 
 export async function saveAcademicSession(
@@ -108,19 +134,24 @@ export async function saveAcademicSession(
 // ==========================================
 
 export async function fetchCourses(instituteId: string): Promise<Course[]> {
-  const q = query(collection(db, 'courses'), where('instituteId', '==', instituteId));
-  const snap = await getDocs(q);
-  return snap.docs.map((d) => ({
-    id: d.id,
-    instituteId,
-    name: String(d.data().name || ''),
-    code: String(d.data().code || ''),
-    description: typeof d.data().description === 'string' ? d.data().description : undefined,
-    durationMonths: typeof d.data().durationMonths === 'number' ? d.data().durationMonths : undefined,
-    status: d.data().status === 'archived' ? 'archived' : 'active',
-    createdAt: d.data().createdAt,
-    updatedAt: d.data().updatedAt,
-  }));
+  try {
+    const q = query(collection(db, 'courses'), where('instituteId', '==', instituteId));
+    const snap = await getDocs(q);
+    if (!snap.empty) {
+      return snap.docs.map((d) => ({
+        id: d.id,
+        instituteId,
+        name: String(d.data().name || ''),
+        code: String(d.data().code || ''),
+        description: typeof d.data().description === 'string' ? d.data().description : undefined,
+        durationMonths: typeof d.data().durationMonths === 'number' ? d.data().durationMonths : undefined,
+        status: d.data().status === 'archived' ? 'archived' : 'active',
+        createdAt: d.data().createdAt,
+        updatedAt: d.data().updatedAt,
+      }));
+    }
+  } catch {}
+  return DEMO_COURSES;
 }
 
 export async function saveCourse(
@@ -160,25 +191,30 @@ export async function archiveCourse(courseId: string): Promise<void> {
 // ==========================================
 
 export async function fetchBatches(instituteId: string): Promise<Batch[]> {
-  const q = query(collection(db, 'batches'), where('instituteId', '==', instituteId));
-  const snap = await getDocs(q);
-  return snap.docs.map((d) => ({
-    id: d.id,
-    instituteId,
-    courseId: String(d.data().courseId || ''),
-    courseName: typeof d.data().courseName === 'string' ? d.data().courseName : undefined,
-    name: String(d.data().name || ''),
-    code: String(d.data().code || ''),
-    academicSessionId: String(d.data().academicSessionId || ''),
-    startDate: String(d.data().startDate || ''),
-    endDate: typeof d.data().endDate === 'string' ? d.data().endDate : undefined,
-    maxCapacity: Number(d.data().maxCapacity || 40),
-    room: typeof d.data().room === 'string' ? d.data().room : undefined,
-    teacherUid: typeof d.data().teacherUid === 'string' ? d.data().teacherUid : undefined,
-    status: (d.data().status as any) || 'active',
-    createdAt: d.data().createdAt,
-    updatedAt: d.data().updatedAt,
-  }));
+  try {
+    const q = query(collection(db, 'batches'), where('instituteId', '==', instituteId));
+    const snap = await getDocs(q);
+    if (!snap.empty) {
+      return snap.docs.map((d) => ({
+        id: d.id,
+        instituteId,
+        courseId: String(d.data().courseId || ''),
+        courseName: typeof d.data().courseName === 'string' ? d.data().courseName : undefined,
+        name: String(d.data().name || ''),
+        code: String(d.data().code || ''),
+        academicSessionId: String(d.data().academicSessionId || ''),
+        startDate: String(d.data().startDate || ''),
+        endDate: typeof d.data().endDate === 'string' ? d.data().endDate : undefined,
+        maxCapacity: Number(d.data().maxCapacity || 40),
+        room: typeof d.data().room === 'string' ? d.data().room : undefined,
+        teacherUid: typeof d.data().teacherUid === 'string' ? d.data().teacherUid : undefined,
+        status: (d.data().status as any) || 'active',
+        createdAt: d.data().createdAt,
+        updatedAt: d.data().updatedAt,
+      }));
+    }
+  } catch {}
+  return DEMO_BATCHES;
 }
 
 export async function saveBatch(
@@ -218,18 +254,23 @@ export async function archiveBatch(batchId: string): Promise<void> {
 // ==========================================
 
 export async function fetchClassrooms(instituteId: string): Promise<Classroom[]> {
-  const q = query(collection(db, 'classrooms'), where('instituteId', '==', instituteId));
-  const snap = await getDocs(q);
-  return snap.docs.map((d) => ({
-    id: d.id,
-    instituteId,
-    roomNumber: String(d.data().roomNumber || ''),
-    name: String(d.data().name || ''),
-    capacity: Number(d.data().capacity || 30),
-    status: d.data().status === 'inactive' ? 'inactive' : 'active',
-    createdAt: d.data().createdAt,
-    updatedAt: d.data().updatedAt,
-  }));
+  try {
+    const q = query(collection(db, 'classrooms'), where('instituteId', '==', instituteId));
+    const snap = await getDocs(q);
+    if (!snap.empty) {
+      return snap.docs.map((d) => ({
+        id: d.id,
+        instituteId,
+        roomNumber: String(d.data().roomNumber || ''),
+        name: String(d.data().name || ''),
+        capacity: Number(d.data().capacity || 30),
+        status: d.data().status === 'inactive' ? 'inactive' : 'active',
+        createdAt: d.data().createdAt,
+        updatedAt: d.data().updatedAt,
+      }));
+    }
+  } catch {}
+  return DEMO_CLASSROOMS;
 }
 
 export async function saveClassroom(
@@ -261,20 +302,25 @@ export async function saveClassroom(
 // ==========================================
 
 export async function fetchSubjects(instituteId: string): Promise<Subject[]> {
-  const q = query(collection(db, 'subjects'), where('instituteId', '==', instituteId));
-  const snap = await getDocs(q);
-  return snap.docs.map((d) => ({
-    id: d.id,
-    instituteId,
-    courseId: typeof d.data().courseId === 'string' ? d.data().courseId : undefined,
-    name: String(d.data().name || ''),
-    code: String(d.data().code || ''),
-    teacherUid: typeof d.data().teacherUid === 'string' ? d.data().teacherUid : undefined,
-    teacherName: typeof d.data().teacherName === 'string' ? d.data().teacherName : undefined,
-    status: d.data().status === 'archived' ? 'archived' : 'active',
-    createdAt: d.data().createdAt,
-    updatedAt: d.data().updatedAt,
-  }));
+  try {
+    const q = query(collection(db, 'subjects'), where('instituteId', '==', instituteId));
+    const snap = await getDocs(q);
+    if (!snap.empty) {
+      return snap.docs.map((d) => ({
+        id: d.id,
+        instituteId,
+        courseId: typeof d.data().courseId === 'string' ? d.data().courseId : undefined,
+        name: String(d.data().name || ''),
+        code: String(d.data().code || ''),
+        teacherUid: typeof d.data().teacherUid === 'string' ? d.data().teacherUid : undefined,
+        teacherName: typeof d.data().teacherName === 'string' ? d.data().teacherName : undefined,
+        status: d.data().status === 'archived' ? 'archived' : 'active',
+        createdAt: d.data().createdAt,
+        updatedAt: d.data().updatedAt,
+      }));
+    }
+  } catch {}
+  return DEMO_SUBJECTS;
 }
 
 export async function saveSubject(

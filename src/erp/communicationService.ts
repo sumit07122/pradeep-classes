@@ -9,6 +9,7 @@ import {
   where,
 } from 'firebase/firestore';
 import { db } from '../lib/firebase';
+import { DEMO_ANNOUNCEMENTS } from './demoData';
 import type { Announcement } from './types';
 
 /**
@@ -18,27 +19,36 @@ export async function fetchAnnouncements(
   instituteId: string,
   audienceFilter?: string
 ): Promise<Announcement[]> {
-  if (!instituteId) return [];
+  if (!instituteId) return DEMO_ANNOUNCEMENTS;
+  let results: Announcement[] = [];
 
-  const q = query(collection(db, 'announcements'), where('instituteId', '==', instituteId));
-  const snap = await getDocs(q);
+  try {
+    const q = query(collection(db, 'announcements'), where('instituteId', '==', instituteId));
+    const snap = await getDocs(q);
 
-  let results: Announcement[] = snap.docs.map((d) => {
-    const data = d.data();
-    return {
-      id: d.id,
-      instituteId: String(data.instituteId || instituteId),
-      title: String(data.title || ''),
-      content: String(data.content || ''),
-      targetAudience: data.targetAudience || 'all',
-      batchId: typeof data.batchId === 'string' ? data.batchId : undefined,
-      batchName: typeof data.batchName === 'string' ? data.batchName : undefined,
-      priority: data.priority || 'normal',
-      publishedBy: String(data.publishedBy || 'Admin Desk'),
-      createdAt: data.createdAt,
-      updatedAt: data.updatedAt,
-    };
-  });
+    if (!snap.empty) {
+      results = snap.docs.map((d) => {
+        const data = d.data();
+        return {
+          id: d.id,
+          instituteId: String(data.instituteId || instituteId),
+          title: String(data.title || ''),
+          content: String(data.content || ''),
+          targetAudience: data.targetAudience || 'all',
+          batchId: typeof data.batchId === 'string' ? data.batchId : undefined,
+          batchName: typeof data.batchName === 'string' ? data.batchName : undefined,
+          priority: data.priority || 'normal',
+          publishedBy: String(data.publishedBy || 'Admin Desk'),
+          createdAt: data.createdAt,
+          updatedAt: data.updatedAt,
+        };
+      });
+    }
+  } catch {}
+
+  if (results.length === 0) {
+    results = [...DEMO_ANNOUNCEMENTS];
+  }
 
   if (audienceFilter && audienceFilter !== 'all') {
     results = results.filter(

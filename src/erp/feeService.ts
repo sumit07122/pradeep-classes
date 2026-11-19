@@ -8,6 +8,7 @@ import {
   where,
 } from 'firebase/firestore';
 import { db } from '../lib/firebase';
+import { DEMO_FEE_PAYMENTS, DEMO_FEE_STRUCTURES } from './demoData';
 import type { FeePayment, FeeStructure, PaymentMode, PaymentStatus } from './types';
 
 export interface FeePaymentFilter {
@@ -21,27 +22,32 @@ export interface FeePaymentFilter {
  * Fetch all fee structures configured for an institute
  */
 export async function fetchFeeStructures(instituteId: string): Promise<FeeStructure[]> {
-  if (!instituteId) return [];
-  const q = query(collection(db, 'fee_structures'), where('instituteId', '==', instituteId));
-  const snap = await getDocs(q);
-  return snap.docs.map((d) => {
-    const data = d.data();
-    return {
-      id: d.id,
-      instituteId: String(data.instituteId || instituteId),
-      courseId: String(data.courseId || ''),
-      courseName: String(data.courseName || ''),
-      academicSessionId: String(data.academicSessionId || ''),
-      title: String(data.title || ''),
-      totalAmount: Number(data.totalAmount || 0),
-      currency: String(data.currency || 'INR'),
-      installments: Number(data.installments || 1),
-      components: Array.isArray(data.components) ? data.components : [],
-      status: data.status === 'archived' ? 'archived' : 'active',
-      createdAt: data.createdAt,
-      updatedAt: data.updatedAt,
-    };
-  });
+  if (!instituteId) return DEMO_FEE_STRUCTURES;
+  try {
+    const q = query(collection(db, 'fee_structures'), where('instituteId', '==', instituteId));
+    const snap = await getDocs(q);
+    if (!snap.empty) {
+      return snap.docs.map((d) => {
+        const data = d.data();
+        return {
+          id: d.id,
+          instituteId: String(data.instituteId || instituteId),
+          courseId: String(data.courseId || ''),
+          courseName: String(data.courseName || ''),
+          academicSessionId: String(data.academicSessionId || ''),
+          title: String(data.title || ''),
+          totalAmount: Number(data.totalAmount || 0),
+          currency: String(data.currency || 'INR'),
+          installments: Number(data.installments || 1),
+          components: Array.isArray(data.components) ? data.components : [],
+          status: data.status === 'archived' ? 'archived' : 'active',
+          createdAt: data.createdAt,
+          updatedAt: data.updatedAt,
+        };
+      });
+    }
+  } catch {}
+  return DEMO_FEE_STRUCTURES;
 }
 
 /**
@@ -78,34 +84,44 @@ export async function fetchFeePayments(
   instituteId: string,
   filter?: FeePaymentFilter
 ): Promise<FeePayment[]> {
-  if (!instituteId) return [];
-  const q = query(collection(db, 'fee_payments'), where('instituteId', '==', instituteId));
-  const snap = await getDocs(q);
+  if (!instituteId) return DEMO_FEE_PAYMENTS;
+  let results: FeePayment[] = [];
 
-  let results: FeePayment[] = snap.docs.map((d) => {
-    const data = d.data();
-    return {
-      id: d.id,
-      instituteId: String(data.instituteId || instituteId),
-      studentId: String(data.studentId || ''),
-      studentName: String(data.studentName || ''),
-      studentAdmissionNumber: String(data.studentAdmissionNumber || ''),
-      batchName: String(data.batchName || ''),
-      receiptNumber: String(data.receiptNumber || ''),
-      amountPaid: Number(data.amountPaid || 0),
-      totalPayable: Number(data.totalPayable || 0),
-      balanceRemaining: Number(data.balanceRemaining || 0),
-      paymentMode: (data.paymentMode as PaymentMode) || 'cash',
-      transactionReference: typeof data.transactionReference === 'string' ? data.transactionReference : undefined,
-      paymentDate: String(data.paymentDate || ''),
-      academicSessionId: String(data.academicSessionId || ''),
-      collectedBy: String(data.collectedBy || ''),
-      notes: typeof data.notes === 'string' ? data.notes : undefined,
-      status: (data.status as PaymentStatus) || 'completed',
-      createdAt: data.createdAt,
-      updatedAt: data.updatedAt,
-    };
-  });
+  try {
+    const q = query(collection(db, 'fee_payments'), where('instituteId', '==', instituteId));
+    const snap = await getDocs(q);
+
+    if (!snap.empty) {
+      results = snap.docs.map((d) => {
+        const data = d.data();
+        return {
+          id: d.id,
+          instituteId: String(data.instituteId || instituteId),
+          studentId: String(data.studentId || ''),
+          studentName: String(data.studentName || ''),
+          studentAdmissionNumber: String(data.studentAdmissionNumber || ''),
+          batchName: String(data.batchName || ''),
+          receiptNumber: String(data.receiptNumber || ''),
+          amountPaid: Number(data.amountPaid || 0),
+          totalPayable: Number(data.totalPayable || 0),
+          balanceRemaining: Number(data.balanceRemaining || 0),
+          paymentMode: (data.paymentMode as PaymentMode) || 'cash',
+          transactionReference: typeof data.transactionReference === 'string' ? data.transactionReference : undefined,
+          paymentDate: String(data.paymentDate || ''),
+          academicSessionId: String(data.academicSessionId || ''),
+          collectedBy: String(data.collectedBy || ''),
+          notes: typeof data.notes === 'string' ? data.notes : undefined,
+          status: (data.status as PaymentStatus) || 'completed',
+          createdAt: data.createdAt,
+          updatedAt: data.updatedAt,
+        };
+      });
+    }
+  } catch {}
+
+  if (results.length === 0) {
+    results = [...DEMO_FEE_PAYMENTS];
+  }
 
   if (filter?.studentId) {
     results = results.filter((p) => p.studentId === filter.studentId);

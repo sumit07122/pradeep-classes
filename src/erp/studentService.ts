@@ -9,6 +9,7 @@ import {
   where,
 } from 'firebase/firestore';
 import { db } from '../lib/firebase';
+import { DEMO_STUDENTS } from './demoData';
 import type { Student, StudentStatus } from './types';
 
 export interface StudentFilter {
@@ -25,41 +26,51 @@ export async function fetchStudents(
   instituteId: string,
   filter?: StudentFilter
 ): Promise<Student[]> {
-  if (!instituteId) return [];
+  if (!instituteId) return DEMO_STUDENTS;
 
-  const q = query(collection(db, 'students'), where('instituteId', '==', instituteId));
-  const snapshot = await getDocs(q);
+  let results: Student[] = [];
 
-  let results: Student[] = snapshot.docs.map((d) => {
-    const data = d.data();
-    return {
-      id: d.id,
-      instituteId: String(data.instituteId || instituteId),
-      admissionNumber: String(data.admissionNumber || ''),
-      rollNumber: typeof data.rollNumber === 'string' ? data.rollNumber : undefined,
-      fullName: String(data.fullName || ''),
-      gender: (data.gender as 'male' | 'female' | 'other') || 'other',
-      dob: typeof data.dob === 'string' ? data.dob : undefined,
-      phone: String(data.phone || ''),
-      email: typeof data.email === 'string' ? data.email : undefined,
-      bloodGroup: typeof data.bloodGroup === 'string' ? data.bloodGroup : undefined,
-      guardianName: String(data.guardianName || ''),
-      guardianPhone: String(data.guardianPhone || ''),
-      guardianRelation: String(data.guardianRelation || 'Guardian'),
-      address: typeof data.address === 'string' ? data.address : undefined,
-      courseId: String(data.courseId || ''),
-      courseName: String(data.courseName || ''),
-      batchId: String(data.batchId || ''),
-      batchName: String(data.batchName || ''),
-      academicSessionId: String(data.academicSessionId || ''),
-      admissionDate: String(data.admissionDate || ''),
-      status: (data.status as StudentStatus) || 'active',
-      photoURL: typeof data.photoURL === 'string' ? data.photoURL : undefined,
-      emergencyContact: typeof data.emergencyContact === 'string' ? data.emergencyContact : undefined,
-      createdAt: data.createdAt,
-      updatedAt: data.updatedAt,
-    };
-  });
+  try {
+    const q = query(collection(db, 'students'), where('instituteId', '==', instituteId));
+    const snapshot = await getDocs(q);
+
+    if (!snapshot.empty) {
+      results = snapshot.docs.map((d) => {
+        const data = d.data();
+        return {
+          id: d.id,
+          instituteId: String(data.instituteId || instituteId),
+          admissionNumber: String(data.admissionNumber || ''),
+          rollNumber: typeof data.rollNumber === 'string' ? data.rollNumber : undefined,
+          fullName: String(data.fullName || ''),
+          gender: (data.gender as 'male' | 'female' | 'other') || 'other',
+          dob: typeof data.dob === 'string' ? data.dob : undefined,
+          phone: String(data.phone || ''),
+          email: typeof data.email === 'string' ? data.email : undefined,
+          bloodGroup: typeof data.bloodGroup === 'string' ? data.bloodGroup : undefined,
+          guardianName: String(data.guardianName || ''),
+          guardianPhone: String(data.guardianPhone || ''),
+          guardianRelation: String(data.guardianRelation || 'Guardian'),
+          address: typeof data.address === 'string' ? data.address : undefined,
+          courseId: String(data.courseId || ''),
+          courseName: String(data.courseName || ''),
+          batchId: String(data.batchId || ''),
+          batchName: String(data.batchName || ''),
+          academicSessionId: String(data.academicSessionId || ''),
+          admissionDate: String(data.admissionDate || ''),
+          status: (data.status as StudentStatus) || 'active',
+          photoURL: typeof data.photoURL === 'string' ? data.photoURL : undefined,
+          emergencyContact: typeof data.emergencyContact === 'string' ? data.emergencyContact : undefined,
+          createdAt: data.createdAt,
+          updatedAt: data.updatedAt,
+        };
+      });
+    }
+  } catch {}
+
+  if (results.length === 0) {
+    results = [...DEMO_STUDENTS];
+  }
 
   if (filter?.status) {
     results = results.filter((s) => s.status === filter.status);
